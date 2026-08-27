@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}Topics · WeGoTrip Content Engine{% endblock %}
+{% block content %}
+<h1>Topics</h1>
+<p class="subtitle">Entity × search intent × market. Score drives the generation queue.</p>
+
+<form class="filters" method="get">
+  <select name="market">
+    <option value="">All markets</option>
+    {% for code in ['en', 'ru'] %}
+    <option value="{{ code }}" {{ 'selected' if filters.market == code }}>{{ code|upper }}</option>
+    {% endfor %}
+  </select>
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for code in statuses %}
+    <option value="{{ code }}" {{ 'selected' if filters.status == code }}>{{ code }}</option>
+    {% endfor %}
+  </select>
+  <select name="entity_type">
+    <option value="">All entity types</option>
+    {% for code in entity_types %}
+    <option value="{{ code }}" {{ 'selected' if filters.entity_type == code }}>{{ code }}</option>
+    {% endfor %}
+  </select>
+  <input type="text" name="q" placeholder="Search query or entity" value="{{ filters.q or '' }}">
+  <button class="btn" type="submit">Filter</button>
+</form>
+
+<table>
+  <thead>
+    <tr>
+      <th>Market</th><th>Entity</th><th>Intent</th><th>Primary query</th>
+      <th class="num">Confidence</th><th class="num">Depth</th><th class="num">Score</th>
+      <th>Status</th><th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for topic in topics %}
+    <tr>
+      <td><span class="badge {{ topic.market }}">{{ topic.market|upper }}</span></td>
+      <td>{{ topic.entity_name }}<div class="muted small">{{ topic.entity_type }}</div></td>
+      <td class="muted small">{{ topic.intent }}</td>
+      <td>
+        {{ topic.primary_query }}
+        {% if topic.secondary_queries %}
+        <div class="muted small">+ {{ topic.secondary_queries|join(' · ') }}</div>
+        {% endif %}
+      </td>
+      <td class="num">
+        {{ '%.2f'|format(topic.demand_confidence) }}
+        <div class="muted small">{{ topic.demand_source }}</div>
+      </td>
+      <td class="num">{{ topic.inventory_depth }}</td>
+      <td class="num">{{ '%.3f'|format(topic.topic_score + topic.boost) }}</td>
+      <td>
+        <span class="badge {{ status_class(topic.status) }}">{{ topic.status }}</span>
+        {% if topic.status_reason %}<div class="muted small">{{ topic.status_reason }}</div>{% endif %}
+      </td>
+      <td class="nowrap">
+        <form method="post" action="/admin/topics/{{ topic.id }}/action">
+          <button class="btn ok" name="action" value="generate">Generate</button>
+          <button class="btn" name="action" value="boost">Boost</button>
+          <button class="btn" name="action" value="ignore">Ignore</button>
+          <button class="btn danger" name="action" value="exclude">Exclude</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="9" class="empty">No topics match the filter.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if total > topics|length %}
+<p class="muted small">Showing {{ topics|length }} of {{ total }}.
+  <a href="?{{ next_query }}">Next page →</a></p>
+{% endif %}
+{% endblock %}

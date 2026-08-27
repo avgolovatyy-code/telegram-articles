@@ -1,0 +1,312 @@
+"""Command line interface: ``wgt <command>``."""
+
+from __future__ import annotations
+
+import csv
+import datetime as dt
+import json
+import pathlib
+from typing import Annotated
+
+import typer
+
+from app.config import MARKETS, Market, get_settings
+from app.db.base import session_scope
+from app.logging_setup import configure_logging, get_logger
+from app.scheduler import jobs
+from app.scheduler.runner import SchedulerRunner
+
+app = typer.Typer(help="WeGoTrip Telegram Content Engine", no_args_is_help=True)
+log = get_logger("cli")
+
+
+def _bootstrap() -> None:
+    settings = get_settings()
+    configure_logging(settings.log_level, settings.log_format)
+
+
+def _markets(market: str | None) -> tuple[Market, ...]:
+    if not market:
+        return MARKETS
+    if market not in MARKETS:
+        raise typer.BadParameter(f"unknown market {market}; expected one of {MARKETS}")
+    return (market,)  # type: ignore[return-value]
+
+
+def _print(report: jobs.JobReport) -> None:
+    typer.echo(
+        json.dumps({"job": report.name, "ok": report.ok, **report.details}, indent=2, default=str)
+    )
+    for error in report.errors:
+        typer.secho(f"  error: {error}", fg=typer.colors.RED)
+
+
+@app.command()
+def seed() -> None:
+    """Create market rows, keyword clusters and prompt versions."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.seed_reference_data(session))
+
+
+@app.command("sync-catalog")
+def sync_catalog(
+    market: Annotated[str | None, typer.Option(help="en or ru; default both")] = None,
+    max_products: Annotated[int, typer.Option(help="upper bound on products per market")] = 400,
+    detail_products: Annotated[int, typer.Option(help="how many products to fetch in detail")] = 60,
+    cities_for_attractions: Annotated[int, typer.Option()] = 25,
+) -> None:
+    """Synchronise the WeGoTrip catalogue for one or both markets."""
+    _bootstrap()
+    from app.catalog.sync import SyncOptions
+
+    options = SyncOptions(
+        cities_for_attractions=cities_for_attractions,
+        max_products=max_products,
+        detail_products=detail_products,
+    )
+    with session_scope() as session:
+        _print(jobs.sync_catalog(session, markets=_markets(market), options=options))
+
+
+@app.command("discover-topics")
+def discover_topics(
+    market: Annotated[str | None, typer.Option()] = None,
+    limit: Annotated[int | None, typer.Option()] = None,
+) -> None:
+    """Build topic candidates from the catalogue and the intent clusters."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.discover_topics(session, markets=_markets(market), limit=limit))
+
+
+@app.command()
+def generate(
+    market: Annotated[str | None, typer.Option()] = None,
+    max_articles: Annotated[int | None, typer.Option(help="cap for this run")] = None,
+) -> None:
+    """Generate articles within the daily AI budget."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(
+            jobs.generate_daily_articles(
+                session, markets=_markets(market), max_per_run=max_articles
+            )
+        )
+
+
+@app.command()
+def schedule(market: Annotated[str | None, typer.Option()] = None) -> None:
+    """Spread approved articles over the publishing window."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.schedule_publications(session, markets=_markets(market)))
+
+
+@app.command("publish-queue")
+def publish_queue(limit: Annotated[int, typer.Option()] = 5) -> None:
+    """Publish everything that is due."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.process_publication_queue(session, limit=limit))
+
+
+@app.command("publish-test")
+def publish_test(article_id: int) -> None:
+    """Publish one article to the test channel."""
+    _bootstrap()
+    from app.db.models import Article
+    from app.services.workflow import ArticleWorkflow
+
+    with session_scope() as session:
+        article = session.get(Article, article_id)
+        if article is None:
+            raise typer.BadParameter(f"article {article_id} not found")
+        result = ArticleWorkflow(session).publish_test(article)
+        typer.secho(result.message, fg=typer.colors.GREEN if result.ok else typer.colors.RED)
+
+
+@app.command()
+def cycle() -> None:
+    """Run sync → discover → generate → schedule."""
+    _bootstrap()
+    for report in jobs.run_daily_cycle():
+        _print(report)
+
+
+@app.command()
+def budget() -> None:
+    """Show today's AI budget."""
+    _bootstrap()
+    from app.ai.budget import BudgetManager
+
+    with session_scope() as session:
+        manager = BudgetManager(session)
+        snapshot = manager.snapshot()
+        typer.echo(
+            json.dumps(
+                {
+                    "date": snapshot.spend_date.isoformat(),
+                    "budget_usd": snapshot.budget_usd,
+                    "spent_usd": snapshot.spent_usd,
+                    "reserved_usd": snapshot.reserved_usd,
+                    "remaining_usd": snapshot.remaining_usd,
+                    "generated": snapshot.generated,
+                    "average_article_cost_usd": snapshot.average_article_cost_usd,
+                    "plan": manager.plan_daily_generation(),
+                },
+                indent=2,
+            )
+        )
+
+
+@app.command("check-telegram")
+def check_telegram() -> None:
+    """Verify the bot token and that the bot can see its channels."""
+    _bootstrap()
+    from app.telegram.api import build_telegram_client
+
+    settings = get_settings()
+    client = build_telegram_client(settings)
+    try:
+        typer.echo(f"bot: {json.dumps(client.get_me())}")
+        for label, channel in (
+            ("EN", settings.telegram_en_channel),
+            ("RU", settings.telegram_ru_channel),
+            ("TEST", settings.telegram_test_channel),
+        ):
+            if not channel:
+                typer.secho(f"{label}: not configured", fg=typer.colors.YELLOW)
+                continue
+            try:
+                chat = client.get_chat(channel)
+                typer.secho(f"{label} {channel}: ok (id={chat.get('id')})", fg=typer.colors.GREEN)
+            except Exception as exc:
+                typer.secho(f"{label} {channel}: {exc}", fg=typer.colors.RED)
+    finally:
+        close = getattr(client, "close", None)
+        if callable(close):
+            close()
+
+
+@app.command("import-conversions")
+def import_conversions(path: Annotated[pathlib.Path, typer.Argument()]) -> None:
+    """Import orders from the affiliate back office.
+
+    CSV columns: order_id, article_public_id, market, product_id, gmv, revenue,
+    currency, occurred_at (ISO 8601).
+    """
+    _bootstrap()
+    from sqlalchemy import select
+
+    from app.db.models import Article, ConversionEvent
+
+    imported = 0
+    with session_scope() as session, path.open(encoding="utf-8") as handle:
+        for row in csv.DictReader(handle):
+            order_id = (row.get("order_id") or "").strip()
+            if not order_id:
+                continue
+            existing = session.scalar(
+                select(ConversionEvent).where(ConversionEvent.external_order_id == order_id)
+            )
+            if existing is not None:
+                continue
+            article = None
+            public_id = (row.get("article_public_id") or "").strip()
+            if public_id:
+                article = session.scalar(select(Article).where(Article.public_id == public_id))
+            occurred = row.get("occurred_at")
+            session.add(
+                ConversionEvent(
+                    external_order_id=order_id,
+                    article_id=article.id if article else None,
+                    market=(row.get("market") or (article.market if article else "en")),
+                    product_external_id=(row.get("product_id") or None),
+                    gmv=float(row.get("gmv") or 0),
+                    revenue=float(row.get("revenue") or 0),
+                    currency_code=(row.get("currency") or "EUR"),
+                    source="csv",
+                    occurred_at=dt.datetime.fromisoformat(occurred)
+                    if occurred
+                    else dt.datetime.now(dt.UTC),
+                    payload=dict(row),
+                )
+            )
+            imported += 1
+    typer.secho(f"imported {imported} conversions", fg=typer.colors.GREEN)
+
+
+@app.command()
+def worker() -> None:
+    """Run the scheduler in the foreground."""
+    _bootstrap()
+    runner = SchedulerRunner(blocking=True)
+    typer.echo("scheduler started; jobs:")
+    for job in runner.scheduler.get_jobs():
+        typer.echo(f"  {job.id}: {job.trigger}")
+    try:
+        runner.start()
+    except (KeyboardInterrupt, SystemExit):
+        runner.shutdown()
+
+
+@app.command()
+def doctor() -> None:
+    """Check configuration and connectivity without spending anything."""
+    _bootstrap()
+    settings = get_settings()
+    checks: list[tuple[str, bool, str]] = []
+
+    checks.append(
+        ("database_url", bool(settings.database_url), settings.database_url.split("@")[-1])
+    )
+    checks.append(("openai_api_key", bool(settings.openai_api_key), settings.llm_provider))
+    checks.append(
+        (
+            "telegram_bot_token",
+            bool(settings.telegram_bot_token),
+            "dry run" if settings.telegram_dry_run else "live",
+        )
+    )
+    checks.append(
+        (
+            "telegram_test_channel",
+            bool(settings.telegram_test_channel),
+            settings.telegram_test_channel or "MISSING",
+        )
+    )
+    checks.append(
+        ("referer_id", settings.wegotrip_referer_id == "435", settings.wegotrip_referer_id)
+    )
+    checks.append(
+        (
+            "auto_publish_off",
+            not (settings.auto_publish_en or settings.auto_publish_ru),
+            "review mode",
+        )
+    )
+    checks.append(
+        (
+            "generated_covers_off",
+            not settings.allow_generated_covers,
+            str(settings.allow_generated_covers),
+        )
+    )
+
+    try:
+        with session_scope() as session:
+            from sqlalchemy import text
+
+            session.execute(text("SELECT 1"))
+        checks.append(("database_connection", True, "ok"))
+    except Exception as exc:
+        checks.append(("database_connection", False, str(exc)[:80]))
+
+    for name, ok, detail in checks:
+        colour = typer.colors.GREEN if ok else typer.colors.YELLOW
+        typer.secho(f"{'✓' if ok else '!'} {name}: {detail}", fg=colour)
+
+
+if __name__ == "__main__":
+    app()

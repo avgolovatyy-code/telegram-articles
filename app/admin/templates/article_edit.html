@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Edit · {{ article.title or article.primary_query }}{% endblock %}
+{% block content %}
+<h1>Edit article JSON</h1>
+<p class="subtitle">
+  Article JSON is the source of truth. Saving re-renders the Telegram payload and
+  bumps the version, which also resets the publication idempotency key.
+</p>
+
+<form method="post" action="/admin/articles/{{ article.id }}/edit">
+  <textarea name="body" spellcheck="false">{{ body_json }}</textarea>
+  <div class="actions">
+    <button class="btn primary" type="submit">Save &amp; re-render</button>
+    <a class="btn" href="/admin/articles/{{ article.id }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

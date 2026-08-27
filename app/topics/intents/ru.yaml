@@ -1,0 +1,301 @@
+# Seed-кластеры поисковых интентов для рынка RU (спецификация §8).
+# Это независимый рынок: формулировки не переводятся с EN, а задаются отдельно.
+# Плейсхолдеры поддерживают падеж: {entity:loct} → «в Париже», {city:loct}, {city:gent}.
+# Падежи: nomn, gent, datv, accs, ablt, loct.
+market: ru
+clusters:
+  # ------------------------------------------------------------------ страна
+  - entity_type: country
+    intent: things_to_do
+    label: Что посмотреть в стране
+    primary: "что посмотреть в {entity:loct}"
+    secondary:
+      - "куда поехать в {entity:loct}"
+      - "достопримечательности {entity:gent}"
+    min_inventory: 12
+    weight: 1.0
+  - entity_type: country
+    intent: travel_guide
+    label: Путеводитель по стране
+    primary: "путеводитель по {entity:datv}"
+    secondary:
+      - "что нужно знать перед поездкой в {entity:accs}"
+    min_inventory: 12
+    weight: 0.85
+  - entity_type: country
+    intent: itinerary
+    label: Маршрут по стране
+    primary: "маршрут по {entity:datv}"
+    secondary:
+      - "сколько дней нужно на {entity:accs}"
+    min_inventory: 15
+    weight: 0.8
+  - entity_type: country
+    intent: best_cities
+    label: Лучшие города страны
+    primary: "лучшие города {entity:gent}"
+    secondary:
+      - "самые красивые города {entity:gent}"
+    min_inventory: 15
+    weight: 0.9
+  - entity_type: country
+    intent: museums
+    label: Музеи страны
+    primary: "лучшие музеи {entity:gent}"
+    secondary:
+      - "какие музеи посетить в {entity:loct}"
+    min_inventory: 10
+    weight: 0.7
+  - entity_type: country
+    intent: with_kids
+    label: Страна с детьми
+    primary: "{entity:nomn} с детьми"
+    secondary:
+      - "куда поехать с детьми в {entity:loct}"
+    min_inventory: 10
+    weight: 0.65
+
+  # ------------------------------------------------------------------- город
+  - entity_type: city
+    intent: things_to_do
+    label: Что посмотреть в городе
+    primary: "что посмотреть в {entity:loct}"
+    secondary:
+      - "куда сходить в {entity:loct}"
+      - "достопримечательности {entity:gent}"
+    min_inventory: 5
+    weight: 1.0
+  - entity_type: city
+    intent: attractions
+    label: Достопримечательности города
+    primary: "главные достопримечательности {entity:gent}"
+    secondary:
+      - "что обязательно посмотреть в {entity:loct}"
+    min_inventory: 5
+    weight: 0.9
+  - entity_type: city
+    intent: one_day
+    label: Город за один день
+    primary: "{entity:nomn} за 1 день"
+    secondary:
+      - "что успеть посмотреть в {entity:loct} за день"
+    min_inventory: 4
+    weight: 0.85
+  - entity_type: city
+    intent: two_days
+    label: Город за два дня
+    primary: "{entity:nomn} за 2 дня"
+    secondary:
+      - "маршрут по {entity:datv} на 2 дня"
+    min_inventory: 6
+    weight: 0.8
+  - entity_type: city
+    intent: three_days
+    label: Город за три дня
+    primary: "{entity:nomn} за 3 дня"
+    secondary:
+      - "маршрут по {entity:datv} на 3 дня"
+    min_inventory: 8
+    weight: 0.8
+  - entity_type: city
+    intent: museums
+    label: Музеи города
+    primary: "лучшие музеи {entity:gent}"
+    secondary:
+      - "какие музеи посетить в {entity:loct}"
+    min_inventory: 4
+    weight: 0.8
+  - entity_type: city
+    intent: with_kids
+    label: Город с детьми
+    primary: "{entity:nomn} с детьми"
+    secondary:
+      - "куда сходить с ребёнком в {entity:loct}"
+    min_inventory: 4
+    weight: 0.7
+  - entity_type: city
+    intent: rainy_day
+    label: Город в дождь
+    primary: "куда сходить в {entity:loct} в дождь"
+    secondary:
+      - "что делать в {entity:loct} в плохую погоду"
+    min_inventory: 4
+    weight: 0.6
+  - entity_type: city
+    intent: at_night
+    label: Город вечером
+    primary: "куда сходить вечером в {entity:loct}"
+    secondary:
+      - "{entity:nomn} ночью: что посмотреть"
+    min_inventory: 4
+    weight: 0.6
+  - entity_type: city
+    intent: independent_trip
+    label: Самостоятельная поездка
+    primary: "что посмотреть в {entity:loct} самостоятельно"
+    secondary:
+      - "экскурсии по {entity:datv} самостоятельно"
+    min_inventory: 4
+    weight: 0.85
+  - entity_type: city
+    intent: walking_route
+    label: Пешеходный маршрут
+    primary: "пешеходный маршрут по {entity:datv}"
+    secondary:
+      - "прогулка по {entity:datv}: маршрут"
+    min_inventory: 3
+    weight: 0.85
+  - entity_type: city
+    intent: audio_guide
+    label: Аудиогид по городу
+    primary: "аудиогид по {entity:datv}"
+    secondary:
+      - "аудиоэкскурсии по {entity:datv}"
+    min_inventory: 3
+    weight: 0.9
+
+  # ------------------------------------------------------- достопримечательность
+  - entity_type: attraction
+    intent: what_to_see
+    label: Что посмотреть в достопримечательности
+    primary: "что посмотреть в {entity:loct}"
+    secondary:
+      - "главные экспонаты {entity:gent}"
+    min_inventory: 1
+    weight: 1.0
+  - entity_type: attraction
+    intent: guide
+    label: Путеводитель по достопримечательности
+    primary: "путеводитель по {entity:datv}"
+    secondary:
+      - "как посетить {entity:accs}"
+    min_inventory: 1
+    weight: 1.0
+  - entity_type: attraction
+    intent: audio_guide
+    label: Аудиогид по достопримечательности
+    primary: "аудиогид по {entity:datv}"
+    secondary:
+      - "самостоятельная экскурсия по {entity:datv}"
+      - "билет и аудиогид {entity:nomn}"
+    min_inventory: 1
+    weight: 0.95
+  - entity_type: attraction
+    intent: tickets
+    label: Билеты
+    primary: "билеты в {entity:accs}"
+    secondary:
+      - "как купить билет в {entity:accs}"
+    min_inventory: 1
+    weight: 0.8
+    requires_volatile_facts: true
+  - entity_type: attraction
+    intent: how_long
+    label: Сколько времени нужно
+    primary: "сколько времени нужно на {entity:accs}"
+    secondary:
+      - "на сколько идти в {entity:accs}"
+    min_inventory: 1
+    weight: 0.7
+  - entity_type: attraction
+    intent: nearby
+    label: Что рядом
+    primary: "что посмотреть рядом с {entity:ablt}"
+    secondary:
+      - "что находится рядом с {entity:ablt}"
+    min_inventory: 2
+    weight: 0.65
+  - entity_type: attraction
+    intent: with_kids
+    label: С детьми
+    primary: "{entity:nomn} с детьми"
+    secondary:
+      - "стоит ли идти в {entity:accs} с ребёнком"
+    min_inventory: 1
+    weight: 0.6
+
+  # ---------------------------------------------------------------- категория
+  - entity_type: category
+    intent: best_in_city
+    label: Лучшие в городе
+    primary: "лучшие {category} в {city:loct}"
+    secondary:
+      - "{category} в {city:loct}"
+    min_inventory: 3
+    weight: 0.95
+  - entity_type: category
+    intent: self_guided_in_city
+    label: Самостоятельные
+    primary: "самостоятельные {category} в {city:loct}"
+    secondary:
+      - "{category} в {city:loct} без гида"
+    min_inventory: 3
+    weight: 0.8
+  - entity_type: category
+    intent: first_time_in_city
+    label: Для первого визита
+    primary: "{category} для первого визита в {city:accs}"
+    secondary:
+      - "с чего начать знакомство с {city:ablt}"
+    min_inventory: 3
+    weight: 0.65
+  - entity_type: category
+    intent: with_kids_in_city
+    label: С детьми
+    primary: "{category} с детьми в {city:loct}"
+    secondary:
+      - "куда сходить с детьми в {city:loct}"
+    min_inventory: 3
+    weight: 0.6
+
+  # --------------------------------------------------------------- коллекция
+  - entity_type: collection
+    intent: best_in_city
+    label: Лучшие тематические маршруты
+    primary: "лучшие {theme} в {city:loct}"
+    secondary:
+      - "{theme} в {city:loct}"
+    min_inventory: 2
+    weight: 0.9
+  - entity_type: collection
+    intent: themed_experience
+    label: Тематическая экскурсия
+    primary: "{theme}: экскурсия по {city:datv}"
+    secondary:
+      - "тематические маршруты по {city:datv}"
+    min_inventory: 2
+    weight: 0.8
+  - entity_type: collection
+    intent: self_guided_routes
+    label: Самостоятельные маршруты
+    primary: "самостоятельные маршруты по {city:datv}: {theme}"
+    secondary:
+      - "пешеходные маршруты по {city:datv}"
+    min_inventory: 2
+    weight: 0.7
+
+  # ------------------------------------------------------------------- товар
+  - entity_type: product
+    intent: audio_guide
+    label: Аудиогид
+    primary: "аудиогид {entity:nomn}"
+    secondary:
+      - "самостоятельная экскурсия {entity:nomn}"
+    min_inventory: 1
+    weight: 0.85
+  - entity_type: product
+    intent: ticket_with_audio
+    label: Билет с аудиогидом
+    primary: "билет с аудиогидом {entity:nomn}"
+    secondary:
+      - "вход без очереди и аудиогид {entity:nomn}"
+    min_inventory: 1
+    weight: 0.8
+  - entity_type: product
+    intent: themed_walking_tour
+    label: Тематический маршрут
+    primary: "{theme}: маршрут по {city:datv}"
+    secondary:
+      - "самостоятельная экскурсия по {city:datv}"
+    min_inventory: 1
+    weight: 0.7

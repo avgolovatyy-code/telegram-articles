@@ -1,0 +1,318 @@
+# Seed search-intent clusters for the EN market (spec §8).
+# `primary` / `secondary` are patterns, not article titles.
+# Placeholders: {entity}, {city}, {country}, {category}, {theme}
+market: en
+clusters:
+  # ------------------------------------------------------------------ country
+  - entity_type: country
+    intent: things_to_do
+    label: Things to do in a country
+    primary: "things to do in {entity}"
+    secondary:
+      - "best places to visit in {entity}"
+      - "what to see in {entity}"
+      - "best attractions in {entity}"
+    min_inventory: 12
+    weight: 1.0
+  - entity_type: country
+    intent: travel_guide
+    label: Country travel guide
+    primary: "{entity} travel guide"
+    secondary:
+      - "{entity} first time guide"
+      - "what to know before visiting {entity}"
+    min_inventory: 12
+    weight: 0.85
+  - entity_type: country
+    intent: itinerary
+    label: Country itinerary
+    primary: "{entity} itinerary"
+    secondary:
+      - "how many days in {entity}"
+      - "{entity} road trip route"
+    min_inventory: 15
+    weight: 0.8
+  - entity_type: country
+    intent: best_cities
+    label: Best cities in a country
+    primary: "best cities to visit in {entity}"
+    secondary:
+      - "most beautiful cities in {entity}"
+    min_inventory: 15
+    weight: 0.9
+  - entity_type: country
+    intent: museums
+    label: Museums in a country
+    primary: "best museums in {entity}"
+    secondary:
+      - "must see museums in {entity}"
+    min_inventory: 10
+    weight: 0.7
+  - entity_type: country
+    intent: with_kids
+    label: Country with kids
+    primary: "{entity} with kids"
+    secondary:
+      - "family friendly things to do in {entity}"
+    min_inventory: 10
+    weight: 0.65
+
+  # --------------------------------------------------------------------- city
+  - entity_type: city
+    intent: things_to_do
+    label: Things to do in a city
+    primary: "things to do in {entity}"
+    secondary:
+      - "best things to do in {entity}"
+      - "what to see in {entity}"
+    min_inventory: 5
+    weight: 1.0
+  - entity_type: city
+    intent: attractions
+    label: City attractions
+    primary: "best attractions in {entity}"
+    secondary:
+      - "top sights in {entity}"
+      - "must see places in {entity}"
+    min_inventory: 5
+    weight: 0.9
+  - entity_type: city
+    intent: one_day
+    label: City in one day
+    primary: "{entity} in one day"
+    secondary:
+      - "one day in {entity} itinerary"
+      - "what to do in {entity} in a day"
+    min_inventory: 4
+    weight: 0.85
+  - entity_type: city
+    intent: two_days
+    label: City in two days
+    primary: "{entity} in 2 days"
+    secondary:
+      - "2 day {entity} itinerary"
+    min_inventory: 6
+    weight: 0.8
+  - entity_type: city
+    intent: three_days
+    label: City in three days
+    primary: "{entity} in 3 days"
+    secondary:
+      - "3 day {entity} itinerary"
+    min_inventory: 8
+    weight: 0.8
+  - entity_type: city
+    intent: museums
+    label: City museums
+    primary: "best museums in {entity}"
+    secondary:
+      - "must visit museums in {entity}"
+    min_inventory: 4
+    weight: 0.8
+  - entity_type: city
+    intent: with_kids
+    label: City with kids
+    primary: "{entity} with kids"
+    secondary:
+      - "family friendly things to do in {entity}"
+    min_inventory: 4
+    weight: 0.7
+  - entity_type: city
+    intent: rainy_day
+    label: City when it rains
+    primary: "things to do in {entity} when it rains"
+    secondary:
+      - "indoor things to do in {entity}"
+    min_inventory: 4
+    weight: 0.6
+  - entity_type: city
+    intent: at_night
+    label: City at night
+    primary: "things to do in {entity} at night"
+    secondary:
+      - "{entity} evening itinerary"
+    min_inventory: 4
+    weight: 0.6
+  - entity_type: city
+    intent: first_time
+    label: City first time guide
+    primary: "{entity} first time guide"
+    secondary:
+      - "first time in {entity} tips"
+    min_inventory: 5
+    weight: 0.75
+  - entity_type: city
+    intent: self_guided_tour
+    label: Self-guided tour of a city
+    primary: "self guided tour {entity}"
+    secondary:
+      - "self guided walking tour {entity}"
+      - "{entity} audio guide app"
+    min_inventory: 3
+    weight: 0.9
+  - entity_type: city
+    intent: walking_tour
+    label: Walking tour of a city
+    primary: "walking tour {entity}"
+    secondary:
+      - "best walking routes in {entity}"
+    min_inventory: 3
+    weight: 0.85
+
+  # --------------------------------------------------------------- attraction
+  - entity_type: attraction
+    intent: guide
+    label: Attraction guide
+    primary: "{entity} guide"
+    secondary:
+      - "how to visit {entity}"
+      - "{entity} visitor guide"
+    min_inventory: 1
+    weight: 1.0
+  - entity_type: attraction
+    intent: what_to_see
+    label: What to see at an attraction
+    primary: "what to see at {entity}"
+    secondary:
+      - "{entity} highlights"
+      - "must see works at {entity}"
+    min_inventory: 1
+    weight: 1.0
+  - entity_type: attraction
+    intent: audio_guide
+    label: Attraction audio guide
+    primary: "{entity} audio guide"
+    secondary:
+      - "{entity} self guided tour"
+      - "{entity} ticket and audio guide"
+    min_inventory: 1
+    weight: 0.95
+  - entity_type: attraction
+    intent: tickets
+    label: Attraction tickets
+    primary: "{entity} tickets"
+    secondary:
+      - "how to buy tickets for {entity}"
+    min_inventory: 1
+    weight: 0.8
+    requires_volatile_facts: true
+  - entity_type: attraction
+    intent: how_long
+    label: How long to spend
+    primary: "how long to spend at {entity}"
+    secondary:
+      - "how much time do you need at {entity}"
+    min_inventory: 1
+    weight: 0.7
+  - entity_type: attraction
+    intent: best_time
+    label: Best time to visit
+    primary: "best time to visit {entity}"
+    secondary:
+      - "when is {entity} least crowded"
+    min_inventory: 1
+    weight: 0.7
+    requires_volatile_facts: true
+  - entity_type: attraction
+    intent: nearby
+    label: Things near an attraction
+    primary: "things to do near {entity}"
+    secondary:
+      - "what is close to {entity}"
+    min_inventory: 2
+    weight: 0.65
+  - entity_type: attraction
+    intent: with_kids
+    label: Attraction with kids
+    primary: "{entity} with kids"
+    secondary:
+      - "visiting {entity} with children"
+    min_inventory: 1
+    weight: 0.6
+
+  # ----------------------------------------------------------------- category
+  - entity_type: category
+    intent: best_in_city
+    label: Best category in a city
+    primary: "best {category} in {city}"
+    secondary:
+      - "{category} in {city}"
+      - "top rated {category} {city}"
+    min_inventory: 3
+    weight: 0.95
+  - entity_type: category
+    intent: self_guided_in_city
+    label: Self-guided category in a city
+    primary: "self guided {category} {city}"
+    secondary:
+      - "{category} you can do on your own in {city}"
+    min_inventory: 3
+    weight: 0.8
+  - entity_type: category
+    intent: first_time_in_city
+    label: Category for first-time visitors
+    primary: "{category} for first time visitors in {city}"
+    secondary:
+      - "best {category} in {city} for beginners"
+    min_inventory: 3
+    weight: 0.65
+  - entity_type: category
+    intent: with_kids_in_city
+    label: Category with kids
+    primary: "{category} with kids in {city}"
+    secondary:
+      - "family friendly {category} in {city}"
+    min_inventory: 3
+    weight: 0.6
+
+  # --------------------------------------------------------------- collection
+  - entity_type: collection
+    intent: best_in_city
+    label: Best collection theme in a city
+    primary: "best {theme} in {city}"
+    secondary:
+      - "{theme} {city}"
+    min_inventory: 2
+    weight: 0.9
+  - entity_type: collection
+    intent: themed_experience
+    label: Themed experience
+    primary: "{theme} tour {city}"
+    secondary:
+      - "themed routes in {city}"
+    min_inventory: 2
+    weight: 0.8
+  - entity_type: collection
+    intent: self_guided_routes
+    label: Self-guided themed routes
+    primary: "self guided {theme} routes in {city}"
+    secondary:
+      - "{theme} walking routes {city}"
+    min_inventory: 2
+    weight: 0.7
+
+  # ------------------------------------------------------------------ product
+  - entity_type: product
+    intent: audio_guide
+    label: Product audio guide
+    primary: "{entity} audio guide"
+    secondary:
+      - "{entity} self guided tour"
+    min_inventory: 1
+    weight: 0.85
+  - entity_type: product
+    intent: ticket_with_audio
+    label: Ticket with audio guide
+    primary: "{entity} ticket with audio guide"
+    secondary:
+      - "skip the line {entity} with audio tour"
+    min_inventory: 1
+    weight: 0.8
+  - entity_type: product
+    intent: themed_walking_tour
+    label: Themed walking tour
+    primary: "{theme} walking tour in {city}"
+    secondary:
+      - "self guided {theme} tour {city}"
+    min_inventory: 1
+    weight: 0.7
