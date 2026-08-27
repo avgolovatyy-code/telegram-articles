@@ -45,10 +45,15 @@ services:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-wegotrip}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-wegotrip_engine}
       # Only the worker runs the scheduler, otherwise every job would run twice.
       SCHEDULER_ENABLED: "false"
+      SECRETS_STORE_FILE: /app/var/secrets/secrets.enc
+      SECRETS_KEY_FILE: /app/var/secrets/master.key
       TRACKING_BASE_URL: https://${DEPLOY_DOMAIN}
       ADMIN_BASE_URL: https://${DEPLOY_DOMAIN}
     volumes:
       - generated:/app/var/generated
+      # The encrypted credential store and its master key. Shared with the worker so
+      # both processes decrypt the same secrets; nothing is kept in plaintext.
+      - secrets:/app/var/secrets
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -63,10 +68,13 @@ services:
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-wegotrip}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-wegotrip_engine}
       SCHEDULER_ENABLED: "true"
+      SECRETS_STORE_FILE: /app/var/secrets/secrets.enc
+      SECRETS_KEY_FILE: /app/var/secrets/master.key
       TRACKING_BASE_URL: https://${DEPLOY_DOMAIN}
       ADMIN_BASE_URL: https://${DEPLOY_DOMAIN}
     volumes:
       - generated:/app/var/generated
+      - secrets:/app/var/secrets
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -90,5 +98,6 @@ services:
 volumes:
   pgdata:
   generated:
+  secrets:
   caddy_data:
   caddy_config:

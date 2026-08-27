@@ -39,6 +39,10 @@ def configure_logging(level: str = "INFO", fmt: str = "console") -> None:
     else:
         renderer = structlog.dev.ConsoleRenderer(colors=False)
 
+    # Imported here: redaction reads the settings' secret names, and importing it at
+    # module scope would make logging depend on configuration import order.
+    from app.security.redaction import redaction_processor
+
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
@@ -46,6 +50,7 @@ def configure_logging(level: str = "INFO", fmt: str = "console") -> None:
             structlog.processors.TimeStamper(fmt="iso", utc=True),
             structlog.processors.StackInfoRenderer(),
             structlog.processors.format_exc_info,
+            redaction_processor,
             renderer,
         ],
         wrapper_class=structlog.make_filtering_bound_logger(

@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import datetime as dt
 import json
+import os
 import pathlib
 from typing import Annotated
 
@@ -215,6 +216,113 @@ def check_telegram() -> None:
             close()
 
 
+secrets_app = typer.Typer(help="Encrypted credential storage", no_args_is_help=True)
+app.add_typer(secrets_app, name="secrets")
+
+
+def _store():
+    from app.security.secrets import SecretStore
+
+    return SecretStore()
+
+
+@secrets_app.command("init")
+def secrets_init() -> None:
+    """Create the master key if it does not exist yet."""
+    _bootstrap()
+    store = _store()
+    store.set("ADMIN_PASSWORD", store.get("ADMIN_PASSWORD") or "change-me")
+    typer.secho(f"Store:      {store.path}", fg=typer.colors.GREEN)
+    typer.secho(f"Master key: {store.key_source}", fg=typer.colors.GREEN)
+    typer.echo("\nBack the master key up somewhere safe. Without it the store cannot be read.")
+
+
+@secrets_app.command("set")
+def secrets_set(
+    name: Annotated[str, typer.Argument(help="e.g. OPENAI_API_KEY")],
+    value: Annotated[
+        str | None, typer.Option(help="Omit to be prompted without echoing to the terminal")
+    ] = None,
+) -> None:
+    """Store one credential, encrypted."""
+    _bootstrap()
+    secret = value or typer.prompt(f"{name.upper()} value", hide_input=True)
+    _store().set(name, secret)
+    typer.secho(f"{name.upper()} stored, encrypted", fg=typer.colors.GREEN)
+
+
+@secrets_app.command("list")
+def secrets_list() -> None:
+    """Show which credentials are stored, masked."""
+    _bootstrap()
+    from app.config import secrets_status
+
+    status = secrets_status()
+    typer.echo(f"Store:      {status['store_path']}")
+    typer.echo(f"Master key: {status['key_source']}\n")
+
+    store = _store()
+    encrypted = status["encrypted"]
+    if isinstance(encrypted, list) and encrypted:
+        typer.secho("Encrypted:", fg=typer.colors.GREEN)
+        for name in encrypted:
+            value = store.get(name) or ""
+            masked = f"{value[:4]}…{value[-4:]}" if len(value) > 12 else "***"
+            typer.echo(f"  {name} = {masked}")
+    else:
+        typer.secho("Encrypted: nothing stored yet", fg=typer.colors.YELLOW)
+
+    plaintext = status["plaintext_env"]
+    if isinstance(plaintext, list) and plaintext:
+        typer.secho(
+            "\nStill in plaintext environment: " + ", ".join(plaintext), fg=typer.colors.YELLOW
+        )
+        typer.echo("Move them in with `wgt secrets import-env .env`.")
+
+
+@secrets_app.command("rm")
+def secrets_rm(name: Annotated[str, typer.Argument()]) -> None:
+    """Remove one credential from the store."""
+    _bootstrap()
+    if _store().delete(name):
+        typer.secho(f"{name.upper()} removed", fg=typer.colors.GREEN)
+    else:
+        typer.secho(f"{name.upper()} was not stored", fg=typer.colors.YELLOW)
+
+
+@secrets_app.command("import-env")
+def secrets_import_env(
+    path: Annotated[pathlib.Path, typer.Argument(help="Plaintext .env to migrate")],
+) -> None:
+    """Move credentials from a plaintext .env into the encrypted store."""
+    _bootstrap()
+    if not path.exists():
+        raise typer.BadParameter(f"{path} not found")
+    imported = _store().import_env_file(path)
+    if not imported:
+        typer.secho("No known credentials found in the file", fg=typer.colors.YELLOW)
+        return
+    typer.secho(f"Imported and encrypted: {', '.join(imported)}", fg=typer.colors.GREEN)
+    typer.secho(
+        f"\nNow delete those lines from {path} — they are still in plaintext there.",
+        fg=typer.colors.YELLOW,
+    )
+
+
+@secrets_app.command("rotate-key")
+def secrets_rotate_key() -> None:
+    """Re-encrypt the store under a new master key."""
+    _bootstrap()
+    store = _store()
+    key = store.rotate_key()
+    typer.secho("Store re-encrypted under a new master key", fg=typer.colors.GREEN)
+    if os.getenv("SECRETS_MASTER_KEY"):
+        typer.secho("\nUpdate SECRETS_MASTER_KEY to:", fg=typer.colors.YELLOW)
+        typer.echo(key)
+    else:
+        typer.echo(f"New key written to {store.key_path}")
+
+
 @app.command("telegram-chats")
 def telegram_chats() -> None:
     """List chats the bot can see, with the ids to put into configuration.
@@ -367,6 +475,23 @@ def doctor() -> None:
         checks.append(("database_connection", True, "ok"))
     except Exception as exc:
         checks.append(("database_connection", False, str(exc)[:80]))
+
+    from app.config import secrets_status
+
+    status = secrets_status()
+    encrypted = status["encrypted"]
+    plaintext = status["plaintext_env"]
+    checks.append(
+        (
+            "secrets_encrypted",
+            bool(encrypted),
+            f"{len(encrypted) if isinstance(encrypted, list) else 0} in {status['store_path']}",
+        )
+    )
+    if isinstance(plaintext, list) and plaintext:
+        checks.append(
+            ("secrets_plaintext", False, ", ".join(plaintext) + " — run `wgt secrets import-env`")
+        )
 
     for name, ok, detail in checks:
         colour = typer.colors.GREEN if ok else typer.colors.YELLOW

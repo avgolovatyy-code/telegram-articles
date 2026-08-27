@@ -6,6 +6,7 @@ budgets, channels or affiliate identifiers.
 
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 from typing import Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -221,6 +222,11 @@ class Settings(BaseSettings):
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
+    # Decrypt `var/secrets.enc` into the environment first, so credentials never have to
+    # exist in plaintext on disk. Values already present in the environment win.
+    from app.security.secrets import load_secrets_into_env
+
+    load_secrets_into_env()
     return Settings()
 
 
@@ -228,6 +234,24 @@ def reload_settings() -> Settings:
     """Drop the cached settings (used by tests and the CLI)."""
     get_settings.cache_clear()
     return get_settings()
+
+
+def secrets_status() -> dict[str, object]:
+    """Where each credential came from — reported by ``wgt doctor``."""
+    from app.security.names import SECRET_NAMES
+    from app.security.secrets import SecretStore
+
+    store = SecretStore()
+    stored = set(store.names()) if store.exists() else set()
+    return {
+        "store_path": str(store.path),
+        "store_exists": store.exists(),
+        "key_source": store.key_source,
+        "encrypted": sorted(stored),
+        "plaintext_env": sorted(
+            name for name in SECRET_NAMES if os.environ.get(name) and name not in stored
+        ),
+    }
 
 
 settings_field_names = set(Settings.model_fields)

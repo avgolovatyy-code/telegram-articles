@@ -107,14 +107,23 @@ To use your own hostname, point an A record at ${PUBLIC_IP} and change DEPLOY_DO
 
 Next steps:
 
-  1. Edit ${APP_DIR}/.env and fill in:
-       OPENAI_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_TEST_CHANNEL
-     Passwords for Postgres and the admin UI were generated for you.
-  2. Start the stack:
+  1. Start the stack:
        cd ${APP_DIR}
        docker compose -f deploy/docker-compose.prod.yml --env-file .env up -d --build
-  3. Seed and check:
-       docker compose -f deploy/docker-compose.prod.yml exec api wgt seed
-       docker compose -f deploy/docker-compose.prod.yml exec api wgt doctor
-       docker compose -f deploy/docker-compose.prod.yml exec api wgt check-telegram
+
+  2. Store the credentials encrypted (they are prompted for, never echoed and never
+     written to shell history or to .env):
+       C="docker compose -f deploy/docker-compose.prod.yml --env-file .env"
+       \$C exec api wgt secrets set OPENAI_API_KEY
+       \$C exec api wgt secrets set TELEGRAM_BOT_TOKEN
+       \$C exec api wgt secrets list
+
+  3. Put the test channel id into .env (it is not a secret):
+       TELEGRAM_TEST_CHANNEL=-1001234567890
+     Run \`\$C exec api wgt telegram-chats\` to find the id of a private channel.
+
+  4. Seed and check:
+       \$C exec api wgt seed
+       \$C exec api wgt doctor
+       \$C exec api wgt check-telegram
 EOF

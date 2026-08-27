@@ -21,6 +21,7 @@ dependencies = [
     "python-slugify>=8.0",
     "pymorphy3>=2.0",
     "pyyaml>=6.0",
+    "cryptography>=42.0",
 ]
 
 [project.optional-dependencies]

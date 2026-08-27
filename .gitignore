@@ -17,6 +17,11 @@ htmlcov/
 *.db
 data/
 var/
+# Encrypted credential store and its master key — never commit either.
+secrets.enc
+master.key
+*.pem
+*.key
 .DS_Store
 .idea/
 .vscode/
