@@ -65,17 +65,21 @@ class MockLLMProvider:
             return {
                 "results": [
                     {
-                        "claim": claim,
+                        "claim": _claim_text(item),
                         "status": "verified",
                         "corrected_statement": None,
-                        "source_url": "https://example.org/official",
+                        "source_url": "https://www.louvre.fr/en/visit",
                         "source_title": "Official source",
                         "confidence": 0.98,
                     }
-                    for claim in context.get("claims", [])
+                    for item in context.get("claims", [])
                 ]
             }
         return {}
+
+
+def _claim_text(item: Any) -> str:
+    return str(item.get("claim", "")) if isinstance(item, dict) else str(item)
 
 
 def _load_context(raw: str) -> dict[str, Any]:

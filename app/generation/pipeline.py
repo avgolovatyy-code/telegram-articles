@@ -13,7 +13,7 @@ import secrets
 from dataclasses import dataclass, field
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.ai.budget import BudgetManager
@@ -34,6 +34,7 @@ from app.db.models import (
     ArticleProduct,
     ArticleSource,
     ArticleVersion,
+    CostLedgerEntry,
     Product,
     TopicCandidate,
 )
@@ -444,7 +445,15 @@ class GenerationPipeline:
         article.body = document.model_dump()
         article.rendered_message = rendered.message
         article.char_count = document.char_count()
-        article.actual_cost_usd = round(cost, 6)
+        # Take the cost from the ledger rather than from the pipeline's running total:
+        # research and any other side calls are billed there too, so the ledger is the
+        # only figure that cannot drift from what was actually spent.
+        ledger_total = self.session.scalar(
+            select(func.coalesce(func.sum(CostLedgerEntry.amount_usd), 0.0)).where(
+                CostLedgerEntry.article_id == article.id
+            )
+        )
+        article.actual_cost_usd = round(float(ledger_total or cost), 6)
         article.validation_issues = [*gate.errors, *gate.warnings][:20]
         if review is not None:
             article.quality_scores = review.model_dump()

@@ -179,7 +179,7 @@ def scan_document(
     market: Market = "en",
 ) -> ClaimScanResult:
     """Find every volatile statement in the produced text."""
-    fact_blob = _normalize(" ".join(api_facts))
+    fact_blob = _normalize(" ".join(api_facts)).replace(",", ".")
     result = ClaimScanResult()
     seen: set[str] = set()
 
@@ -204,12 +204,25 @@ def scan_document(
     return result
 
 
+_NUMBER_TOKEN_RE = re.compile(r"\d+(?:[.,]\d+)?")
+
+
 def _supported_by_api(sentence: str, fact_blob: str) -> bool:
-    """True when every number in the sentence also appears in the API facts."""
-    numbers = re.findall(r"\d+(?:[.,]\d+)?", sentence)
+    """True when every number in the sentence is a *whole* number in the API facts.
+
+    Substring matching would be dangerously permissive: "15-20 minutes" would look
+    supported just because the digits appear inside "180-240 min" and "2286 RUB", so an
+    invented figure would skip verification. Numbers are therefore compared as tokens.
+    """
+    numbers = _NUMBER_TOKEN_RE.findall(sentence)
     if not numbers:
         return False
-    return all(number in fact_blob for number in numbers)
+    known = set(_NUMBER_TOKEN_RE.findall(fact_blob))
+    return all(_normalize_number(number) in known for number in numbers)
+
+
+def _normalize_number(value: str) -> str:
+    return value.replace(",", ".")
 
 
 def strip_unverified(

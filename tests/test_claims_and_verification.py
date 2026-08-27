@@ -79,6 +79,21 @@ def test_scan_marks_api_backed_numbers_as_trusted():
     assert not result.critical
 
 
+def test_a_number_hidden_inside_another_number_is_not_treated_as_api_backed():
+    """ "15-20 minutes" must not pass because "180-240 min" and "2286" contain the digits."""
+    doc = document("Allow 15-20 minutes of walking between the stops.")
+    result = scan_document(
+        doc,
+        api_facts=[
+            "Tour: duration 180-240 min (WeGoTrip API)",
+            "Tour: from 2286 RUB (WeGoTrip API)",
+        ],
+    )
+    assert result.claims
+    assert not any(claim.supported_by_api for claim in result.claims)
+    assert result.claims[0].requires_verification
+
+
 def test_scan_marks_unsupported_numbers_as_needing_verification():
     doc = document("Tickets cost €22 and the museum is closed on Tuesdays.")
     result = scan_document(doc, api_facts=["Tour: duration 90 min (WeGoTrip API)"])
