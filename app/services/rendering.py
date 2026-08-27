@@ -48,7 +48,7 @@ def render_stored_article(
 
     media: dict[str, MediaCandidate] = {}
     for index, item in enumerate(sorted(article.media, key=lambda m: m.position)):
-        media_id = f"m{index + 1}"
+        media_id = item.media_key or f"m{index + 1}"
         media[media_id] = MediaCandidate(
             id=media_id,
             url=item.url,
@@ -59,7 +59,7 @@ def render_stored_article(
             caption=item.caption,
             role=item.role,
         )
-    # Stored media ids are positional; realign the document's references to them.
+    # Only assets that survived media validation the first time are still available.
     document.media_placements = [
         placement for placement in document.media_placements if placement.media_id in media
     ]

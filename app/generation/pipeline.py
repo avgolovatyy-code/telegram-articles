@@ -557,6 +557,7 @@ class GenerationPipeline:
                 continue
             article.media.append(
                 ArticleMedia(
+                    media_key=candidate.id,
                     kind=candidate.kind,
                     role=candidate.role,
                     url=candidate.url,

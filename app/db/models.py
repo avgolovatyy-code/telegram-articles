@@ -557,6 +557,9 @@ class ArticleMedia(Base):
     article_id: Mapped[int] = mapped_column(
         ForeignKey("articles.id", ondelete="CASCADE"), nullable=False, index=True
     )
+    #: The id the article body refers to (``m1``, ``m2``, …). Kept so that re-rendering a
+    #: stored article resolves every placement to the same asset.
+    media_key: Mapped[str | None] = mapped_column(String(16))
     kind: Mapped[str] = mapped_column(String(16), default="photo", nullable=False)
     role: Mapped[str] = mapped_column(String(32), default="inline", nullable=False)
     url: Mapped[str] = mapped_column(Text, nullable=False)

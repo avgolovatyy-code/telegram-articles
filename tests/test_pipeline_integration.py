@@ -184,6 +184,17 @@ def test_rerendering_a_stored_article_is_stable(synced_session, settings):
     assert validate_rich_message(rendered.message) == []
     assert collect_urls(rendered.message)
 
+    # Media placements must resolve to the same assets as the original render.
+    stored_photos = [
+        block["photo"]["media"]
+        for block in article.rendered_message["blocks"]
+        if block["type"] == "photo"
+    ]
+    rerendered_photos = [
+        block["photo"]["media"] for block in rendered.message["blocks"] if block["type"] == "photo"
+    ]
+    assert rerendered_photos == stored_photos
+
 
 def test_analytics_counts_a_click(synced_session, settings):
     from app.analytics.tracking import TrackingService
