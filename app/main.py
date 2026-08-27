@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.admin.routes import router as admin_router
 from app.api.routes import router as api_router
+from app.api.slack_routes import router as slack_router
 from app.config import get_settings
 from app.errors import EngineError
 from app.generation.covers import GENERATED_DIR
@@ -62,6 +63,7 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     application.include_router(api_router)
+    application.include_router(slack_router)
     application.include_router(admin_router)
 
     static_dir = Path(__file__).parent / "admin" / "static"

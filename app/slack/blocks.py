@@ -1,0 +1,179 @@
+"""Slack Block Kit payloads for editorial control."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from app.db.models import Article
+from app.topics.coverage import CoverageReport
+
+MARKET_FLAG = {"en": "🇬🇧", "ru": "🇷🇺"}
+
+ACTION_PUBLISH = "article_publish"
+ACTION_REJECT = "article_reject"
+ACTION_REGENERATE = "article_regenerate"
+ACTION_PUBLISH_TEST = "article_publish_test"
+ACTION_HOLD = "article_hold"
+
+
+def _text(markdown: str) -> dict[str, Any]:
+    return {"type": "mrkdwn", "text": markdown}
+
+
+def _section(markdown: str) -> dict[str, Any]:
+    return {"type": "section", "text": _text(markdown)}
+
+
+def _button(label: str, action_id: str, value: str, style: str | None = None) -> dict[str, Any]:
+    button: dict[str, Any] = {
+        "type": "button",
+        "text": {"type": "plain_text", "text": label, "emoji": True},
+        "action_id": action_id,
+        "value": value,
+    }
+    if style:
+        button["style"] = style
+    return button
+
+
+def _preview(article: Article, limit: int = 420) -> str:
+    body = article.body or {}
+    intro = str(body.get("intro") or "")
+    if len(intro) > limit:
+        intro = intro[: limit - 1].rsplit(" ", 1)[0] + "…"
+    return intro or "_нет вступления_"
+
+
+def article_card(article: Article, *, admin_url: str, auto_publish: bool) -> list[dict[str, Any]]:
+    """Card shown when an article is written and waiting for its slot."""
+    flag = MARKET_FLAG.get(article.market, article.market)
+    quality = f"{article.quality_score:.2f}" if article.quality_score else "—"
+    factuality = f"{article.factuality_score:.2f}" if article.factuality_score else "—"
+    scheduled = (
+        article.scheduled_for.strftime("%d.%m %H:%M UTC")
+        if article.scheduled_for
+        else "не назначена"
+    )
+
+    headline = (
+        "Публикуется автоматически, вмешательство не требуется"
+        if auto_publish
+        else "Ожидает вашего решения"
+    )
+
+    blocks: list[dict[str, Any]] = [
+        _section(f"{flag} *{article.title or article.primary_query}*"),
+        _section(_preview(article)),
+        {
+            "type": "context",
+            "elements": [
+                _text(
+                    f"запрос: `{article.primary_query}` · {article.entity_type} "
+                    f"{article.entity_name} · {article.char_count} знаков"
+                )
+            ],
+        },
+        {
+            "type": "context",
+            "elements": [
+                _text(
+                    f"качество {quality} · факты {factuality} · товаров "
+                    f"{len(article.products)} · стоимость ${article.actual_cost_usd:.4f} · "
+                    f"публикация {scheduled}"
+                )
+            ],
+        },
+        {"type": "context", "elements": [_text(f"_{headline}_")]},
+        {
+            "type": "actions",
+            "block_id": f"article:{article.id}",
+            "elements": [
+                _button("Открыть", "article_open", str(article.id))
+                | {"url": f"{admin_url}/admin/articles/{article.id}"},
+                _button("Опубликовать сейчас", ACTION_PUBLISH, str(article.id), "primary"),
+                _button("В тест-канал", ACTION_PUBLISH_TEST, str(article.id)),
+                _button("Перегенерировать", ACTION_REGENERATE, str(article.id)),
+                _button("Снять", ACTION_REJECT, str(article.id), "danger"),
+            ],
+        },
+        {"type": "divider"},
+    ]
+    return blocks
+
+
+def published_card(
+    article: Article, *, message_url: str | None, channel: str
+) -> list[dict[str, Any]]:
+    flag = MARKET_FLAG.get(article.market, article.market)
+    link = f"<{message_url}|посмотреть в Telegram>" if message_url else "ссылка недоступна"
+    return [
+        _section(f"{flag} *Опубликовано:* {article.title or article.primary_query}"),
+        {
+            "type": "context",
+            "elements": [
+                _text(
+                    f"{channel} · {link} · стоимость ${article.actual_cost_usd:.4f} · "
+                    f"запрос `{article.primary_query}`"
+                )
+            ],
+        },
+    ]
+
+
+def result_card(message: str, *, ok: bool = True) -> list[dict[str, Any]]:
+    icon = "✅" if ok else "⚠️"
+    return [_section(f"{icon} {message}")]
+
+
+def digest_card(
+    *,
+    budget: Any,
+    coverage: dict[str, CoverageReport],
+    published_today: dict[str, int],
+    admin_url: str,
+) -> list[dict[str, Any]]:
+    spent_bar = min(1.0, budget.spent_usd / budget.budget_usd) if budget.budget_usd else 0.0
+    filled = int(spent_bar * 20)
+    bar = "█" * filled + "░" * (20 - filled)
+
+    lines = [
+        f"*Бюджет* `{bar}` ${budget.spent_usd:.2f} из ${budget.budget_usd:.2f}",
+        f"*Сгенерировано:* EN {budget.generated.get('en', 0)} · RU {budget.generated.get('ru', 0)}",
+        f"*Опубликовано:* EN {published_today.get('en', 0)} · RU {published_today.get('ru', 0)}",
+        f"*Средняя стоимость статьи:* ${budget.average_article_cost_usd:.4f}",
+    ]
+
+    for market, report in coverage.items():
+        flag = MARKET_FLAG.get(market, market)
+        if report.exhausted:
+            lines.append(f"{flag} материал закончился — {report.reason}")
+        else:
+            lines.append(f"{flag} осталось тем: {report.usable_candidates}")
+
+    return [
+        _section("*Сводка за день*"),
+        _section("\n".join(lines)),
+        {"type": "context", "elements": [_text(f"<{admin_url}/admin|Открыть админку>")]},
+        {"type": "divider"},
+    ]
+
+
+def alert_card(title: str, detail: str) -> list[dict[str, Any]]:
+    return [
+        _section(f"🚨 *{title}*"),
+        {"type": "context", "elements": [_text(detail[:2500])]},
+    ]
+
+
+__all__ = [
+    "ACTION_HOLD",
+    "ACTION_PUBLISH",
+    "ACTION_PUBLISH_TEST",
+    "ACTION_REGENERATE",
+    "ACTION_REJECT",
+    "alert_card",
+    "article_card",
+    "digest_card",
+    "published_card",
+    "result_card",
+]

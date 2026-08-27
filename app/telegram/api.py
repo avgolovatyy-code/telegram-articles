@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -33,9 +34,7 @@ class SentMessage:
 
     @property
     def url(self) -> str | None:
-        if self.chat_username:
-            return f"https://t.me/{self.chat_username.lstrip('@')}/{self.message_id}"
-        return None
+        return message_url(self.chat_id, self.chat_username, self.message_id)
 
 
 class TelegramBotClient:
@@ -133,6 +132,38 @@ class TelegramBotClient:
         result = self.call("sendMessage", {"chat_id": chat_id, "text": text})
         return _to_sent_message(result, chat_id)
 
+    def get_updates(self, *, limit: int = 100) -> list[dict[str, Any]]:
+        """Recent updates — used to discover the id of a private channel."""
+        result = self.call(
+            "getUpdates",
+            {"limit": limit, "allowed_updates": ["channel_post", "my_chat_member", "message"]},
+        )
+        return result if isinstance(result, list) else []
+
+    def discover_chats(self) -> list[dict[str, Any]]:
+        """Chats the bot has seen, with the ids to put into configuration.
+
+        A private channel has no ``@username``, so its numeric ``-100…`` id is the only
+        way to address it. Telegram only reveals that id once the bot has seen an event
+        in the channel, which happens as soon as it is added as an administrator.
+        """
+        seen: dict[str, dict[str, Any]] = {}
+        for update in self.get_updates():
+            for key in ("channel_post", "message", "my_chat_member"):
+                payload = update.get(key)
+                if not isinstance(payload, dict):
+                    continue
+                chat = payload.get("chat")
+                if not isinstance(chat, dict) or "id" not in chat:
+                    continue
+                seen[str(chat["id"])] = {
+                    "id": str(chat["id"]),
+                    "type": chat.get("type"),
+                    "title": chat.get("title"),
+                    "username": chat.get("username"),
+                }
+        return list(seen.values())
+
 
 class DryRunTelegramClient:
     """Builds and validates payloads but never contacts Telegram."""
@@ -149,7 +180,8 @@ class DryRunTelegramClient:
         return {"id": 0, "username": "dry_run_bot", "is_bot": True}
 
     def get_chat(self, chat_id: str) -> dict[str, Any]:
-        return {"id": chat_id, "username": str(chat_id).lstrip("@"), "type": "channel"}
+        username = None if is_numeric_chat_id(chat_id) else str(chat_id).lstrip("@")
+        return {"id": chat_id, "username": username, "type": "channel"}
 
     def send_rich_message(
         self,
@@ -179,14 +211,42 @@ class DryRunTelegramClient:
         self._counter += 1
         return SentMessage(self._counter, str(chat_id), str(chat_id).lstrip("@"), {"text": text})
 
+    def get_updates(self, *, limit: int = 100) -> list[dict[str, Any]]:
+        return []
+
+    def discover_chats(self) -> list[dict[str, Any]]:
+        return []
+
+
+def is_numeric_chat_id(value: str) -> bool:
+    """Private channels have no @username and are addressed by a ``-100…`` id."""
+    return bool(re.fullmatch(r"-?\d+", str(value).strip()))
+
+
+def message_url(chat_id: str, chat_username: str | None, message_id: int) -> str | None:
+    """Public link for a sent message, or the internal ``t.me/c/…`` form.
+
+    Private channels are reachable only as ``https://t.me/c/<id without -100>/<msg>``,
+    and that link works for members of the channel.
+    """
+    if chat_username:
+        return f"https://t.me/{chat_username.lstrip('@')}/{message_id}"
+    raw = str(chat_id)
+    if is_numeric_chat_id(raw) and raw.startswith("-100"):
+        return f"https://t.me/c/{raw[4:]}/{message_id}"
+    return None
+
 
 def _to_sent_message(result: dict[str, Any], chat_id: str) -> SentMessage:
     chat = result.get("chat") or {}
+    resolved_id = str(chat.get("id", chat_id))
+    username = chat.get("username")
+    if not username and str(chat_id).startswith("@"):
+        username = str(chat_id).lstrip("@")
     return SentMessage(
         message_id=int(result.get("message_id", 0)),
-        chat_id=str(chat.get("id", chat_id)),
-        chat_username=chat.get("username")
-        or (str(chat_id).lstrip("@") if str(chat_id).startswith("@") else None),
+        chat_id=resolved_id,
+        chat_username=username,
         raw=result,
     )
 
@@ -204,4 +264,6 @@ __all__ = [
     "SentMessage",
     "TelegramBotClient",
     "build_telegram_client",
+    "is_numeric_chat_id",
+    "message_url",
 ]

@@ -28,6 +28,7 @@ from app.db.types import utcnow
 from app.errors import EngineError, TelegramRateLimited
 from app.generation.pipeline import GenerationPipeline
 from app.logging_setup import get_logger, job_context, new_job_id
+from app.slack.notifications import SlackNotifier
 from app.telegram.api import build_telegram_client
 from app.telegram.publisher import TelegramPublisher
 from app.topics.clusters import KeywordClusterRegistry
@@ -180,6 +181,7 @@ def generate_daily_articles(
     budget = BudgetManager(session, settings)
     gateway = LLMGateway(session, settings=settings, budget=budget)
     pipeline = GenerationPipeline(session, gateway, settings=settings)
+    notifier = SlackNotifier(session, settings)
 
     plan = budget.plan_daily_generation()
     report.details["plan"] = plan
@@ -226,6 +228,8 @@ def generate_daily_articles(
                 continue
             if outcome.ok:
                 produced += 1
+                if outcome.article is not None:
+                    notifier.article_drafted(outcome.article)
             else:
                 skipped += 1
         report.details[f"{market}_generated"] = produced
@@ -433,6 +437,7 @@ def process_publication_queue(
     worker_id = new_job_id("pub")
     client = build_telegram_client(settings)
     publisher = TelegramPublisher(session, client, settings=settings)
+    notifier = SlackNotifier(session, settings)
 
     due = list(
         session.scalars(
@@ -471,6 +476,12 @@ def process_publication_queue(
                     )
                     if result.created:
                         published += 1
+                        if item.target == PublicationTarget.PRODUCTION:
+                            notifier.article_published(
+                                article,
+                                message_url=result.publication.message_url,
+                                channel=result.publication.channel_username,
+                            )
                     ctx["status"] = "published" if result.created else "already_published"
                 except TelegramRateLimited as exc:
                     item.scheduled_for = utcnow() + dt.timedelta(seconds=exc.retry_after)
@@ -523,6 +534,19 @@ def _rerender_without(
     session.flush()
 
 
+def send_daily_digest(session: Session, *, settings: Settings | None = None) -> JobReport:
+    """Post the daily summary to Slack."""
+    settings = settings or get_settings()
+    report = JobReport("send_daily_digest")
+    notifier = SlackNotifier(session, settings)
+    if not notifier.enabled:
+        report.details["skipped"] = "Slack is not configured"
+        return report
+    notifier.daily_digest()
+    report.details["sent"] = True
+    return report
+
+
 def cleanup_expired(session: Session, *, settings: Settings | None = None) -> JobReport:
     settings = settings or get_settings()
     report = JobReport("cleanup")
@@ -573,5 +597,6 @@ __all__ = [
     "run_daily_cycle",
     "schedule_publications",
     "seed_reference_data",
+    "send_daily_digest",
     "sync_catalog",
 ]

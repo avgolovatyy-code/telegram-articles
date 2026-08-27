@@ -28,10 +28,23 @@ def _wrap(func: Callable[..., jobs.JobReport], name: str, settings: Settings) ->
                 report = func(session, settings=settings)
             log.info("scheduler.job_done", job=name, ok=report.ok, details=report.details)
         except Exception as exc:
-            log.error("scheduler.job_failed", job=name, error=f"{type(exc).__name__}: {exc}")
+            detail = f"{type(exc).__name__}: {exc}"
+            log.error("scheduler.job_failed", job=name, error=detail)
+            _alert(name, detail, settings)
 
     runner.__name__ = f"job_{name}"
     return runner
+
+
+def _alert(job: str, detail: str, settings: Settings) -> None:
+    """Tell Slack that a scheduled job failed; never raise from here."""
+    try:
+        from app.slack.notifications import SlackNotifier
+
+        with session_scope() as session:
+            SlackNotifier(session, settings).alert(f"Джоба {job} упала", detail)
+    except Exception:
+        log.warning("scheduler.alert_failed", job=job)
 
 
 class SchedulerRunner:
@@ -94,6 +107,14 @@ class SchedulerRunner:
             _wrap(jobs.cleanup_expired, "cleanup", settings),
             IntervalTrigger(minutes=30),
             id="cleanup",
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+        add(
+            _wrap(jobs.send_daily_digest, "slack_digest", settings),
+            CronTrigger(hour=settings.slack_digest_hour, minute=0),
+            id="slack_digest",
             replace_existing=True,
             max_instances=1,
             coalesce=True,

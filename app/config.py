@@ -87,8 +87,11 @@ class Settings(BaseSettings):
     default_estimated_article_cost_usd: float = 0.09
 
     # ------------------------------------------------------------- publishing
-    auto_publish_en: bool = False
-    auto_publish_ru: bool = False
+    #: Hands-off by default at the client's request: articles publish themselves once
+    #: they pass every automatic gate, and Slack is where you watch and intervene.
+    #: A test-channel publication is still mandatory before the first production post.
+    auto_publish_en: bool = True
+    auto_publish_ru: bool = True
     #: Publications scheduled per market per day. 0 means "everything that is ready",
     #: spread across the window; the budget already bounds how much gets written.
     en_publish_per_day: int = 0
@@ -140,6 +143,17 @@ class Settings(BaseSettings):
     #: A topic whose articles keep failing the quality gates is retired after this many
     #: attempts, so a doomed topic cannot be retried on every run at full cost.
     max_topic_generation_failures: int = 2
+
+    # ------------------------------------------------------------------ Slack
+    slack_enabled: bool = False
+    slack_bot_token: str | None = None
+    slack_signing_secret: str | None = None
+    #: Channel id (`C0123ABCD`) or name (`#wegotrip-content`) for notifications.
+    slack_channel: str | None = None
+    slack_notify_on_draft: bool = True
+    slack_notify_on_publish: bool = True
+    #: Hour (UTC) at which the daily digest is posted.
+    slack_digest_hour: int = 18
 
     # ------------------------------------------------------------------ admin
     admin_username: str = "admin"
