@@ -252,6 +252,17 @@ def schedule_publications(
             )
             scheduled = 0
             for article, slot in zip(pending, slots, strict=False):
+                # Even in auto-publish mode the rendering is exercised on the test
+                # channel first — production is never a preview mechanism (spec §40).
+                if not any(p.target == PublicationTarget.TEST for p in article.publications):
+                    if not settings.telegram_test_channel:
+                        report.errors.append(
+                            f"article {article.id}: TELEGRAM_TEST_CHANNEL is not configured"
+                        )
+                        continue
+                    publisher.enqueue(
+                        article, target=PublicationTarget.TEST, scheduled_for=utcnow()
+                    )
                 article.scheduled_for = slot
                 article.status = ArticleStatus.SCHEDULED
                 publisher.enqueue(article, target=PublicationTarget.PRODUCTION, scheduled_for=slot)

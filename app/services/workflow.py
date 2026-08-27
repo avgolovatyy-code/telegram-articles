@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.ai.router import LLMGateway
 from app.config import Settings, get_settings
-from app.db.enums import ArticleStatus, PublicationTarget
+from app.db.enums import ArticleStatus, PublicationTarget, TopicStatus
 from app.db.models import Article, TelegramPublication
 from app.db.types import utcnow
 from app.errors import ConfigurationError, EngineError, ValidationFailed
@@ -82,7 +82,7 @@ class ArticleWorkflow:
         article.status = ArticleStatus.ARCHIVED
         article.status_reason = "superseded by a regeneration"
         topic = article.topic
-        topic.status = "candidate"
+        topic.status = TopicStatus.CANDIDATE
         self.session.flush()
         return pipeline.generate(topic)
 
