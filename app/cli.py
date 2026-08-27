@@ -215,6 +215,45 @@ def check_telegram() -> None:
             close()
 
 
+@app.command("telegram-chats")
+def telegram_chats() -> None:
+    """List chats the bot can see, with the ids to put into configuration.
+
+    A private channel has no @username, so it is addressed by its numeric `-100…` id.
+    Telegram reveals that id only after the bot has seen an event in the channel: add
+    the bot as an administrator and post anything there, then run this command.
+    """
+    _bootstrap()
+    from app.telegram.api import build_telegram_client
+
+    client = build_telegram_client(get_settings())
+    try:
+        chats = client.discover_chats()
+    finally:
+        close = getattr(client, "close", None)
+        if callable(close):
+            close()
+
+    if not chats:
+        typer.secho(
+            "Не видно ни одного чата. Добавьте бота администратором в канал и отправьте "
+            "туда любое сообщение, затем повторите команду.",
+            fg=typer.colors.YELLOW,
+        )
+        return
+
+    for chat in chats:
+        name = chat.get("title") or chat.get("username") or "без названия"
+        username = f"@{chat['username']}" if chat.get("username") else "приватный"
+        typer.secho(
+            f"{chat['id']}  {name}  ({chat.get('type')}, {username})", fg=typer.colors.GREEN
+        )
+    typer.echo(
+        "\nВставьте нужный id в TELEGRAM_TEST_CHANNEL / TELEGRAM_EN_CHANNEL / "
+        "TELEGRAM_RU_CHANNEL — числовой id работает так же, как @username."
+    )
+
+
 @app.command("import-conversions")
 def import_conversions(path: Annotated[pathlib.Path, typer.Argument()]) -> None:
     """Import orders from the affiliate back office.
