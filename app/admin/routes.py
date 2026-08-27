@@ -151,6 +151,7 @@ def dashboard(
     context = _base_context(request, session, settings, "dashboard")
     context |= {
         "overviews": analytics.overviews(),
+        "coverage": jobs.coverage_report(session, settings=settings),
         "plan": budget.plan_daily_generation(),
         "auto_publish": {"en": settings.auto_publish_en, "ru": settings.auto_publish_ru},
         "recent_articles": list(

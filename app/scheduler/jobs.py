@@ -11,7 +11,7 @@ import datetime as dt
 from dataclasses import dataclass, field
 from typing import Any
 
-from sqlalchemy import select
+from sqlalchemy import and_, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.ai.budget import BudgetManager
@@ -31,6 +31,7 @@ from app.logging_setup import get_logger, job_context, new_job_id
 from app.telegram.api import build_telegram_client
 from app.telegram.publisher import TelegramPublisher
 from app.topics.clusters import KeywordClusterRegistry
+from app.topics.coverage import CoverageReport, assess_coverage
 from app.topics.discovery import TopicDiscoveryService, select_topics_for_generation
 
 log = get_logger("scheduler.jobs")
@@ -147,8 +148,22 @@ def discover_topics(
     report = JobReport("discover_topics")
     for market in markets:
         stats = service.discover(market, limit=limit)
-        report.details[market] = stats.as_dict()
+        coverage = assess_coverage(session, market, settings)
+        report.details[market] = {**stats.as_dict(), "coverage": coverage.as_dict()}
+        if coverage.exhausted:
+            log.info("topics.exhausted", market=market, reason=coverage.reason)
     return report
+
+
+def coverage_report(
+    session: Session,
+    *,
+    markets: tuple[Market, ...] = MARKETS,
+    settings: Settings | None = None,
+) -> dict[str, CoverageReport]:
+    """How much of the catalogue still has unwritten topics."""
+    settings = settings or get_settings()
+    return {market: assess_coverage(session, market, settings) for market in markets}
 
 
 # ------------------------------------------------------------------ generation
@@ -179,7 +194,23 @@ def generate_daily_articles(
             report.details[f"{market}_generated"] = 0
             continue
 
-        candidates = select_topics_for_generation(session, market, wanted * 3)
+        candidates = select_topics_for_generation(session, market, wanted * 3, settings=settings)
+        if not candidates:
+            # The daily target is a ceiling, not an obligation: with no topic above the
+            # quality floor the engine stops rather than inventing something to write.
+            coverage = assess_coverage(session, market, settings)
+            report.details[f"{market}_generated"] = 0
+            report.details[f"{market}_exhausted"] = coverage.reason
+            log.info(
+                "topics.exhausted",
+                market=market,
+                reason=coverage.reason,
+                below_threshold=coverage.below_threshold,
+                used_topics=coverage.used_topics,
+                available_products=coverage.available_products,
+            )
+            continue
+
         for topic in candidates:
             if produced >= wanted:
                 break
@@ -199,6 +230,10 @@ def generate_daily_articles(
                 skipped += 1
         report.details[f"{market}_generated"] = produced
         report.details[f"{market}_skipped"] = skipped
+        if produced < wanted:
+            coverage = assess_coverage(session, market, settings)
+            if coverage.exhausted:
+                report.details[f"{market}_exhausted"] = coverage.reason
 
     snapshot = budget.snapshot()
     report.details["budget"] = {
@@ -247,9 +282,19 @@ def schedule_publications(
                 report.details[f"{market}_scheduled"] = 0
                 continue
 
-            slots = _publication_slots(
-                session, market, settings, count=min(len(pending), settings.publish_per_day(market))
-            )
+            # The daily figure, when set, is a ceiling for the whole day rather than per
+            # scheduler run: this job runs several times a day and must not multiply it.
+            ceiling = settings.publish_per_day(market)
+            if ceiling is None:
+                wanted = len(pending)
+            else:
+                wanted = min(len(pending), ceiling - _planned_today(session, market))
+            if wanted <= 0:
+                report.details[f"{market}_scheduled"] = 0
+                report.details[f"{market}_note"] = "daily publication quota already planned"
+                continue
+
+            slots = _publication_slots(session, market, settings, count=wanted)
             scheduled = 0
             for article, slot in zip(pending, slots, strict=False):
                 # Even in auto-publish mode the rendering is exercised on the test
@@ -276,43 +321,107 @@ def schedule_publications(
     return report
 
 
+def _planned_today(session: Session, market: Market) -> int:
+    """Articles already published or scheduled for publication today."""
+    start = dt.datetime.combine(utcnow().date(), dt.time.min, tzinfo=dt.UTC)
+    end = start + dt.timedelta(days=1)
+    return int(
+        session.scalar(
+            select(func.count(Article.id)).where(
+                Article.market == market,
+                or_(
+                    and_(Article.scheduled_for >= start, Article.scheduled_for < end),
+                    and_(Article.published_at >= start, Article.published_at < end),
+                ),
+            )
+        )
+        or 0
+    )
+
+
 def _publication_slots(
     session: Session, market: Market, settings: Settings, *, count: int
 ) -> list[dt.datetime]:
+    """Spread ``count`` publications across the publishing window.
+
+    Posts are distributed over the whole remaining window rather than fired back to
+    back at the minimum interval, so a batch generated at 04:00 still trickles out
+    through the day. Whatever does not fit today rolls into tomorrow's window.
+    """
+    if count <= 0:
+        return []
+
     now = utcnow()
-    interval = dt.timedelta(minutes=settings.min_post_interval_minutes)
+    min_interval = dt.timedelta(minutes=settings.min_post_interval_minutes)
 
     last = session.scalar(
         select(Article.scheduled_for)
         .where(
             Article.market == market,
             Article.scheduled_for.is_not(None),
-            Article.scheduled_for >= now - interval,
+            Article.scheduled_for >= now - min_interval,
         )
         .order_by(Article.scheduled_for.desc())
         .limit(1)
     )
-    cursor = max(now + dt.timedelta(minutes=5), (last + interval) if last else now)
+    cursor = _next_in_window(
+        max(now + dt.timedelta(minutes=5), (last + min_interval) if last else now), settings
+    )
 
     slots: list[dt.datetime] = []
-    while len(slots) < count:
-        cursor = _next_in_window(cursor, settings)
-        slots.append(cursor)
-        cursor = cursor + interval
+    remaining = count
+    while remaining > 0:
+        window_end = _window_end(cursor, settings)
+        available = window_end - cursor
+        if available < dt.timedelta(0):
+            cursor = _next_in_window(window_end + dt.timedelta(minutes=1), settings)
+            continue
+
+        fits_today = min(remaining, int(available / min_interval) + 1)
+        if fits_today <= 1:
+            spacing = min_interval
+        else:
+            # Stretch to the window edge, never tighter than the configured minimum.
+            spacing = max(min_interval, available / (fits_today - 1))
+
+        for index in range(fits_today):
+            slots.append(cursor + spacing * index)
+        remaining -= fits_today
+        cursor = _next_in_window(window_end + dt.timedelta(minutes=1), settings)
+
     return slots
 
 
+def _window_end(moment: dt.datetime, settings: Settings) -> dt.datetime:
+    """End of the publishing window for the local day ``moment`` falls in."""
+    local = moment.astimezone(settings.publish_tz)
+    start, end = settings.publish_window_start_hour, settings.publish_window_end_hour
+    if start >= end:
+        local_end = local.replace(hour=23, minute=59, second=0, microsecond=0)
+    else:
+        local_end = local.replace(hour=end, minute=0, second=0, microsecond=0)
+    return local_end.astimezone(dt.UTC)
+
+
 def _next_in_window(moment: dt.datetime, settings: Settings) -> dt.datetime:
+    """Move ``moment`` forward to the next instant inside the publishing window.
+
+    Window hours are local to ``PUBLISH_TIMEZONE`` (Moscow by default) while everything
+    stored in the database stays UTC, so the window follows daylight-saving changes in
+    other timezones without any date arithmetic elsewhere.
+    """
     start, end = settings.publish_window_start_hour, settings.publish_window_end_hour
     if start >= end:
         return moment
-    if moment.hour < start:
-        return moment.replace(hour=start, minute=0, second=0, microsecond=0)
-    if moment.hour >= end:
-        return (moment + dt.timedelta(days=1)).replace(
+
+    local = moment.astimezone(settings.publish_tz)
+    if local.hour < start:
+        local = local.replace(hour=start, minute=0, second=0, microsecond=0)
+    elif local.hour >= end:
+        local = (local + dt.timedelta(days=1)).replace(
             hour=start, minute=0, second=0, microsecond=0
         )
-    return moment
+    return local.astimezone(dt.UTC)
 
 
 # ----------------------------------------------------------------- publishing
@@ -456,6 +565,7 @@ def run_daily_cycle(settings: Settings | None = None) -> list[JobReport]:
 __all__ = [
     "JobReport",
     "cleanup_expired",
+    "coverage_report",
     "discover_topics",
     "generate_daily_articles",
     "process_publication_queue",

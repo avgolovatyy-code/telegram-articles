@@ -95,9 +95,19 @@ def test_hard_cap_detection(session, settings):
     assert not manager.can_start_article("en").allowed
 
 
-def test_daily_maximum_per_market_is_enforced(session, settings):
+def test_no_ceiling_by_default_so_the_budget_is_the_only_limit(session, settings):
+    """A cheap day may produce well over 20 articles per market."""
+    assert settings.articles_max_per_day("en") is None
     manager = BudgetManager(session, settings)
-    for _ in range(settings.en_articles_max_per_day):
+    for _ in range(25):
+        make_article(session, "en", 0.001)
+    assert manager.can_start_article("en").allowed
+
+
+def test_an_explicit_ceiling_is_still_honoured(session, settings, monkeypatch):
+    monkeypatch.setattr(settings, "en_articles_max_per_day", 20)
+    manager = BudgetManager(session, settings)
+    for _ in range(20):
         make_article(session, "en", 0.001)
     decision = manager.can_start_article("en")
     assert not decision.allowed
@@ -109,8 +119,23 @@ def test_plan_serves_both_minimums_before_growing(session, settings):
     plan = manager.plan_daily_generation()
     assert plan["en"] >= settings.en_articles_min_per_day
     assert plan["ru"] >= settings.ru_articles_min_per_day
-    assert plan["en"] <= settings.en_articles_max_per_day
-    assert plan["ru"] <= settings.ru_articles_max_per_day
+
+
+def test_a_cheap_day_plans_more_than_twenty_per_market(session, settings):
+    """$3 at ~$0.05 per article funds far more than the old 20-per-market cap."""
+    for _ in range(4):
+        make_article(session, "en", 0.03)
+    plan = BudgetManager(session, settings).plan_daily_generation()
+    assert plan["en"] + plan["ru"] > 40
+    assert plan["en"] > 20
+
+
+def test_the_plan_never_exceeds_the_daily_budget(session, settings):
+    manager = BudgetManager(session, settings)
+    make_article(session, "en", 0.05)
+    plan = manager.plan_daily_generation()
+    projected = (plan["en"] + plan["ru"]) * manager.average_article_cost()
+    assert projected <= settings.daily_ai_budget_usd
 
 
 def test_plan_prioritises_minimums_when_the_budget_is_tight(session, settings):

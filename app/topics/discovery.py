@@ -30,6 +30,7 @@ from app.db.models import (
 from app.db.types import utcnow
 from app.logging_setup import get_logger, job_context
 from app.topics.clusters import ClusterDefinition, KeywordClusterRegistry
+from app.topics.coverage import usable_candidate_query
 from app.topics.dedup import DeduplicationService, canonicalize_query, topic_key, topic_slug
 from app.topics.demand import SearchDemandProvider, build_demand_provider
 from app.topics.morphology import render_pattern
@@ -560,16 +561,17 @@ class TopicDiscoveryService:
 
 
 def select_topics_for_generation(
-    session: Session, market: Market, limit: int
+    session: Session, market: Market, limit: int, *, settings: Settings | None = None
 ) -> list[TopicCandidate]:
-    """Highest-scoring candidates that are not already in the pipeline."""
+    """Highest-scoring candidates that clear the quality floor.
+
+    Returning fewer than ``limit`` is a valid answer: the daily counts are a ceiling,
+    and a thin topic is never promoted just to fill it.
+    """
+    settings = settings or get_settings()
     return list(
         session.scalars(
-            select(TopicCandidate)
-            .where(
-                TopicCandidate.market == market,
-                TopicCandidate.status == TopicStatus.CANDIDATE,
-            )
+            usable_candidate_query(market, settings)
             .order_by((TopicCandidate.topic_score + TopicCandidate.boost).desc())
             .limit(limit)
         ).all()

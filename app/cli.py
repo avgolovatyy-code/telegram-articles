@@ -135,6 +135,32 @@ def cycle() -> None:
 
 
 @app.command()
+def coverage(market: Annotated[str | None, typer.Option()] = None) -> None:
+    """Show how much catalogue material is still unwritten."""
+    _bootstrap()
+    with session_scope() as session:
+        reports = jobs.coverage_report(session, markets=_markets(market))
+    for code, report in reports.items():
+        colour = typer.colors.YELLOW if report.exhausted else typer.colors.GREEN
+        typer.secho(
+            f"{code.upper()}: {report.usable_candidates} topics left, "
+            f"{report.used_topics} written, {report.available_products} products",
+            fg=colour,
+        )
+        typer.echo(f"  {report.reason}")
+        if report.below_threshold:
+            typer.echo(
+                f"  {report.below_threshold} candidates are below MIN_TOPIC_SCORE and "
+                "will not be written"
+            )
+        if report.last_new_product_at:
+            typer.echo(
+                f"  newest product seen: {report.last_new_product_at:%Y-%m-%d} "
+                f"({report.new_products_7d} added in the last 7 days)"
+            )
+
+
+@app.command()
 def budget() -> None:
     """Show today's AI budget."""
     _bootstrap()

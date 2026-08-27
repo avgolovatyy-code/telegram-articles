@@ -396,6 +396,9 @@ class TopicCandidate(Base, TimestampMixin):
     boost: Mapped[float] = mapped_column(Float, default=0.0)
     embedding: Mapped[list[float] | None] = mapped_column(JSONColumn)
     last_used_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+    #: How many times generation produced an article that failed the quality gates.
+    #: A topic that keeps failing is retired instead of burning budget every run.
+    generation_failures: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
 
 # -------------------------------------------------------------------- articles

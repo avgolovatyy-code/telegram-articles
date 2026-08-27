@@ -153,7 +153,7 @@ class BudgetManager:
 
         plan: dict[str, int] = dict.fromkeys(MARKETS, 0)
 
-        def fill(ceiling_for: Callable[[Market], int]) -> None:
+        def fill(ceiling_for: Callable[[Market], int | None]) -> None:
             """Hand out one article at a time so neither market starves."""
             nonlocal affordable
             while affordable > 0:
@@ -161,7 +161,8 @@ class BudgetManager:
                 for market in MARKETS:
                     if affordable <= 0:
                         break
-                    if snapshot.generated[market] + plan[market] >= ceiling_for(market):
+                    ceiling = ceiling_for(market)
+                    if ceiling is not None and snapshot.generated[market] + plan[market] >= ceiling:
                         continue
                     plan[market] += 1
                     affordable -= 1
@@ -171,7 +172,8 @@ class BudgetManager:
 
         # Phase 1 — both minimums, alternating between markets.
         fill(self.settings.articles_min_per_day)
-        # Phase 2 — grow towards the maxima with whatever budget is left.
+        # Phase 2 — spend whatever is left. With no configured ceiling this keeps going
+        # until the budget runs out, so a cheap day produces more than 20 per market.
         fill(self.settings.articles_max_per_day)
         return plan
 
@@ -186,7 +188,8 @@ class BudgetManager:
         )
         remaining = snapshot.remaining_usd - self.settings.budget_safety_margin_usd
 
-        if snapshot.generated[market] >= self.settings.articles_max_per_day(market):
+        ceiling = self.settings.articles_max_per_day(market)
+        if ceiling is not None and snapshot.generated[market] >= ceiling:
             return GenerationDecision(
                 False, f"daily maximum for {market} reached", projected, snapshot.remaining_usd
             )

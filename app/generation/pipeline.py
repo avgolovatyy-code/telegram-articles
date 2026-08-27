@@ -272,13 +272,30 @@ class GenerationPipeline:
         if not gate.passed:
             article.status = ArticleStatus.VALIDATION_FAILED
             article.status_reason = "; ".join(gate.errors[:5])
-            topic.status = TopicStatus.CANDIDATE
+            topic.generation_failures += 1
+            if topic.generation_failures >= self.settings.max_topic_generation_failures:
+                # Retire the topic rather than paying for the same failure every run.
+                topic.status = TopicStatus.REJECTED
+                topic.status_reason = (
+                    f"retired after {topic.generation_failures} failed generations: "
+                    f"{article.status_reason}"
+                )
+                log.info(
+                    "topics.retired",
+                    topic_id=topic.id,
+                    market=topic.market,
+                    failures=topic.generation_failures,
+                    reason=article.status_reason,
+                )
+            else:
+                topic.status = TopicStatus.CANDIDATE
             self.session.flush()
             return GenerationOutcome(
                 article, ArticleStatus.VALIDATION_FAILED, article.status_reason, cost, gate.errors
             )
 
         topic.status = TopicStatus.USED
+        topic.generation_failures = 0
         topic.last_used_at = utcnow()
         article.status = ArticleStatus.NEEDS_REVIEW
         article.status_reason = None

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 from typing import Literal
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -75,21 +76,30 @@ class Settings(BaseSettings):
 
     # ---------------------------------------------------------------- budget
     daily_ai_budget_usd: float = 3.00
+    #: Priority floor: these are funded first, alternating between markets.
     en_articles_min_per_day: int = 10
-    en_articles_max_per_day: int = 20
     ru_articles_min_per_day: int = 10
-    ru_articles_max_per_day: int = 20
+    #: Hard ceiling per market per day. 0 means "no ceiling" — the daily budget is the
+    #: only limit, so a cheap day can produce well over 20 articles per market.
+    en_articles_max_per_day: int = 0
+    ru_articles_max_per_day: int = 0
     budget_safety_margin_usd: float = 0.05
     default_estimated_article_cost_usd: float = 0.09
 
     # ------------------------------------------------------------- publishing
     auto_publish_en: bool = False
     auto_publish_ru: bool = False
-    en_publish_per_day: int = 10
-    ru_publish_per_day: int = 10
-    min_post_interval_minutes: int = 45
-    publish_window_start_hour: int = 7
-    publish_window_end_hour: int = 22
+    #: Publications scheduled per market per day. 0 means "everything that is ready",
+    #: spread across the window; the budget already bounds how much gets written.
+    en_publish_per_day: int = 0
+    ru_publish_per_day: int = 0
+    #: Floor for the gap between two posts in the same channel. The scheduler stretches
+    #: beyond it to fill the window when there are fewer articles.
+    min_post_interval_minutes: int = 20
+    #: Publishing window, in `publish_timezone` local hours.
+    publish_timezone: str = "Europe/Moscow"
+    publish_window_start_hour: int = 10
+    publish_window_end_hour: int = 21
     stale_article_refresh_hours: int = 24
 
     # ---------------------------------------------------------------- quality
@@ -124,6 +134,12 @@ class Settings(BaseSettings):
     # ----------------------------------------------------------------- topics
     search_demand_provider: Literal["heuristic", "none"] = "heuristic"
     topic_candidates_per_run: int = 120
+    #: Quality floor for generation. When nothing clears it the engine stops instead of
+    #: writing a weak article to fill the daily quota.
+    min_topic_score: float = 0.25
+    #: A topic whose articles keep failing the quality gates is retired after this many
+    #: attempts, so a doomed topic cannot be retried on every run at full cost.
+    max_topic_generation_failures: int = 2
 
     # ------------------------------------------------------------------ admin
     admin_username: str = "admin"
@@ -168,11 +184,22 @@ class Settings(BaseSettings):
     def articles_min_per_day(self, market: Market) -> int:
         return self.ru_articles_min_per_day if market == "ru" else self.en_articles_min_per_day
 
-    def articles_max_per_day(self, market: Market) -> int:
-        return self.ru_articles_max_per_day if market == "ru" else self.en_articles_max_per_day
+    def articles_max_per_day(self, market: Market) -> int | None:
+        """Daily ceiling, or ``None`` when only the budget limits generation."""
+        value = self.ru_articles_max_per_day if market == "ru" else self.en_articles_max_per_day
+        return value if value > 0 else None
 
-    def publish_per_day(self, market: Market) -> int:
-        return self.ru_publish_per_day if market == "ru" else self.en_publish_per_day
+    def publish_per_day(self, market: Market) -> int | None:
+        """Daily publication ceiling, or ``None`` for "everything that is ready"."""
+        value = self.ru_publish_per_day if market == "ru" else self.en_publish_per_day
+        return value if value > 0 else None
+
+    @property
+    def publish_tz(self) -> ZoneInfo:
+        try:
+            return ZoneInfo(self.publish_timezone)
+        except ZoneInfoNotFoundError:
+            return ZoneInfo("UTC")
 
     def utm_campaign(self, market: Market) -> str:
         return f"wegotrip_{market}"

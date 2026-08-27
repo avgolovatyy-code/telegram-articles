@@ -1,0 +1,141 @@
+# DigitalOcean App Platform spec.
+#
+#   doctl apps create --spec .do/app.yaml
+#   doctl apps update <APP_ID> --spec .do/app.yaml
+#
+# Three components:
+#   * pre-deploy job  — runs Alembic migrations before every release;
+#   * web             — FastAPI: admin UI and the /r/<token> click redirect;
+#   * worker          — APScheduler: sync, discovery, generation, publishing.
+#
+# Secrets (OPENAI_API_KEY, TELEGRAM_BOT_TOKEN, ADMIN_PASSWORD) are NOT stored here.
+# Set them once with `doctl apps update ... --spec` after editing, or in the DO console
+# under Settings → App-Level Environment Variables, marked as "Encrypted".
+
+name: wegotrip-content-engine
+region: fra
+
+databases:
+  - name: engine-db
+    engine: PG
+    version: "16"
+    production: false
+    cluster_name: wegotrip-content-engine-db
+
+envs:
+  - key: DATABASE_URL
+    scope: RUN_AND_BUILD_TIME
+    value: ${engine-db.DATABASE_URL}
+  - key: APP_ENV
+    scope: RUN_AND_BUILD_TIME
+    value: production
+  - key: LOG_FORMAT
+    scope: RUN_AND_BUILD_TIME
+    value: json
+  - key: LOG_LEVEL
+    scope: RUN_AND_BUILD_TIME
+    value: INFO
+  - key: WEGOTRIP_REFERER_ID
+    scope: RUN_AND_BUILD_TIME
+    value: "435"
+  - key: TELEGRAM_EN_CHANNEL
+    scope: RUN_AND_BUILD_TIME
+    value: "@wegotrip"
+  - key: TELEGRAM_RU_CHANNEL
+    scope: RUN_AND_BUILD_TIME
+    value: "@wegotrip_ru"
+  # Set this to your own private channel before the first production publication.
+  - key: TELEGRAM_TEST_CHANNEL
+    scope: RUN_AND_BUILD_TIME
+    value: ""
+  - key: OPENAI_WRITER_MODEL
+    scope: RUN_AND_BUILD_TIME
+    value: gpt-5.6-terra
+  - key: OPENAI_UTILITY_MODEL
+    scope: RUN_AND_BUILD_TIME
+    value: gpt-5.6-luna
+  - key: OPENAI_FALLBACK_MODEL
+    scope: RUN_AND_BUILD_TIME
+    value: gpt-5.6-sol
+  - key: DAILY_AI_BUDGET_USD
+    scope: RUN_AND_BUILD_TIME
+    value: "3.00"
+  # Review mode until the rendering has been checked on the test channel.
+  - key: AUTO_PUBLISH_EN
+    scope: RUN_AND_BUILD_TIME
+    value: "false"
+  - key: AUTO_PUBLISH_RU
+    scope: RUN_AND_BUILD_TIME
+    value: "false"
+  - key: ALLOW_GENERATED_COVERS
+    scope: RUN_AND_BUILD_TIME
+    value: "false"
+  # Public URL of the web component; click tracking links are built from it.
+  - key: TRACKING_BASE_URL
+    scope: RUN_AND_BUILD_TIME
+    value: ${APP_URL}
+  - key: ADMIN_BASE_URL
+    scope: RUN_AND_BUILD_TIME
+    value: ${APP_URL}
+  - key: OPENAI_API_KEY
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: REPLACE_ME
+  - key: TELEGRAM_BOT_TOKEN
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: REPLACE_ME
+  - key: ADMIN_PASSWORD
+    scope: RUN_AND_BUILD_TIME
+    type: SECRET
+    value: REPLACE_ME
+
+jobs:
+  - name: migrate
+    kind: PRE_DEPLOY
+    github:
+      repo: avgolovatyy-code/telegram-articles
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: Dockerfile
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    instance_count: 1
+    run_command: alembic upgrade head
+
+services:
+  - name: web
+    github:
+      repo: avgolovatyy-code/telegram-articles
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: Dockerfile
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    instance_count: 1
+    http_port: 8000
+    run_command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    health_check:
+      http_path: /healthz
+      initial_delay_seconds: 20
+      period_seconds: 30
+    envs:
+      # Only the worker runs the scheduler, otherwise every job would run twice.
+      - key: SCHEDULER_ENABLED
+        scope: RUN_TIME
+        value: "false"
+    routes:
+      - path: /
+
+workers:
+  - name: worker
+    github:
+      repo: avgolovatyy-code/telegram-articles
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: Dockerfile
+    instance_size_slug: apps-s-1vcpu-1gb
+    instance_count: 1
+    run_command: wgt worker
+    envs:
+      - key: SCHEDULER_ENABLED
+        scope: RUN_TIME
+        value: "true"

@@ -30,6 +30,20 @@
     <div class="small muted">Rolling 7-day actual spend</div>
   </div>
   <div class="card">
+    <h3>Material left</h3>
+    <div class="metric small">
+      {% for code, report in coverage.items() %}
+      <div>
+        {{ code|upper }}
+        <span class="badge {{ 'warn' if report.exhausted else 'ok' }}">
+          {{ report.usable_candidates }} topics
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="small muted">Daily counts are a ceiling, never a quota to fill</div>
+  </div>
+  <div class="card">
     <h3>Auto-publish</h3>
     <div class="metric small">
       EN <span class="badge {{ 'ok' if auto_publish.en else '' }}">{{ 'on' if auto_publish.en else 'off' }}</span>
@@ -38,6 +52,18 @@
     <div class="small muted">Review mode is the default</div>
   </div>
 </div>
+
+{% for code, report in coverage.items() %}
+{% if report.exhausted %}
+<div class="flash flash-ok" style="margin-top:16px">
+  <strong>{{ code|upper }}: material exhausted.</strong> {{ report.reason }}
+  {% if report.last_new_product_at %}
+  Newest product seen {{ report.last_new_product_at.strftime('%Y-%m-%d') }};
+  {{ report.new_products_7d }} added in the last 7 days.
+  {% endif %}
+</div>
+{% endif %}
+{% endfor %}
 
 <h2>Markets</h2>
 <div class="grid grid-2">

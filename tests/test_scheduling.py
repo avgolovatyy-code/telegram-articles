@@ -84,15 +84,58 @@ def test_publications_are_spaced_out(session, settings):
     assert all(gap >= settings.min_post_interval_minutes for gap in gaps)
 
 
-def test_slots_stay_inside_the_publishing_window(session, settings):
-    for index in range(6):
+def test_slots_stay_inside_the_moscow_publishing_window(session, settings):
+    """Window hours are local to PUBLISH_TIMEZONE, not UTC."""
+    assert settings.publish_timezone == "Europe/Moscow"
+    for index in range(12):
         make_article(session, "en", ArticleStatus.APPROVED, index)
 
     jobs.schedule_publications(session, markets=("en",), settings=settings)
 
     for article in session.scalars(select(Article).where(Article.scheduled_for.is_not(None))):
-        hour = article.scheduled_for.hour
-        assert settings.publish_window_start_hour <= hour <= settings.publish_window_end_hour
+        local_hour = article.scheduled_for.astimezone(settings.publish_tz).hour
+        assert settings.publish_window_start_hour <= local_hour <= settings.publish_window_end_hour
+
+
+def test_a_batch_is_spread_across_the_whole_window(session, settings):
+    """A batch generated at once must trickle out, not fire back to back."""
+    for index in range(10):
+        make_article(session, "en", ArticleStatus.APPROVED, index)
+
+    jobs.schedule_publications(session, markets=("en",), settings=settings)
+
+    slots = sorted(
+        article.scheduled_for
+        for article in session.scalars(select(Article).where(Article.scheduled_for.is_not(None)))
+    )
+    assert len(slots) == 10
+    span_hours = (slots[-1] - slots[0]).total_seconds() / 3600
+    window_hours = settings.publish_window_end_hour - settings.publish_window_start_hour
+    # The batch should occupy most of a publishing window, not a couple of hours.
+    assert span_hours >= min(window_hours, 9 * settings.min_post_interval_minutes / 60) * 0.75
+
+
+def test_everything_ready_is_scheduled_when_no_ceiling_is_set(session, settings):
+    assert settings.publish_per_day("en") is None
+    for index in range(25):
+        make_article(session, "en", ArticleStatus.APPROVED, index)
+
+    report = jobs.schedule_publications(session, markets=("en",), settings=settings)
+
+    assert report.details["en_scheduled"] == 25
+
+
+def test_an_explicit_quota_is_not_multiplied_by_repeated_runs(session, settings, monkeypatch):
+    monkeypatch.setattr(settings, "en_publish_per_day", 10)
+    for index in range(15):
+        make_article(session, "en", ArticleStatus.APPROVED, index)
+
+    first = jobs.schedule_publications(session, markets=("en",), settings=settings)
+    second = jobs.schedule_publications(session, markets=("en",), settings=settings)
+
+    total = first.details["en_scheduled"] + second.details["en_scheduled"]
+    assert total <= 10
+    assert second.details["en_scheduled"] == 0
 
 
 def test_queue_publishes_due_items_once(session, settings):

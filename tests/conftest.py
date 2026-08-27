@@ -6,14 +6,36 @@ from collections.abc import Iterator
 import pytest
 from sqlalchemy.orm import Session
 
-os.environ.setdefault("DATABASE_URL", "sqlite+pysqlite:///:memory:")
-os.environ.setdefault("CATALOG_PROVIDER", "mock")
-os.environ.setdefault("LLM_PROVIDER", "mock")
-os.environ.setdefault("TELEGRAM_DRY_RUN", "true")
-os.environ.setdefault("TELEGRAM_TEST_CHANNEL", "@wegotrip_test")
-os.environ.setdefault("VALIDATE_MEDIA_OVER_NETWORK", "false")
-os.environ.setdefault("SCHEDULER_ENABLED", "false")
-os.environ.setdefault("TRACKING_BASE_URL", "https://engine.example")
+# The test profile is pinned rather than inherited: the suite asserts on concrete
+# budgets, windows and thresholds, so an exported variable in the developer's shell
+# (or a stray .env) must not change the outcome.
+os.environ["DATABASE_URL"] = "sqlite+pysqlite:///:memory:"
+os.environ["CATALOG_PROVIDER"] = "mock"
+os.environ["LLM_PROVIDER"] = "mock"
+os.environ["OPENAI_API_KEY"] = ""
+os.environ["TELEGRAM_DRY_RUN"] = "true"
+os.environ["TELEGRAM_BOT_TOKEN"] = ""
+os.environ["TELEGRAM_EN_CHANNEL"] = "@wegotrip"
+os.environ["TELEGRAM_RU_CHANNEL"] = "@wegotrip_ru"
+os.environ["TELEGRAM_TEST_CHANNEL"] = "@wegotrip_test"
+os.environ["VALIDATE_MEDIA_OVER_NETWORK"] = "false"
+os.environ["SCHEDULER_ENABLED"] = "false"
+os.environ["TRACKING_BASE_URL"] = "https://engine.example"
+os.environ["DAILY_AI_BUDGET_USD"] = "3.00"
+os.environ["EN_ARTICLES_MIN_PER_DAY"] = "10"
+os.environ["RU_ARTICLES_MIN_PER_DAY"] = "10"
+os.environ["EN_ARTICLES_MAX_PER_DAY"] = "0"
+os.environ["RU_ARTICLES_MAX_PER_DAY"] = "0"
+os.environ["EN_PUBLISH_PER_DAY"] = "0"
+os.environ["RU_PUBLISH_PER_DAY"] = "0"
+os.environ["PUBLISH_TIMEZONE"] = "Europe/Moscow"
+os.environ["PUBLISH_WINDOW_START_HOUR"] = "10"
+os.environ["PUBLISH_WINDOW_END_HOUR"] = "21"
+os.environ["MIN_POST_INTERVAL_MINUTES"] = "20"
+os.environ["MIN_TOPIC_SCORE"] = "0.25"
+os.environ["ALLOW_GENERATED_COVERS"] = "false"
+os.environ["AUTO_PUBLISH_EN"] = "false"
+os.environ["AUTO_PUBLISH_RU"] = "false"
 
 from app.config import Settings, reload_settings
 from app.db import models  # noqa: F401

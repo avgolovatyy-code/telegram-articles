@@ -9,6 +9,7 @@
 * Спецификация: [`WEGOTRIP_TELEGRAM_CONTENT_ENGINE_CURSOR_SPEC.md`](WEGOTRIP_TELEGRAM_CONTENT_ENGINE_CURSOR_SPEC.md)
 * План и архитектурные решения: [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)
 * Статус требований: [`REQUIREMENTS_STATUS.md`](REQUIREMENTS_STATUS.md)
+* Деплой на DigitalOcean: [`DEPLOY.md`](DEPLOY.md)
 
 ---
 
@@ -30,8 +31,11 @@ Affiliate API → каталог (EN и RU раздельно) → темы по
    иначе предложение удаляется целиком.
 4. **Только медиа из WeGoTrip API.** Сгенерированная обложка — выключенное по умолчанию
    исключение.
-5. **$3 в сутки — жёсткий предел.** Расход считается по фактическому `usage`, перед
-   каждой генерацией резервируется бюджет.
+5. **$3 в сутки — единственный предел.** Расход считается по фактическому `usage`,
+   перед каждой генерацией резервируется бюджет. Потолка по числу статей нет: сколько
+   влезает в бюджет, столько и пишется.
+6. **Материал не выдумывается.** Когда в каталоге не остаётся тем выше порога качества,
+   движок останавливается и говорит об этом, а не добирает норму слабыми статьями.
 
 ---
 
@@ -81,6 +85,7 @@ docker compose exec api wgt check-telegram
 | `wgt publish-test <article_id>` | Публикация одной статьи в тест-канал |
 | `wgt cycle` | sync → discover → generate → schedule |
 | `wgt budget` | Бюджет на сегодня и план генерации |
+| `wgt coverage` | Сколько материала в каталоге ещё не описано |
 | `wgt check-telegram` | Проверка токена и доступа к каналам |
 | `wgt import-conversions file.csv` | Импорт заказов из партнёрского кабинета |
 | `wgt doctor` | Проверка конфигурации и подключения к БД |
@@ -118,11 +123,16 @@ OPENAI_WRITER_MODEL=gpt-5.6-terra
 OPENAI_UTILITY_MODEL=gpt-5.6-luna
 OPENAI_FALLBACK_MODEL=gpt-5.6-sol
 
-DAILY_AI_BUDGET_USD=3.00
-EN_ARTICLES_MIN_PER_DAY=10
-EN_ARTICLES_MAX_PER_DAY=20
+DAILY_AI_BUDGET_USD=3.00         # жёсткий предел, больше ничего не ограничивает
+EN_ARTICLES_MIN_PER_DAY=10       # приоритетный минимум
 RU_ARTICLES_MIN_PER_DAY=10
-RU_ARTICLES_MAX_PER_DAY=20
+EN_ARTICLES_MAX_PER_DAY=0        # 0 = без потолка, ограничивает только бюджет
+RU_ARTICLES_MAX_PER_DAY=0
+
+PUBLISH_TIMEZONE=Europe/Moscow   # окно публикаций 10:00–21:00 по Москве
+PUBLISH_WINDOW_START_HOUR=10
+PUBLISH_WINDOW_END_HOUR=21
+MIN_POST_INTERVAL_MINUTES=20     # только нижняя граница паузы между постами
 
 AUTO_PUBLISH_EN=false            # режим ревью по умолчанию
 AUTO_PUBLISH_RU=false
@@ -130,6 +140,7 @@ ALLOW_GENERATED_COVERS=false     # контролируемое исключен
 
 MIN_QUALITY_SCORE=0.88
 MIN_FACTUALITY_SCORE=0.97
+MIN_TOPIC_SCORE=0.25             # ниже порога темы не пишутся вообще
 ENABLE_HASHTAGS=true
 ```
 
@@ -188,7 +199,32 @@ mock-провайдер каталога, mock-модель и dry-run Telegram-
 
 ---
 
+## Как работает суточный цикл
+
+`worker` держит расписание: синхронизация каталога в 02:00 UTC, поиск тем в 03:00,
+генерация в 04:00 / 10:00 / 16:00, распределение публикаций в 05:30 / 11:30 / 17:30,
+очередь публикаций каждые 5 минут.
+
+**Публикация растянута на день.** Окно — 10:00–21:00 по Москве. Статьи генерируются
+пачками, но выходят поштучно: интервал считается как «оставшееся окно / количество
+постов» и не бывает плотнее `MIN_POST_INTERVAL_MINUTES`. Что не поместилось сегодня,
+переносится на завтра.
+
+**Ограничивает только бюджет.** Сначала финансируются минимумы 10 EN + 10 RU по очереди,
+затем на остаток пишется столько статей, сколько влезает в $3. При средней цене около
+$0.05 за статью это порядка 45–55 статей в сутки суммарно.
+
+**Материал не выдумывается.** Когда сочетаний «сущность × интент» выше `MIN_TOPIC_SCORE`
+не остаётся, движок останавливается, пишет `topics.exhausted` в лог и показывает это на
+дашборде. Порог не понижается, слабые темы не берутся. Новые темы появляются сами, когда
+`sync_catalog` увидит в Affiliate API новые товары. Остаток материала: `wgt coverage`.
+
 ## Деплой
+
+Пошаговая инструкция для DigitalOcean — в [`DEPLOY.md`](DEPLOY.md): вариант с droplet и
+Docker Compose (`deploy/`) и вариант с App Platform (`.do/app.yaml`).
+
+Кратко, если разворачиваете куда-то ещё:
 
 1. PostgreSQL 16 и переменные окружения из `.env.example`.
 2. `alembic upgrade head`.
@@ -199,8 +235,6 @@ mock-провайдер каталога, mock-модель и dry-run Telegram-
 5. Первый запуск: `wgt seed`, `wgt sync-catalog`, `wgt discover-topics`, `wgt generate`.
 6. Опубликуйте несколько статей в тест-канал, проверьте вёрстку, и только потом
    включайте `AUTO_PUBLISH_EN` / `AUTO_PUBLISH_RU`.
-
-`docker-compose.yml` поднимает эту схему целиком: `db`, `migrate`, `api`, `worker`.
 
 ### Безопасность
 
