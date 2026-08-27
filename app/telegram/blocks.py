@@ -10,6 +10,7 @@ Limits enforced by :func:`validate_rich_message`:
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -61,14 +62,14 @@ def footer(text: RichText) -> dict[str, Any]:
     return {"type": "footer", "text": text}
 
 
-def bullet_list(items: list[RichText]) -> dict[str, Any]:
+def bullet_list(items: Sequence[RichText]) -> dict[str, Any]:
     return {
         "type": "list",
         "items": [{"blocks": [paragraph(item)]} for item in items],
     }
 
 
-def ordered_list(items: list[RichText]) -> dict[str, Any]:
+def ordered_list(items: Sequence[RichText]) -> dict[str, Any]:
     return {
         "type": "list",
         "items": [
@@ -100,7 +101,10 @@ def pull_quote(text: RichText, credit: RichText | None = None) -> dict[str, Any]
 
 
 def table(
-    rows: list[list[RichText]], *, bordered: bool = True, caption: RichText | None = None
+    rows: Sequence[Sequence[RichText]],
+    *,
+    bordered: bool = True,
+    caption: RichText | None = None,
 ) -> dict[str, Any]:
     cells = [[{"text": cell} for cell in row[:TABLE_COLUMN_LIMIT]] for row in rows]
     payload: dict[str, Any] = {"type": "table", "cells": cells}
@@ -127,7 +131,7 @@ def photo(url: str, caption: RichText | None = None) -> dict[str, Any]:
     return payload
 
 
-def collage(urls: list[str], caption: RichText | None = None) -> dict[str, Any]:
+def collage(urls: Sequence[str], caption: RichText | None = None) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "type": "collage",
         "blocks": [photo(url) for url in urls],
@@ -137,7 +141,7 @@ def collage(urls: list[str], caption: RichText | None = None) -> dict[str, Any]:
     return payload
 
 
-def slideshow(urls: list[str], caption: RichText | None = None) -> dict[str, Any]:
+def slideshow(urls: Sequence[str], caption: RichText | None = None) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "type": "slideshow",
         "blocks": [photo(url) for url in urls],
@@ -179,7 +183,7 @@ def url_button(text: str, url: str, *, style: str = "primary") -> dict[str, Any]
     return {"text": text, "url": url, "style": style}
 
 
-def buttons(items: list[dict[str, Any]], *, align: str = "left") -> dict[str, Any]:
+def buttons(items: Sequence[dict[str, Any]], *, align: str = "left") -> dict[str, Any]:
     return {"type": "buttons", "buttons": items[:BUTTONS_PER_ROW_LIMIT], "align": align}
 
 

@@ -133,16 +133,18 @@ class CatalogIndex:
                 self.by_city[product.city_external_id].append(product.external_id)
             if product.country_external_id:
                 self.by_country[product.country_external_id].append(product.external_id)
-            for link in product.attractions:
-                self.by_attraction[link.attraction_external_id].append(product.external_id)
+            for attraction_link in product.attractions:
+                self.by_attraction[attraction_link.attraction_external_id].append(
+                    product.external_id
+                )
             if product.city_external_id:
-                for link in product.categories:
+                for category_link in product.categories:
                     self.by_category_city[
-                        (link.category_external_id, product.city_external_id)
+                        (category_link.category_external_id, product.city_external_id)
                     ].append(product.external_id)
-                for link in product.collections:
+                for collection_link in product.collections:
                     self.by_collection_city[
-                        (link.collection_external_id, product.city_external_id)
+                        (collection_link.collection_external_id, product.city_external_id)
                     ].append(product.external_id)
 
         self._max_rank = max((p.popularity_rank or 0 for p in self.products), default=1) or 1
@@ -154,9 +156,10 @@ class CatalogIndex:
 
     def product_popularity(self, product_ids: list[str]) -> float:
         ranks = [
-            self.products_by_id[pid].popularity_rank
+            rank
             for pid in product_ids
-            if pid in self.products_by_id and self.products_by_id[pid].popularity_rank is not None
+            if pid in self.products_by_id
+            and (rank := self.products_by_id[pid].popularity_rank) is not None
         ]
         if not ranks:
             return 0.3
@@ -358,7 +361,9 @@ class TopicDiscoveryService:
             key=lambda p: p.popularity_rank if p.popularity_rank is not None else 9999,
         )[:150]:
             city = index.cities.get(product.city_external_id or "")
-            attraction_name = product.attractions[0].name if product.attractions else product.title
+            attraction_name = (
+                product.attractions[0].name if product.attractions else None
+            ) or product.title
             yield EntityRef(
                 entity_type=EntityType.PRODUCT,
                 external_id=product.external_id,
@@ -367,10 +372,12 @@ class TopicDiscoveryService:
                 popularity=index.popularity_from_rank(product.popularity_rank, len(index.products)),
                 product_ids=[product.external_id],
                 context={
-                    "entity": attraction_name or product.title,
-                    "attraction": attraction_name or "",
+                    "entity": attraction_name,
+                    "attraction": attraction_name,
                     "city": city.name if city else "",
-                    "theme": (product.collections[0].title.lower() if product.collections else ""),
+                    "theme": (
+                        (product.collections[0].title or "").lower() if product.collections else ""
+                    ),
                 },
             )
 

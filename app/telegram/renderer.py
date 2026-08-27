@@ -90,11 +90,11 @@ class RichMessageRenderer:
         for placement in document.product_placements:
             placements_by_section.setdefault(placement.after_section, []).append(placement)
         media_by_section: dict[int, list[Any]] = {}
-        for placement in document.media_placements:
-            media_by_section.setdefault(placement.after_section, []).append(placement)
+        for media_placement in document.media_placements:
+            media_by_section.setdefault(media_placement.after_section, []).append(media_placement)
         audio_by_section: dict[int, list[Any]] = {}
-        for placement in document.audio_placements:
-            audio_by_section.setdefault(placement.after_section, []).append(placement)
+        for audio_placement in document.audio_placements:
+            audio_by_section.setdefault(audio_placement.after_section, []).append(audio_placement)
 
         collection_products: list[Product] = []
 

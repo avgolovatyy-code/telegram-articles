@@ -113,11 +113,12 @@ class MediaValidator:
         seen: set[str] = set()
         for url, kind in urls:
             check = self.check(url, kind=kind)
-            if check.ok and check.fingerprint:
-                if check.fingerprint in seen:
+            fingerprint = check.fingerprint
+            if check.ok and fingerprint:
+                if fingerprint in seen:
                     check = MediaCheck(url, False, kind, error="duplicate image in article")
                 else:
-                    seen.add(check.fingerprint)
+                    seen.add(fingerprint)
             results.append(check)
         return results
 

@@ -447,18 +447,15 @@ class CatalogSyncService:
                 by_country[product.country_external_id] = (
                     by_country.get(product.country_external_id, 0) + 1
                 )
-            for link in product.attractions:
-                by_attraction[link.attraction_external_id] = (
-                    by_attraction.get(link.attraction_external_id, 0) + 1
-                )
-            for link in product.categories:
-                by_category[link.category_external_id] = (
-                    by_category.get(link.category_external_id, 0) + 1
-                )
-            for link in product.collections:
-                by_collection[link.collection_external_id] = (
-                    by_collection.get(link.collection_external_id, 0) + 1
-                )
+            for attraction_link in product.attractions:
+                key = attraction_link.attraction_external_id
+                by_attraction[key] = by_attraction.get(key, 0) + 1
+            for category_link in product.categories:
+                key = category_link.category_external_id
+                by_category[key] = by_category.get(key, 0) + 1
+            for collection_link in product.collections:
+                key = collection_link.collection_external_id
+                by_collection[key] = by_collection.get(key, 0) + 1
 
         for city in self.session.scalars(select(City).where(City.market == market)):
             counted = by_city.get(city.external_id)

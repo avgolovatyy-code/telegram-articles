@@ -15,6 +15,7 @@ Rules implemented (spec §13):
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from sqlalchemy import func, select
@@ -150,27 +151,28 @@ class BudgetManager:
         budget_left = max(0.0, snapshot.remaining_usd - self.settings.budget_safety_margin_usd)
         affordable = int(budget_left // avg)
 
-        plan = dict.fromkeys(MARKETS, 0)
-        # Phase 1 — minimums.
-        for market in MARKETS:
-            need = max(0, self.settings.articles_min_per_day(market) - snapshot.generated[market])
-            take = min(need, affordable)
-            plan[market] += take
-            affordable -= take
-        # Phase 2 — grow towards the maxima, round-robin so neither market starves.
-        while affordable > 0:
-            progressed = False
-            for market in MARKETS:
-                ceiling = self.settings.articles_max_per_day(market)
-                if snapshot.generated[market] + plan[market] >= ceiling:
-                    continue
-                plan[market] += 1
-                affordable -= 1
-                progressed = True
-                if affordable <= 0:
-                    break
-            if not progressed:
-                break
+        plan: dict[str, int] = dict.fromkeys(MARKETS, 0)
+
+        def fill(ceiling_for: Callable[[Market], int]) -> None:
+            """Hand out one article at a time so neither market starves."""
+            nonlocal affordable
+            while affordable > 0:
+                progressed = False
+                for market in MARKETS:
+                    if affordable <= 0:
+                        break
+                    if snapshot.generated[market] + plan[market] >= ceiling_for(market):
+                        continue
+                    plan[market] += 1
+                    affordable -= 1
+                    progressed = True
+                if not progressed:
+                    return
+
+        # Phase 1 — both minimums, alternating between markets.
+        fill(self.settings.articles_min_per_day)
+        # Phase 2 — grow towards the maxima with whatever budget is left.
+        fill(self.settings.articles_max_per_day)
         return plan
 
     def can_start_article(

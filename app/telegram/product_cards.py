@@ -200,9 +200,9 @@ class TelegramProductCardRenderer:
 
     def _auto_pitch(self, product: Product, market: Market) -> str | None:
         """Fallback copy built only from API fields — never invented."""
-        highlight = (product.highlights or [None])[0]
-        if highlight:
-            return highlight
+        highlights = product.highlights or []
+        if highlights:
+            return highlights[0]
         text = product.short_description or product.description
         if not text:
             return None

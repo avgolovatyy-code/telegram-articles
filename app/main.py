@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -13,6 +14,7 @@ from app.admin.routes import router as admin_router
 from app.api.routes import router as api_router
 from app.config import get_settings
 from app.errors import EngineError
+from app.generation.covers import GENERATED_DIR
 from app.logging_setup import configure_logging, get_logger
 from app.scheduler.runner import SchedulerRunner
 
@@ -62,9 +64,18 @@ def create_app() -> FastAPI:
     application.include_router(api_router)
     application.include_router(admin_router)
 
-    static_dir = __import__("pathlib").Path(__file__).parent / "admin" / "static"
+    static_dir = Path(__file__).parent / "admin" / "static"
     if static_dir.exists():
         application.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+    # Generated covers are written to disk and served from here so Telegram can fetch
+    # them by URL. The directory only exists when ALLOW_GENERATED_COVERS is enabled.
+    GENERATED_DIR.mkdir(parents=True, exist_ok=True)
+    application.mount(
+        "/media/generated",
+        StaticFiles(directory=str(GENERATED_DIR)),
+        name="generated-media",
+    )
 
     return application
 

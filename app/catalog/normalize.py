@@ -93,6 +93,10 @@ def _float_or_none(value: Any) -> float | None:
         return None
 
 
+def _as_dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
 def _str_list(value: Any) -> list[str]:
     if not isinstance(value, list):
         return []
@@ -267,8 +271,8 @@ def normalize_product(
     if not external_id:
         raise CatalogSchemaError("Product payload has no id")
 
-    city = raw.get("city") if isinstance(raw.get("city"), dict) else {}
-    country = raw.get("country") if isinstance(raw.get("country"), dict) else {}
+    city = _as_dict(raw.get("city"))
+    country = _as_dict(raw.get("country"))
     duration_min, duration_max = _duration_bounds(raw)
 
     categories = [
@@ -292,8 +296,8 @@ def normalize_product(
         if isinstance(item, dict)
     ]
 
-    tags = raw.get("tags") if isinstance(raw.get("tags"), dict) else {}
-    types = raw.get("types") if isinstance(raw.get("types"), dict) else {}
+    tags = _as_dict(raw.get("tags"))
+    types = _as_dict(raw.get("types"))
     available = raw.get("available")
     if available is None:
         available = tags.get("available", True)
@@ -334,7 +338,7 @@ def normalize_product(
         important_info=_str_list(raw.get("importantInfo")),
         address=raw.get("address"),
         start_location=raw.get("startLocation"),
-        location_geo=raw.get("locationGeo") if isinstance(raw.get("locationGeo"), dict) else None,
+        location_geo=_as_dict(raw.get("locationGeo")) or None,
         country_external_id=_str_id(country.get("id")),
         country_name=country.get("name"),
         city_external_id=_str_id(city.get("id")),

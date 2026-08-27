@@ -11,6 +11,7 @@ import datetime as dt
 import hashlib
 import json
 from dataclasses import dataclass
+from typing import Any
 from urllib.parse import urlsplit
 
 from sqlalchemy import select
@@ -189,12 +190,13 @@ class FactResearchService:
         return results
 
     # ---------------------------------------------------------------- helpers
-    def _to_result(self, claim: DetectedClaim, item: dict[str, object]) -> VerificationResult:
+    def _to_result(self, claim: DetectedClaim, item: dict[str, Any]) -> VerificationResult:
         raw_status = str(item.get("status") or "unverified")
-        url = item.get("source_url")
-        url = url if isinstance(url, str) and url.startswith("http") else None
+        raw_url = item.get("source_url")
+        url = raw_url if isinstance(raw_url, str) and raw_url.startswith("http") else None
         tier = classify_source(url)
-        confidence = float(item.get("confidence") or 0.0)
+        raw_confidence = item.get("confidence")
+        confidence = float(raw_confidence) if isinstance(raw_confidence, int | float) else 0.0
 
         if raw_status == "verified" and url and tier <= MAX_ACCEPTED_TIER and confidence >= 0.7:
             status = ClaimStatus.VERIFIED
@@ -204,13 +206,12 @@ class FactResearchService:
             status = ClaimStatus.UNVERIFIED
 
         corrected = item.get("corrected_statement")
+        title = item.get("source_title")
         return VerificationResult(
             claim=claim.text,
             status=status,
             source_url=url,
-            source_title=item.get("source_title")
-            if isinstance(item.get("source_title"), str)
-            else None,
+            source_title=title if isinstance(title, str) else None,
             source_tier=tier,
             confidence=confidence,
             corrected_statement=corrected if isinstance(corrected, str) else None,

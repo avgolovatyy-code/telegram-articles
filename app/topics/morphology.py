@@ -21,7 +21,9 @@ log = get_logger("topics.morphology")
 CASES = {"nomn", "gent", "datv", "accs", "ablt", "loct"}
 
 _PLACEHOLDER_RE = re.compile(r"\{(?P<name>[a-z_]+)(?::(?P<case>[a-z]+))?\}")
-_TOKEN_SPLIT_RE = re.compile(r"([\s\-]+)")
+#: Whitespace only: pymorphy3 declines hyphenated toponyms ("Санкт-Петербург") as
+#: single words, and splitting them produces "Санкте-Петербурге".
+_TOKEN_SPLIT_RE = re.compile(r"(\s+)")
 
 
 @lru_cache(maxsize=1)
@@ -39,6 +41,20 @@ def _analyzer() -> Any | None:
 
 
 def _match_capitalisation(source: str, inflected: str) -> str:
+    """Restore the source casing, segment by segment for hyphenated toponyms.
+
+    pymorphy3 lowercases everything, so "Ростов-на-Дону" comes back as
+    "ростове-на-дону" and has to be re-cased against the original.
+    """
+    source_parts = source.split("-")
+    inflected_parts = inflected.split("-")
+    if len(source_parts) == len(inflected_parts) and len(source_parts) > 1:
+        pairs = zip(source_parts, inflected_parts, strict=True)
+        return "-".join(_match_word_case(src, out) for src, out in pairs)
+    return _match_word_case(source, inflected)
+
+
+def _match_word_case(source: str, inflected: str) -> str:
     if source.isupper():
         return inflected.upper()
     if source[:1].isupper():

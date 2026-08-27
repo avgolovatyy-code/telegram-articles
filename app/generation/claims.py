@@ -35,8 +35,9 @@ _PATTERNS: list[tuple[ClaimCategory, re.Pattern[str]]] = [
     (
         ClaimCategory.CLOSING_DAYS,
         re.compile(
-            r"\b(closed on|closed every|day off|выходной день|закрыт[аоы]?\s+(по|в)\s+"
-            r"(понедельник|вторник|сред|четверг|пятниц|суббот|воскресень))\b",
+            r"(\bclosed on\b|\bclosed every\b|\bday off\b|выходной день"
+            r"|закрыт[аоы]?\s+(по|в)\s+"
+            r"(понедельник|вторник|сред|четверг|пятниц|суббот|воскресень))",
             re.IGNORECASE,
         ),
     ),
@@ -122,9 +123,12 @@ _PATTERNS: list[tuple[ClaimCategory, re.Pattern[str]]] = [
     ),
 ]
 
-#: Numbers that are almost certainly volatile when they appear next to money or counts.
+#: Numbers that carry a unit or a currency — the kind that must match the API or a source.
 _NUMERIC_RE = re.compile(
-    r"[€$£₽]\s?\d|\d+\s?(euros?|dollars?|pounds?|рубл|евро|доллар)", re.IGNORECASE
+    r"[€$£₽]\s?\d"
+    r"|\d+(?:[.,]\d+)?\s?(?:eur|usd|gbp|rub|euros?|dollars?|pounds?|рубл|евро|доллар)\b"
+    r"|\d+(?:[.,]\d+)?\s?(?:minutes?|mins?\b|hours?|hrs?\b|km\b|метр|минут|часа?|часов|км\b)",
+    re.IGNORECASE,
 )
 
 
@@ -235,9 +239,9 @@ def strip_unverified(
 
     data = document.model_copy(deep=True)
 
-    data.intro, dropped = clean(data.intro)
+    cleaned_intro, dropped = clean(data.intro)
     removed += dropped
-    data.intro = data.intro or ""
+    data.intro = cleaned_intro or ""
 
     for section in data.sections:
         new_blocks = []

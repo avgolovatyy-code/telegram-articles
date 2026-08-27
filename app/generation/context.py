@@ -141,18 +141,21 @@ class ContextBuilder:
         }
         match topic.entity_type:
             case "city":
-                row = self._city(market, entity_id)
-                if row:
-                    payload |= {"country": row.country_name, "slug": row.slug}
+                city_row = self._city(market, entity_id)
+                if city_row:
+                    payload |= {"country": city_row.country_name, "slug": city_row.slug}
             case "country":
-                row = self._country(market, entity_id)
-                if row:
-                    payload |= {"slug": row.slug, "cities": row.city_count}
+                country_row = self._country(market, entity_id)
+                if country_row:
+                    payload |= {"slug": country_row.slug, "cities": country_row.city_count}
             case "attraction":
-                row = self._attraction(market, entity_id)
-                if row:
-                    city = self._city(market, row.city_external_id or "")
-                    payload |= {"slug": row.slug, "city": city.name if city else None}
+                attraction_row = self._attraction(market, entity_id)
+                if attraction_row:
+                    city = self._city(market, attraction_row.city_external_id or "")
+                    payload |= {
+                        "slug": attraction_row.slug,
+                        "city": city.name if city else None,
+                    }
             case "category" | "collection":
                 _, _, city_id = topic.entity_external_id.partition("@")
                 city = self._city(market, city_id)

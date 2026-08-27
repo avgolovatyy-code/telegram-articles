@@ -40,7 +40,8 @@ from app.db.models import (
 from app.db.types import utcnow
 from app.errors import BudgetExceeded, LLMError
 from app.generation.claims import DetectedClaim, scan_document, strip_unverified
-from app.generation.context import ContextBuilder, MediaCandidate, WriterContext
+from app.generation.context import ContextBuilder, WriterContext
+from app.generation.covers import GeneratedCoverService
 from app.generation.product_selection import ProductSelector, RankedProduct
 from app.generation.quality import GateResult, QualityGate
 from app.generation.research import FactResearchService, VerificationResult
@@ -48,6 +49,7 @@ from app.generation.schemas import ArticleDocument, QualityReview
 from app.generation.writer import ArticleCritic, ArticleWriter
 from app.links.affiliate import AffiliateLinkBuilder, LinkContext
 from app.logging_setup import get_logger, job_context, new_job_id
+from app.media_assets import MediaCandidate
 from app.telegram.media import MediaValidator
 from app.telegram.renderer import RenderedArticle, RichMessageRenderer
 
@@ -96,6 +98,7 @@ class GenerationPipeline:
         self.renderer = RichMessageRenderer(settings=self.settings, link_builder=self.links)
         self.media_validator = media_validator or MediaValidator(self.settings)
         self.tracking = TrackingService(session, settings=self.settings, link_builder=self.links)
+        self.covers = GeneratedCoverService(gateway.provider, self.budget, settings=self.settings)
 
     # ------------------------------------------------------------------ main
     def generate(self, topic: TopicCandidate) -> GenerationOutcome:
@@ -373,6 +376,22 @@ class GenerationPipeline:
                     error=check.error,
                 )
 
+        usable_cover = any(
+            item.kind == "photo" and item.id not in blocked for item in context.media
+        )
+        generated = self.covers.generate(
+            market=market,
+            entity_name=article.entity_name,
+            article_id=article.id,
+            api_media_available=usable_cover,
+        )
+        if generated is not None:
+            for item in media_by_id.values():
+                if item.role == "cover":
+                    item.role = "inline"
+            media_by_id[generated.id] = generated
+            context.media.append(generated)
+
         products = {item.product.external_id: item.product for item in context.products}
         link_context = LinkContext(
             market=market, article_id=article.public_id, topic_slug=article.topic_slug
@@ -434,9 +453,8 @@ class GenerationPipeline:
         article.current_version += 1
         article.products_refreshed_at = utcnow()
 
-        self.session.add(
+        article.versions.append(
             ArticleVersion(
-                article_id=article.id,
                 version=article.current_version,
                 body=article.body,
                 rendered_message=rendered.message,
@@ -446,7 +464,7 @@ class GenerationPipeline:
             )
         )
 
-        self._replace(article.claims, ArticleClaim)
+        self._replace(article.claims)
         status_by_claim = {result.claim: result for result in verifications}
         for claim in detected:
             result = status_by_claim.get(claim.text)
@@ -459,9 +477,8 @@ class GenerationPipeline:
                 status = ClaimStatus.VERIFIED
             else:
                 status = ClaimStatus.PENDING
-            self.session.add(
+            article.claims.append(
                 ArticleClaim(
-                    article_id=article.id,
                     claim=claim.text,
                     claim_type=str(
                         ClaimType.WEGOTRIP_API if claim.supported_by_api else claim.claim_type
@@ -478,21 +495,20 @@ class GenerationPipeline:
                 )
             )
 
-        self._replace(article.sources, ArticleSource)
+        self._replace(article.sources)
         seen_sources: set[str] = set()
         for result in verifications:
             if result.source_url and result.source_url not in seen_sources:
                 seen_sources.add(result.source_url)
-                self.session.add(
+                article.sources.append(
                     ArticleSource(
-                        article_id=article.id,
                         url=result.source_url,
                         title=result.source_title,
                         tier=result.source_tier,
                     )
                 )
 
-        self._replace(article.products, ArticleProduct)
+        self._replace(article.products)
         placements = {p.product_id: p for p in document.product_placements}
         for position, item in enumerate(context.products):
             placement = placements.get(item.product.external_id)
@@ -504,9 +520,8 @@ class GenerationPipeline:
                 ),
                 None,
             )
-            self.session.add(
+            article.products.append(
                 ArticleProduct(
-                    article_id=article.id,
                     product_external_id=item.product.external_id,
                     placement=placement.placement if placement else item.placement,
                     position=position,
@@ -534,19 +549,22 @@ class GenerationPipeline:
                 )
             )
 
-        self._replace(article.media, ArticleMedia)
+        self._replace(article.media)
         media_by_id = {item.id: item for item in context.media}
         for position, media_id in enumerate(rendered.used_media_ids):
             candidate: MediaCandidate | None = media_by_id.get(media_id)
             if candidate is None:
                 continue
-            self.session.add(
+            article.media.append(
                 ArticleMedia(
-                    article_id=article.id,
                     kind=candidate.kind,
                     role=candidate.role,
                     url=candidate.url,
-                    source=str(MediaSource.WEGOTRIP_API),
+                    source=str(
+                        MediaSource.GENERATED
+                        if candidate.source_entity_type == "generated"
+                        else MediaSource.WEGOTRIP_API
+                    ),
                     source_entity_type=candidate.source_entity_type,
                     source_entity_id=candidate.source_entity_id,
                     product_external_id=candidate.product_external_id,
@@ -559,12 +577,10 @@ class GenerationPipeline:
         _ = topic
         self.session.flush()
 
-    def _replace(self, collection: list[Any], model: type) -> None:
-        for row in list(collection):
-            self.session.delete(row)
+    def _replace(self, collection: list[Any]) -> None:
+        """Clear a child collection; ``delete-orphan`` removes the rows on flush."""
         collection.clear()
         self.session.flush()
-        _ = model
 
 
 __all__ = ["MAX_GENERATION_ATTEMPTS", "GenerationOutcome", "GenerationPipeline"]

@@ -110,9 +110,9 @@ class QualityGate:
                 errors.append(f"product {placement.product_id} is not in the selected set")
 
         allowed_media = {item.id for item in context.media}
-        for placement in document.media_placements:
-            if placement.media_id not in allowed_media:
-                errors.append(f"media {placement.media_id} is not an allowed WeGoTrip asset")
+        for media_placement in document.media_placements:
+            if media_placement.media_id not in allowed_media:
+                errors.append(f"media {media_placement.media_id} is not an allowed WeGoTrip asset")
 
         for url in rendered_urls:
             if not self.links.is_store_url(url):

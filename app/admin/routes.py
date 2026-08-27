@@ -9,6 +9,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import secrets
+from collections.abc import Callable
 from typing import Any
 from urllib.parse import urlencode
 
@@ -540,7 +541,7 @@ def ops_run(
     settings: Settings = Depends(get_settings),
     _: str = Depends(require_admin),
 ) -> RedirectResponse:
-    handlers = {
+    handlers: dict[str, Callable[..., jobs.JobReport]] = {
         "seed": jobs.seed_reference_data,
         "sync_catalog": jobs.sync_catalog,
         "discover_topics": jobs.discover_topics,

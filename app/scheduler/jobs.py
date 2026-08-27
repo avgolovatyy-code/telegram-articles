@@ -106,11 +106,12 @@ def refresh_article_products(
     """
     settings = settings or get_settings()
     provider = build_catalog_provider(settings)
+    market: Market = article.market  # type: ignore[assignment]
     stale: list[str] = []
     try:
         for link in article.products:
             product = refresh_product(
-                session, provider, article.market, link.product_external_id, settings=settings
+                session, provider, market, link.product_external_id, settings=settings
             )
             if product is None or not product.available or not product.published:
                 stale.append(link.product_external_id)
@@ -414,9 +415,12 @@ def cleanup_expired(session: Session, *, settings: Settings | None = None) -> Jo
     ).all()
     dead = 0
     for link in orphan_links:
+        article = session.get(Article, link.article_id)
+        if article is None:
+            continue
         product = session.scalar(
             select(Product).where(
-                Product.market == session.get(Article, link.article_id).market,  # type: ignore[union-attr]
+                Product.market == article.market,
                 Product.external_id == link.product_external_id,
             )
         )
