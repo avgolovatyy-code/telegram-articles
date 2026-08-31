@@ -235,6 +235,7 @@ def test_auto_publish_is_on_by_default():
     # Slack stays optional: nothing breaks when it is not configured.
     assert shipped.slack_enabled is False
     assert shipped.slack_active is False
+    assert shipped.slack_channel == "#telegram-articles"
 
 
 def test_slack_turns_on_when_the_three_credentials_are_present():

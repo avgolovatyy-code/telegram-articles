@@ -19,14 +19,18 @@ SECRET_NAMES: frozenset[str] = frozenset(
         "DATABASE_URL",
         "POSTGRES_PASSWORD",
         "DIGITALOCEAN_ACCESS_TOKEN",
+        "DEPLOY_SSH_PRIVATE_KEY",
     }
 )
 
-#: Dashboard / Cursor names that map onto the canonical setting. The owner stored
-#: Slack credentials as ``*_TG``; without this they never reach ``Settings``.
+#: Dashboard / Cursor names that map onto the canonical setting. The owner already
+#: stored Slack as ``*_TG`` and the droplet key as ``DEPLOY_SSH_KEY`` (shared with
+#: the video-generation repo).
 SECRET_ALIASES: dict[str, str] = {
     "SLACK_BOT_TOKEN_TG": "SLACK_BOT_TOKEN",
     "SLACK_SIGNING_SECRET_TG": "SLACK_SIGNING_SECRET",
+    "DEPLOY_SSH_KEY": "DEPLOY_SSH_PRIVATE_KEY",
+    "DROPLET_SSH_PRIVATE_KEY": "DEPLOY_SSH_PRIVATE_KEY",
 }
 
 #: Canonical names plus aliases — anything that must be stored encrypted and masked.

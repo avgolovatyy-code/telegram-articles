@@ -57,6 +57,13 @@ def test_alias_is_stored_under_the_canonical_name(store: SecretStore):
     assert store.get("SLACK_BOT_TOKEN") == slack
 
 
+def test_deploy_ssh_key_alias_is_accepted(store: SecretStore):
+    key = "-----BEGIN OPENSSH PRIVATE KEY-----\nunit-test\n-----END OPENSSH PRIVATE KEY-----"
+    store.set("DEPLOY_SSH_KEY", key)
+    assert store.names() == ["DEPLOY_SSH_PRIVATE_KEY"]
+    assert store.get("DEPLOY_SSH_PRIVATE_KEY") == key
+
+
 def test_empty_values_are_refused(store: SecretStore):
     with pytest.raises(ConfigurationError, match="empty value"):
         store.set("OPENAI_API_KEY", "   ")
@@ -226,8 +233,11 @@ def test_secret_names_cover_every_credential_setting():
     fields = set(Settings.model_fields)
     for name in SECRET_NAMES:
         lowered = name.lower()
-        # POSTGRES_PASSWORD and DIGITALOCEAN_ACCESS_TOKEN belong to deployment, not
-        # to the application settings model.
-        if lowered in {"postgres_password", "digitalocean_access_token"}:
+        # These belong to deployment, not to the application settings model.
+        if lowered in {
+            "postgres_password",
+            "digitalocean_access_token",
+            "deploy_ssh_private_key",
+        }:
             continue
         assert lowered in fields, f"{name} is not a setting"

@@ -90,22 +90,26 @@ Telegram → New Channel → название, например `WeGoTrip Conten
 1. Откройте [cursor.com/dashboard](https://cursor.com/dashboard).
 2. Слева выберите **Cloud Agents**, затем вкладку **Secrets**.
 3. Нажмите **Add secret**. Откроются два поля: имя и значение.
-4. Добавьте по очереди семь записей из таблицы ниже. Имя пишите **точно** как в первой
-   колонке — заглавными буквами, с подчёркиваниями.
-5. Когда добавите все, напишите мне в чат любое сообщение, например «секреты добавил».
+4. Добавьте записи из таблицы ниже. Имя пишите **точно** как в первой колонке.
+   Уже лежащие в Dashboard имена с другой стороны тоже принимаются.
+5. Секреты попадают только в **новый** Cloud Agent. В уже идущем чате их не будет,
+   даже если они видны в Dashboard. После добавления откройте новый агент на этой
+   ветке и напишите «задеплой».
 
-| Имя (скопируйте как есть) | Что вставить в значение |
-| --- | --- |
-| `DIGITALOCEAN_ACCESS_TOKEN` | токен DigitalOcean из шага 6 |
-| `OPENAI_API_KEY` | ключ OpenAI из шага 4 |
-| `TELEGRAM_BOT_TOKEN` | токен бота из шага 1 |
-| `TELEGRAM_TEST_CHANNEL` | id тест-канала, я подскажу как его получить |
-| `DEPLOY_SSH_PRIVATE_KEY` | содержимое файла `~/.ssh/id_ed25519` целиком |
-| `ACME_EMAIL` | ваша почта |
-| `ADMIN_PASSWORD` | придумайте пароль для входа в админку |
-
-Почему нужно написать мне после добавления: секреты попадают только в **новые** запуски
-агента. В текущем сеансе я их не вижу, поэтому без вашего сообщения ничего не начнётся.
+| Имя (скопируйте как есть) | Что вставить в значение | Уже есть в Dashboard под именем |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | ключ OpenAI из шага 4 | `OPENAI_API_KEY` |
+| `TELEGRAM_BOT_TOKEN` | токен бота из шага 1 | `TELEGRAM_BOT_TOKEN` |
+| `SLACK_BOT_TOKEN` | Bot User OAuth Token | `SLACK_BOT_TOKEN_TG` |
+| `SLACK_SIGNING_SECRET` | Signing Secret | `SLACK_SIGNING_SECRET_TG` |
+| `SLACK_CHANNEL` | `#telegram-articles` | `SLACK_CHANNEL` |
+| `DEPLOY_HOST` | IP или hostname droplet | `DEPLOY_HOST` |
+| `DEPLOY_USER` | пользователь SSH | `DEPLOY_USER` |
+| `DEPLOY_SSH_PRIVATE_KEY` | приватный SSH-ключ целиком | `DEPLOY_SSH_KEY` |
+| `TELEGRAM_TEST_CHANNEL` | id тест-канала | — |
+| `DIGITALOCEAN_ACCESS_TOKEN` | только если нужен **новый** droplet | — |
+| `ACME_EMAIL` | почта для сертификата | — |
+| `ADMIN_PASSWORD` | пароль админки; можно сгенерировать на сервере | — |
 
 Дальше я сам создам сервер, разверну систему, наполню каталог и покажу первые статьи в
 тест-канале.

@@ -150,7 +150,7 @@ class Settings(BaseSettings):
     slack_bot_token: str | None = None
     slack_signing_secret: str | None = None
     #: Channel id (`C0BTME6R546`) or name (`#telegram-articles`) for notifications.
-    slack_channel: str | None = None
+    slack_channel: str | None = "#telegram-articles"
     slack_notify_on_draft: bool = True
     slack_notify_on_publish: bool = True
     #: Hour (UTC) at which the daily digest is posted.
