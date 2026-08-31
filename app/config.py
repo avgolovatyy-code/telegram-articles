@@ -253,7 +253,7 @@ def reload_settings() -> Settings:
 
 def secrets_status() -> dict[str, object]:
     """Where each credential came from — reported by ``wgt doctor``."""
-    from app.security.names import SECRET_NAMES
+    from app.security.names import SECRET_ALIASES, SECRET_NAMES
     from app.security.secrets import SecretStore
 
     store = SecretStore()
@@ -264,7 +264,12 @@ def secrets_status() -> dict[str, object]:
         "key_source": store.key_source,
         "encrypted": sorted(stored),
         "plaintext_env": sorted(
-            name for name in SECRET_NAMES if os.environ.get(name) and name not in stored
+            {name for name in SECRET_NAMES if os.environ.get(name) and name not in stored}
+            | {
+                name
+                for name in SECRET_ALIASES
+                if os.environ.get(name) and SECRET_ALIASES[name] not in stored
+            }
         ),
     }
 

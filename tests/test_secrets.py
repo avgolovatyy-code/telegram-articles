@@ -50,6 +50,13 @@ def test_unknown_names_are_refused(store: SecretStore):
         store.set("SOME_RANDOM_SETTING", "x")
 
 
+def test_alias_is_stored_under_the_canonical_name(store: SecretStore):
+    slack = "xoxb-" + "1" * 10 + "-" + "abcdefghijklmnop"
+    store.set("SLACK_BOT_TOKEN_TG", slack)
+    assert store.names() == ["SLACK_BOT_TOKEN"]
+    assert store.get("SLACK_BOT_TOKEN") == slack
+
+
 def test_empty_values_are_refused(store: SecretStore):
     with pytest.raises(ConfigurationError, match="empty value"):
         store.set("OPENAI_API_KEY", "   ")
@@ -134,6 +141,44 @@ def test_missing_store_is_not_an_error(tmp_path):
 def test_registered_values_are_masked(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", OPENAI_KEY)
     assert OPENAI_KEY not in redact(f"request failed with key {OPENAI_KEY}")
+
+
+def test_dashboard_alias_values_are_masked(monkeypatch):
+    signing = "abcdef0123456789abcdef0123456789"
+    monkeypatch.setenv("SLACK_SIGNING_SECRET_TG", signing)
+    assert signing not in redact(f"sig={signing}")
+
+
+def test_alias_env_fills_the_canonical_setting(monkeypatch):
+    from app.config import Settings
+    from app.security.secrets import apply_secret_aliases
+
+    token = "xoxb-" + "1" * 10 + "-" + "abcdefghijklmnop"
+    signing = "abcdef0123456789abcdef0123456789"
+    monkeypatch.setenv("SLACK_BOT_TOKEN_TG", token)
+    monkeypatch.setenv("SLACK_SIGNING_SECRET_TG", signing)
+    monkeypatch.delenv("SLACK_BOT_TOKEN", raising=False)
+    monkeypatch.delenv("SLACK_SIGNING_SECRET", raising=False)
+    monkeypatch.setenv("SLACK_CHANNEL", "#content")
+
+    applied = apply_secret_aliases()
+
+    assert "SLACK_BOT_TOKEN" in applied
+    settings = Settings(_env_file=None)
+    assert settings.slack_bot_token == token
+    assert settings.slack_signing_secret == signing
+    assert settings.slack_active is True
+
+
+def test_canonical_env_wins_over_the_alias(monkeypatch):
+    from app.security.secrets import apply_secret_aliases
+
+    monkeypatch.setenv("SLACK_BOT_TOKEN", "canonical-token-value")
+    monkeypatch.setenv("SLACK_BOT_TOKEN_TG", "alias-token-value-xx")
+
+    apply_secret_aliases()
+
+    assert os.environ["SLACK_BOT_TOKEN"] == "canonical-token-value"
 
 
 def test_unregistered_credentials_are_masked_by_shape():

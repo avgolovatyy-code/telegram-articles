@@ -29,7 +29,7 @@ from cryptography.fernet import Fernet, InvalidToken
 
 from app.errors import ConfigurationError
 from app.logging_setup import get_logger
-from app.security.names import SECRET_NAMES
+from app.security.names import SECRET_INPUT_NAMES, SECRET_NAMES, canonical_secret_name
 
 log = get_logger("security.secrets")
 
@@ -119,10 +119,10 @@ class SecretStore:
         return self._read_all().get(name.upper())
 
     def set(self, name: str, value: str) -> None:
-        key = name.upper()
+        key = canonical_secret_name(name)
         if key not in SECRET_NAMES:
             raise ConfigurationError(
-                f"{key} is not a known secret. Allowed: {', '.join(sorted(SECRET_NAMES))}"
+                f"{key} is not a known secret. Allowed: {', '.join(sorted(SECRET_INPUT_NAMES))}"
             )
         if not value.strip():
             raise ConfigurationError(f"Refusing to store an empty value for {key}")
@@ -160,7 +160,7 @@ class SecretStore:
             if not stripped or stripped.startswith("#") or "=" not in stripped:
                 continue
             name, _, value = stripped.partition("=")
-            name = name.strip().upper()
+            name = canonical_secret_name(name.strip())
             value = value.strip().strip("'\"")
             if name in SECRET_NAMES and value:
                 self.set(name, value)
@@ -186,23 +186,43 @@ class SecretStore:
 _loaded = False
 
 
+def apply_secret_aliases() -> list[str]:
+    """Copy alias env vars onto the canonical names when those are empty.
+
+    Cursor injects whatever name the owner typed in the dashboard. If they used
+    ``SLACK_BOT_TOKEN_TG`` instead of ``SLACK_BOT_TOKEN``, the setting would stay
+    empty without this step.
+    """
+    from app.security.names import SECRET_ALIASES
+
+    applied: list[str] = []
+    for alias, canonical in SECRET_ALIASES.items():
+        raw = os.environ.get(alias)
+        if raw and not os.environ.get(canonical):
+            os.environ[canonical] = raw
+            applied.append(canonical)
+    return applied
+
+
 def load_secrets_into_env() -> list[str]:
     """Idempotently load the encrypted store; never fatal if it is absent."""
     global _loaded
-    if _loaded or os.getenv("SECRETS_DISABLED") == "1":
-        return []
+    if os.getenv("SECRETS_DISABLED") == "1":
+        return apply_secret_aliases()
+    if _loaded:
+        return apply_secret_aliases()
     _loaded = True
+    names: list[str] = []
     try:
         store = SecretStore()
-        if not store.exists():
-            return []
-        names = store.load_into_env()
-        if names:
-            log.info("secrets.loaded", count=len(names))
-        return names
+        if store.exists():
+            names = store.load_into_env()
+            if names:
+                log.info("secrets.loaded", count=len(names))
     except ConfigurationError as exc:
         log.error("secrets.load_failed", error=str(exc))
-        return []
+    names.extend(apply_secret_aliases())
+    return names
 
 
 def reset_loaded_flag() -> None:
@@ -215,6 +235,7 @@ __all__ = [
     "DEFAULT_KEY_PATH",
     "DEFAULT_STORE_PATH",
     "SecretStore",
+    "apply_secret_aliases",
     "load_secrets_into_env",
     "reset_loaded_flag",
 ]

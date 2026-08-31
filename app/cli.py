@@ -242,9 +242,14 @@ def slack_check(
             )
             typer.secho(f"test message posted to {channel}", fg=typer.colors.GREEN)
         elif not settings.slack_active:
+            missing = []
+            if not channel:
+                missing.append("SLACK_CHANNEL")
+            if not secret_ok:
+                missing.append("SLACK_SIGNING_SECRET")
+            hint = " и ".join(missing) if missing else "SLACK_ENABLED=true"
             typer.secho(
-                "\nТокен принят, но интеграция ещё выключена: задайте SLACK_CHANNEL "
-                "и SLACK_SIGNING_SECRET (или SLACK_ENABLED=true).",
+                f"\nТокен принят, но интеграция ещё выключена: задайте {hint}.",
                 fg=typer.colors.YELLOW,
             )
     except SlackError as exc:

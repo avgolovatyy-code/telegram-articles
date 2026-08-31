@@ -13,7 +13,7 @@ import re
 from collections.abc import Mapping, MutableMapping
 from typing import Any
 
-from app.security.names import SECRET_NAMES
+from app.security.names import SECRET_ALIASES, SECRET_NAMES
 
 MASK = "***"
 
@@ -32,7 +32,7 @@ _MIN_LITERAL_LENGTH = 8
 
 def known_secret_values() -> list[str]:
     values = []
-    for name in SECRET_NAMES:
+    for name in (*SECRET_NAMES, *SECRET_ALIASES):
         value = os.environ.get(name)
         if value and len(value) >= _MIN_LITERAL_LENGTH:
             values.append(value)
