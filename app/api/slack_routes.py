@@ -24,7 +24,7 @@ router = APIRouter(prefix="/slack", tags=["slack"])
 
 
 async def _verified_body(request: Request, settings: Settings) -> bytes:
-    if not settings.slack_enabled:
+    if not settings.slack_active:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Slack integration is disabled")
     if not settings.slack_signing_secret:
         raise HTTPException(

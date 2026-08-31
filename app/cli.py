@@ -187,6 +187,79 @@ def budget() -> None:
         )
 
 
+@app.command("slack-check")
+def slack_check(
+    post: Annotated[
+        bool, typer.Option("--post", help="Send a test message to SLACK_CHANNEL")
+    ] = False,
+) -> None:
+    """Verify Slack credentials. Does not spend AI budget.
+
+    Slack turns itself on when the bot token, signing secret and channel are all
+    set, even if ``SLACK_ENABLED`` was left at the default false.
+    """
+    _bootstrap()
+    from app.slack import blocks as sb
+    from app.slack.client import SlackClient, SlackError
+
+    settings = get_settings()
+    token_ok = bool(settings.slack_bot_token)
+    secret_ok = bool(settings.slack_signing_secret)
+    channel = (settings.slack_channel or "").strip()
+
+    typer.echo(f"SLACK_ENABLED:         {'true' if settings.slack_enabled else 'false'}")
+    typer.echo(f"SLACK_BOT_TOKEN:       {'set' if token_ok else 'MISSING'}")
+    typer.echo(f"SLACK_SIGNING_SECRET:  {'set' if secret_ok else 'MISSING'}")
+    typer.echo(f"SLACK_CHANNEL:         {channel or 'MISSING'}")
+    typer.echo(f"active:                {'yes' if settings.slack_active else 'no'}")
+
+    if not token_ok:
+        typer.secho(
+            "\nПоложите SLACK_BOT_TOKEN в `wgt secrets set` или в Cursor Secrets. "
+            "Не пишите токен в чат.",
+            fg=typer.colors.YELLOW,
+        )
+        raise typer.Exit(code=1)
+
+    client = SlackClient(settings)
+    try:
+        identity = client.auth_test()
+        bot = identity.get("user") or identity.get("bot_id") or "?"
+        team = identity.get("team") or identity.get("url") or "?"
+        typer.secho(f"\nauth.test: ok  bot={bot}  workspace={team}", fg=typer.colors.GREEN)
+        if post:
+            if not channel:
+                typer.secho(
+                    "SLACK_CHANNEL не задан — тестовое сообщение не отправить",
+                    fg=typer.colors.RED,
+                )
+                raise typer.Exit(code=1)
+            client.post_message(
+                blocks=sb.connected_card(
+                    bot_name=str(bot), team=str(team), admin_url=settings.admin_base_url
+                ),
+                text="WeGoTrip Content Engine подключён",
+            )
+            typer.secho(f"test message posted to {channel}", fg=typer.colors.GREEN)
+        elif not settings.slack_active:
+            typer.secho(
+                "\nТокен принят, но интеграция ещё выключена: задайте SLACK_CHANNEL "
+                "и SLACK_SIGNING_SECRET (или SLACK_ENABLED=true).",
+                fg=typer.colors.YELLOW,
+            )
+    except SlackError as exc:
+        typer.secho(f"\nauth.test failed: {exc}", fg=typer.colors.RED)
+        raise typer.Exit(code=1) from exc
+    finally:
+        client.close()
+
+    host = settings.admin_base_url.rstrip("/")
+    if host.startswith("http"):
+        typer.echo("\nПосле деплоя в Slack App укажите:")
+        typer.echo(f"  Interactivity Request URL: {host}/slack/interactions")
+        typer.echo(f"  Slash Command /wegotrip:   {host}/slack/commands")
+
+
 @app.command("check-telegram")
 def check_telegram() -> None:
     """Verify the bot token and that the bot can see its channels."""
@@ -464,6 +537,20 @@ def doctor() -> None:
             "generated_covers_off",
             not settings.allow_generated_covers,
             str(settings.allow_generated_covers),
+        )
+    )
+    slack_bits = []
+    if settings.slack_bot_token:
+        slack_bits.append("token")
+    if settings.slack_signing_secret:
+        slack_bits.append("signing")
+    if settings.slack_channel:
+        slack_bits.append(settings.slack_channel)
+    checks.append(
+        (
+            "slack",
+            settings.slack_active,
+            "active (" + ", ".join(slack_bits) + ")" if slack_bits else "off",
         )
     )
 

@@ -219,6 +219,21 @@ class Settings(BaseSettings):
     def utm_campaign(self, market: Market) -> str:
         return f"wegotrip_{market}"
 
+    @property
+    def slack_active(self) -> bool:
+        """Whether Slack notifications and inbound webhooks should run.
+
+        Explicit ``SLACK_ENABLED=true`` turns it on when a channel is set.
+        Otherwise Slack turns itself on when the three credentials are present
+        (bot token, signing secret, channel), so the owner does not need a
+        fourth flag after creating the Slack app.
+        """
+        if not (self.slack_channel or "").strip():
+            return False
+        if self.slack_enabled:
+            return True
+        return bool(self.slack_bot_token and self.slack_signing_secret)
+
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

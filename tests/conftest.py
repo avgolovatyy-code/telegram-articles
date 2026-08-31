@@ -36,6 +36,10 @@ os.environ["MIN_TOPIC_SCORE"] = "0.25"
 os.environ["ALLOW_GENERATED_COVERS"] = "false"
 os.environ["AUTO_PUBLISH_EN"] = "false"
 os.environ["AUTO_PUBLISH_RU"] = "false"
+os.environ["SLACK_ENABLED"] = "false"
+os.environ["SLACK_BOT_TOKEN"] = ""
+os.environ["SLACK_SIGNING_SECRET"] = ""
+os.environ["SLACK_CHANNEL"] = ""
 
 from app.config import Settings, reload_settings
 from app.db import models  # noqa: F401

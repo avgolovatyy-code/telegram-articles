@@ -87,6 +87,7 @@ docker compose exec api wgt check-telegram
 | `wgt budget` | Бюджет на сегодня и план генерации |
 | `wgt coverage` | Сколько материала в каталоге ещё не описано |
 | `wgt check-telegram` | Проверка токена и доступа к каналам |
+| `wgt slack-check [--post]` | Проверка Slack-токена; `--post` шлёт тестовое сообщение |
 | `wgt telegram-chats` | Показать id каналов, включая приватные без `@username` |
 | `wgt secrets set/list/rm` | Шифрованное хранилище ключей |
 | `wgt import-conversions file.csv` | Импорт заказов из партнёрского кабинета |

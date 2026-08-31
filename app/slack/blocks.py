@@ -165,6 +165,18 @@ def alert_card(title: str, detail: str) -> list[dict[str, Any]]:
     ]
 
 
+def connected_card(*, bot_name: str, team: str, admin_url: str) -> list[dict[str, Any]]:
+    """Posted by ``wgt slack-check --post`` so the owner can see the bot is live."""
+    return [
+        _section(f"*WeGoTrip Content Engine подключён* · {bot_name} @ {team}"),
+        _section(
+            "Публикация идёт автоматически. Здесь будут карточки статей, сводка "
+            "за день и алерты. Кнопки нужны только если захотите вмешаться."
+        ),
+        {"type": "context", "elements": [_text(f"<{admin_url}/admin|Открыть админку>")]},
+    ]
+
+
 __all__ = [
     "ACTION_HOLD",
     "ACTION_PUBLISH",
@@ -173,6 +185,7 @@ __all__ = [
     "ACTION_REJECT",
     "alert_card",
     "article_card",
+    "connected_card",
     "digest_card",
     "published_card",
     "result_card",

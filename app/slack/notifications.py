@@ -36,7 +36,7 @@ class SlackNotifier:
 
     @property
     def enabled(self) -> bool:
-        return bool(self.settings.slack_enabled and self.settings.slack_channel)
+        return self.settings.slack_active
 
     def _send(self, blocks: list[dict[str, Any]], text: str) -> None:
         if not self.enabled:

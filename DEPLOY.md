@@ -181,6 +181,25 @@ SLACK_CHANNEL=#wegotrip-content
 старше пяти минут отклоняются. Если Slack недоступен, публикация всё равно проходит:
 ошибки уведомлений подавляются и не могут остановить конвейер.
 
+Если заданы все три значения (`SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`,
+`SLACK_CHANNEL`), интеграция включается сама — отдельный `SLACK_ENABLED=true`
+не нужен. Проверка без публикации статьи: `wgt slack-check` (и `--post`, чтобы
+отправить тестовое сообщение в канал).
+
+**Токены нельзя писать в чат с агентом.** Положите их в Cursor Dashboard →
+Cloud Agents → Secrets или на сервере через `wgt secrets set SLACK_BOT_TOKEN`.
+
+### Если приложение Slack уже создано
+
+Осталось:
+
+1. Три секрета (имена точно такие): `SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`,
+   `SLACK_CHANNEL` (`C…` или `#имя`).
+2. После того как droplet получит адрес — два URL в Slack App:
+   * Interactivity Request URL: `https://<хост>/slack/interactions`
+   * Slash Command `/wegotrip`: `https://<хост>/slack/commands`
+3. На сервере: `wgt slack-check --post`.
+
 ---
 
 ## Справка: какие секреты за что отвечают
@@ -278,6 +297,7 @@ C="docker compose -f deploy/docker-compose.prod.yml --env-file .env"
 
 $C exec api wgt doctor            # конфигурация и подключение к БД
 $C exec api wgt check-telegram    # токен бота и доступ к трём каналам
+$C exec api wgt slack-check --post  # Slack: auth.test и тестовое сообщение
 $C exec api wgt seed              # рынки, кластеры интентов, версии промптов
 $C exec api wgt sync-catalog      # первая синхронизация, 5–15 минут
 $C exec api wgt discover-topics

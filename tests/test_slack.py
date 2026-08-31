@@ -175,6 +175,22 @@ def test_notifier_is_silent_when_slack_is_off(session, settings):
     assert notifier.client.sent == []
 
 
+def test_notifier_sends_when_credentials_are_present_without_the_flag(
+    session, settings, monkeypatch
+):
+    monkeypatch.setattr(settings, "slack_enabled", False)
+    monkeypatch.setattr(settings, "slack_bot_token", "xoxb-test")
+    monkeypatch.setattr(settings, "slack_signing_secret", "signing")
+    monkeypatch.setattr(settings, "slack_channel", "#content")
+    client = NullSlackClient(settings)
+    notifier = SlackNotifier(session, settings, client=client)
+
+    notifier.article_drafted(make_article(session))
+
+    assert notifier.enabled is True
+    assert len(client.sent) == 1
+
+
 def test_notifier_sends_when_configured(session, settings, monkeypatch):
     monkeypatch.setattr(settings, "slack_enabled", True)
     monkeypatch.setattr(settings, "slack_channel", "#content")
@@ -218,6 +234,50 @@ def test_auto_publish_is_on_by_default():
     assert shipped.auto_publish_ru is True
     # Slack stays optional: nothing breaks when it is not configured.
     assert shipped.slack_enabled is False
+    assert shipped.slack_active is False
+
+
+def test_slack_turns_on_when_the_three_credentials_are_present():
+    """After the Slack app is created, the three secrets are enough — no fourth flag."""
+    configured = Settings(
+        _env_file=None,
+        slack_bot_token="xoxb-test",
+        slack_signing_secret="signing",
+        slack_channel="#content",
+    )
+    assert configured.slack_enabled is False
+    assert configured.slack_active is True
+
+
+def test_slack_stays_off_until_the_channel_is_set():
+    partial = Settings(
+        _env_file=None,
+        slack_bot_token="xoxb-test",
+        slack_signing_secret="signing",
+        slack_channel=None,
+    )
+    assert partial.slack_active is False
+
+
+def test_explicit_slack_enabled_does_not_need_the_signing_secret():
+    """Outbound notifications work with token+channel; inbound buttons need the secret."""
+    outbound = Settings(
+        _env_file=None,
+        slack_enabled=True,
+        slack_bot_token="xoxb-test",
+        slack_channel="#content",
+    )
+    assert outbound.slack_active is True
+
+
+def test_connected_card_is_a_plain_status_message():
+    card = sb.connected_card(
+        bot_name="wegotrip-engine", team="WeGoTrip", admin_url="https://engine.example"
+    )
+    rendered = json.dumps(card, ensure_ascii=False)
+    assert "подключён" in rendered
+    assert "wegotrip-engine" in rendered
+    assert "автоматически" in rendered
 
 
 def test_article_card_mentions_automatic_publishing(session, settings):

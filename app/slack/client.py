@@ -62,6 +62,10 @@ class SlackClient:
             raise SlackError(f"{method}: {body.get('error', 'unknown error')}", payload=body)
         return body
 
+    def auth_test(self) -> dict[str, Any]:
+        """Identify the bot and workspace. Does not post anything."""
+        return self._call("auth.test", {})
+
     def post_message(
         self, *, blocks: list[dict[str, Any]], text: str, channel: str | None = None
     ) -> SlackMessage:
@@ -97,6 +101,9 @@ class NullSlackClient:
     def close(self) -> None:
         return None
 
+    def auth_test(self) -> dict[str, Any]:
+        return {"ok": True, "dry_run": True, "user": "null"}
+
     def post_message(
         self, *, blocks: list[dict[str, Any]], text: str, channel: str | None = None
     ) -> SlackMessage:
@@ -116,7 +123,7 @@ class NullSlackClient:
 
 def build_slack_client(settings: Settings | None = None):
     settings = settings or get_settings()
-    if not settings.slack_enabled or not settings.slack_bot_token:
+    if not settings.slack_active or not settings.slack_bot_token:
         return NullSlackClient(settings)
     return SlackClient(settings)
 
