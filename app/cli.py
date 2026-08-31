@@ -7,6 +7,7 @@ import datetime as dt
 import json
 import os
 import pathlib
+import sys
 from typing import Annotated
 
 import typer
@@ -324,7 +325,14 @@ def secrets_set(
 ) -> None:
     """Store one credential, encrypted."""
     _bootstrap()
-    secret = value or typer.prompt(f"{name.upper()} value", hide_input=True)
+    if value:
+        secret = value
+    elif sys.stdin.isatty():
+        secret = typer.prompt(f"{name.upper()} value", hide_input=True)
+    else:
+        secret = sys.stdin.read().rstrip("\n")
+        if not secret.strip():
+            raise typer.BadParameter("empty secret on stdin")
     _store().set(name, secret)
     typer.secho(f"{name.upper()} stored, encrypted", fg=typer.colors.GREEN)
 
