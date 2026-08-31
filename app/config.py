@@ -149,7 +149,7 @@ class Settings(BaseSettings):
     slack_enabled: bool = False
     slack_bot_token: str | None = None
     slack_signing_secret: str | None = None
-    #: Channel id (`C0123ABCD`) or name (`#wegotrip-content`) for notifications.
+    #: Channel id (`C0BTME6R546`) or name (`#telegram-articles`) for notifications.
     slack_channel: str | None = None
     slack_notify_on_draft: bool = True
     slack_notify_on_publish: bool = True

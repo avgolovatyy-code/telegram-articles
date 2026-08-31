@@ -174,7 +174,7 @@ Slack решает одну проблему: чтобы узнать, что п
 SLACK_ENABLED=true
 SLACK_BOT_TOKEN=xoxb-...
 SLACK_SIGNING_SECRET=...
-SLACK_CHANNEL=#wegotrip-content
+SLACK_CHANNEL=#telegram-articles
 ```
 
 Каждый входящий запрос от Slack проверяется по подписи `X-Slack-Signature`, запросы
@@ -194,8 +194,8 @@ Cloud Agents → Secrets или на сервере через `wgt secrets set 
 Осталось:
 
 1. Три секрета (имена точно такие): `SLACK_BOT_TOKEN`, `SLACK_SIGNING_SECRET`,
-   `SLACK_CHANNEL` (`C…` или `#имя`). Суффикс `_TG` тоже принимается
-   (`SLACK_BOT_TOKEN_TG` → `SLACK_BOT_TOKEN`).
+   `SLACK_CHANNEL` (`#telegram-articles` или `C0BTME6R546`). Суффикс `_TG` тоже
+   принимается (`SLACK_BOT_TOKEN_TG` → `SLACK_BOT_TOKEN`).
 2. После того как droplet получит адрес — два URL в Slack App:
    * Interactivity Request URL: `https://<хост>/slack/interactions`
    * Slash Command `/wegotrip`: `https://<хост>/slack/commands`
