@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# CI runs entirely offline: the catalogue comes from bundled fixtures, the model is a
+# deterministic stub and the Telegram client is a dry-run client, so no job can ever
+# publish to @wegotrip or @wegotrip_ru.
+env:
+  DATABASE_URL: "sqlite+pysqlite:///./var/ci.sqlite3"
+  CATALOG_PROVIDER: mock
+  LLM_PROVIDER: mock
+  TELEGRAM_DRY_RUN: "true"
+  TELEGRAM_TEST_CHANNEL: "@ci_test_channel"
+  TELEGRAM_EN_CHANNEL: "@ci_en"
+  TELEGRAM_RU_CHANNEL: "@ci_ru"
+  VALIDATE_MEDIA_OVER_NETWORK: "false"
+  SCHEDULER_ENABLED: "false"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint
+        run: |
+          ruff check app tests scripts
+          ruff format --check app tests scripts
+
+      - name: Type check
+        run: mypy app
+
+      - name: Migrations apply and roll back
+        run: |
+          alembic upgrade head
+          alembic downgrade base
+          alembic upgrade head
+
+      - name: Tests
+        run: pytest
+
+      - name: Offline end-to-end smoke
+        run: |
+          wgt seed
+          wgt sync-catalog
+          wgt discover-topics
+          wgt generate --max-articles 2
+          wgt budget

@@ -1,0 +1,4540 @@
+{
+ "market": "en",
+ "countries": [
+  {
+   "id": 783754,
+   "code": "AL",
+   "name": "Albania",
+   "slug": "albania"
+  },
+  {
+   "id": 3865483,
+   "code": "AR",
+   "name": "Argentina",
+   "slug": "argentina"
+  },
+  {
+   "id": 174982,
+   "code": "AM",
+   "name": "Armenia",
+   "slug": "armenia"
+  },
+  {
+   "id": 2077456,
+   "code": "AU",
+   "name": "Australia",
+   "slug": "australia"
+  },
+  {
+   "id": 2782113,
+   "code": "AT",
+   "name": "Austria",
+   "slug": "austria"
+  },
+  {
+   "id": 587116,
+   "code": "AZ",
+   "name": "Azerbaijan",
+   "slug": "azerbaijan"
+  },
+  {
+   "id": 3374084,
+   "code": "BB",
+   "name": "Barbados",
+   "slug": "barbados"
+  },
+  {
+   "id": 630336,
+   "code": "BY",
+   "name": "Belarus",
+   "slug": "belarus"
+  },
+  {
+   "id": 2802361,
+   "code": "BE",
+   "name": "Belgium",
+   "slug": "belgium"
+  },
+  {
+   "id": 3469034,
+   "code": "BR",
+   "name": "Brazil",
+   "slug": "brazil"
+  },
+  {
+   "id": 732800,
+   "code": "BG",
+   "name": "Bulgaria",
+   "slug": "bulgaria"
+  },
+  {
+   "id": 1831722,
+   "code": "KH",
+   "name": "Cambodia",
+   "slug": "cambodia"
+  },
+  {
+   "id": 6251999,
+   "code": "CA",
+   "name": "Canada",
+   "slug": "canada"
+  },
+  {
+   "id": 3895114,
+   "code": "CL",
+   "name": "Chile",
+   "slug": "chile"
+  },
+  {
+   "id": 1814991,
+   "code": "CN",
+   "name": "China",
+   "slug": "china"
+  },
+  {
+   "id": 3686110,
+   "code": "CO",
+   "name": "Colombia",
+   "slug": "colombia"
+  },
+  {
+   "id": 3624060,
+   "code": "CR",
+   "name": "Costa Rica",
+   "slug": "costa-rica"
+  },
+  {
+   "id": 3202326,
+   "code": "HR",
+   "name": "Croatia",
+   "slug": "croatia"
+  },
+  {
+   "id": 7626836,
+   "code": "CW",
+   "name": "Curacao",
+   "slug": "curacao"
+  },
+  {
+   "id": 146669,
+   "code": "CY",
+   "name": "Cyprus",
+   "slug": "cyprus"
+  }
+ ],
+ "cities": [
+  {
+   "id": 3128760,
+   "name": "Barcelona",
+   "slug": "barcelona",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/1/la-sagrada/bec0309d3b44a1366d5a3d2a69797d9a.jpg",
+   "itemsCount": 69,
+   "country": "Spain"
+  },
+  {
+   "id": 2988507,
+   "name": "Paris",
+   "slug": "paris",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/3/istock_639337086.d4c5b151051.original/b60097b5641bddbc381fa4fc1abc7819.jpg",
+   "itemsCount": 112,
+   "country": "France"
+  },
+  {
+   "id": 2643743,
+   "name": "London",
+   "slug": "london",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/8/marcin-nowak-iXqTqC-f6jI-unsplash/e63a87802e8d1bc5a9193503f038100a.jpg",
+   "itemsCount": 71,
+   "country": "United Kingdom"
+  },
+  {
+   "id": 5128581,
+   "name": "New York City",
+   "slug": "new-york-city",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/7/ben-o-bro-wpU4veNGnHg-unsplash_1/e56b18bd2c95d2d7cea8f10fa195e565.jpg",
+   "itemsCount": 47,
+   "country": "United States"
+  },
+  {
+   "id": 3117735,
+   "name": "Madrid",
+   "slug": "madrid",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/14/madrid-327979_1920/aeab1930167a78284c4757398be7e9ec.jpg",
+   "itemsCount": 38,
+   "country": "Spain"
+  },
+  {
+   "id": 2759794,
+   "name": "Amsterdam",
+   "slug": "amsterdam",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/4/Amsterdam-kanaly/0211399a5b5adab6151613d7dd78917b.jpg",
+   "itemsCount": 66,
+   "country": "Netherlands"
+  },
+  {
+   "id": 3173435,
+   "name": "Milan",
+   "slug": "milan",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/5/alba_in_piazza_del_duomo_a_milano_italy_n_2_by_zefirino-d4v4eez/be34d9adb3a42f917004ffc240f727f2.jpg",
+   "itemsCount": 30,
+   "country": "Italy"
+  },
+  {
+   "id": 4887398,
+   "name": "Chicago",
+   "slug": "chicago",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/33/4_Mignificant_Mile_4r8qtoc/ce105b8954a2cb996d82e12ca67c96a7.jpg",
+   "itemsCount": 29,
+   "country": "United States"
+  },
+  {
+   "id": 2950159,
+   "name": "Berlin",
+   "slug": "berlin",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/13/florian-wehde-1uWanmgkd5g-unsplash/43395737bf9ed4a5ddf0ce5b6a458b40.jpg",
+   "itemsCount": 82,
+   "country": "Germany"
+  },
+  {
+   "id": 5368361,
+   "name": "Los Angeles",
+   "slug": "los-angeles-5368361",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/330/LA/2ff2be2546afcca9247c906d56b9c730.jpg",
+   "itemsCount": 17,
+   "country": "United States"
+  },
+  {
+   "id": 3164603,
+   "name": "Venice",
+   "slug": "venice",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/11/0_t5OOS3vSifE0pZEy/ccf02eb1009904e65e1be72653ca3cce.jpg",
+   "itemsCount": 31,
+   "country": "Italy"
+  },
+  {
+   "id": 3169070,
+   "name": "Rome",
+   "slug": "rome",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/2/shutterstock_226922599/c60d6e64bf42a900d03b1d701b5504c2.jpg",
+   "itemsCount": 50,
+   "country": "Italy"
+  },
+  {
+   "id": 3176959,
+   "name": "Florence",
+   "slug": "florence",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/12/shutterstock_337498682/bf5d2377af37f23867cc83eb42e8c5ea.jpg",
+   "itemsCount": 39,
+   "country": "Italy"
+  },
+  {
+   "id": 3128026,
+   "name": "Bilbao",
+   "slug": "bilbao",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/22/puente-portugalete-2007812_1920/6e3f563d2b210ec10243994225e25ebc.jpg",
+   "itemsCount": 3,
+   "country": "Spain"
+  },
+  {
+   "id": 4140963,
+   "name": "Washington, D.C.",
+   "slug": "washington-dc",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/337/jorge-alcala-fbtHV94f-bA-unsplash/d1297102188829e50800b3dcaa5a8152.jpg",
+   "itemsCount": 15,
+   "country": "United States"
+  },
+  {
+   "id": 2650225,
+   "name": "Edinburgh",
+   "slug": "edinburgh",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/10/DSC09046-01/a2257a610583b0819a6b2b6b788d9d20.jpeg",
+   "itemsCount": 17,
+   "country": "United Kingdom"
+  },
+  {
+   "id": 2267057,
+   "name": "Lisbon",
+   "slug": "lisbon",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/17/louis-droege-8Nd3GY8z-iU-unsplash/5a696f3c2f302d516cb75a50d90bccd9.jpg",
+   "itemsCount": 29,
+   "country": "Portugal"
+  },
+  {
+   "id": 2969679,
+   "name": "Versailles",
+   "slug": "versailles",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/347/Depositphotos_8713789_L/e67dcce28bd0160bb8aad7469b42a0d5.jpg",
+   "itemsCount": 6,
+   "country": "France"
+  },
+  {
+   "id": 3122453,
+   "name": "Figueres",
+   "slug": "figueres",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/601/Depositphotos_196681672_XL_1/b7cb32acc01372fcb98a805314628279.jpg",
+   "itemsCount": 4,
+   "country": "Spain"
+  },
+  {
+   "id": 2800866,
+   "name": "Brussels",
+   "slug": "brussels",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/31/brussels-4682216_1920_UJFrMlD/d64ab0c2e13625416c7b6aa493bc633d.jpg",
+   "itemsCount": 13,
+   "country": "Belgium"
+  }
+ ],
+ "selected_city_ids": [
+  "2988507",
+  "3169070"
+ ],
+ "attractions": [
+  {
+   "id": 2285,
+   "name": "The Louvre",
+   "slug": "musee-du-louvre",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2285/michael-fousert-9s5mwnvwdxq-unsplash/20da6d76e6d9acdb73b241fbcbb8c048.jpg",
+   "itemsCount": 12
+  },
+  {
+   "id": 171,
+   "name": "Catacombs of Paris",
+   "slug": "catacombes-de-paris",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/171/tmp5cxhe0rc/84dd327111fe5d6eb261610ea875ee2f.jpg",
+   "itemsCount": 3
+  },
+  {
+   "id": 6228,
+   "name": "Montparnasse Cemetery",
+   "slug": "montparnasse-cemetery",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/6228/Depositphotos_8507861_XL_1/102ea1cac88be737401cff085fa7e0da.jpg",
+   "itemsCount": 3
+  },
+  {
+   "id": 412,
+   "name": "Montparnasse Tower",
+   "slug": "montparnasse-tower",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/6223/montparnasse-tower-gc340503b8_1920/6e1af6c09cc9a9b09147c7ba6eeda8f2.jpg",
+   "itemsCount": 3
+  },
+  {
+   "id": 169,
+   "name": "Sainte-Chapelle",
+   "slug": "la-sainte-chapelle",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/169/tmpkwmvqiz6/b7671601e06901c20c15d0ce837484b6.jpg",
+   "itemsCount": 9
+  },
+  {
+   "id": 3575,
+   "name": "Place de la Concorde",
+   "slug": "place-de-la-concorde",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/3575/tmpmui3txhv/589880cc43417b2da326ad009b51a21d.jpg",
+   "itemsCount": 7
+  },
+  {
+   "id": 56,
+   "name": "Orangerie Museum",
+   "slug": "orangerie-museum",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/56/Orangerie_Museum_audio_tours_and_entry_tickets/69819e492772fb0d1327448c702fb1e4.jpg",
+   "itemsCount": 5
+  },
+  {
+   "id": 165,
+   "name": "Orsay Museum",
+   "slug": "musee-dorsay",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/165/tmpn4s2kva5/a18d08fe3e79594a12bbddd7c8389f8d.jpg",
+   "itemsCount": 5
+  },
+  {
+   "id": 2065,
+   "name": "Tomb of Napoleon Bonaparte",
+   "slug": "tomb-of-napoleon-bonaparte",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2065/Patio_de_honor_del_palacio_de_Los_Inv%C3%A1lidos_Par%C3%ADs/abdfa046a6deda9e019cc2e8e9589360.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 2064,
+   "name": "Dôme des Invalides",
+   "slug": "dome-des-invalides",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2064/tmpu75vrg0l/bed14b892514a6eef2ab296c1410f5a2.jpg",
+   "itemsCount": 8
+  },
+  {
+   "id": 2058,
+   "name": "The Army Museum",
+   "slug": "the-army-museum",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2058/hotel-des-invalides-a-paris-1160x627/8120c829404acb7c8aa13283882a0881.jpg",
+   "itemsCount": 2
+  },
+  {
+   "id": 2062,
+   "name": "Historial Charles de Gaulle",
+   "slug": "historial-charles-de-gaulle",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2062/chris-karidis-nnzkZNYWHaU-unsplash/f654fd9c56d320cb3dfe4ae5f0fb6146.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 83,
+   "name": "Trevi Fountain",
+   "slug": "trevi-fountain",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/83/tmpi8q6com0/cf4265c58b64fa302b341397d957049d.jpg",
+   "itemsCount": 10
+  },
+  {
+   "id": 84,
+   "name": "Pantheon",
+   "slug": "pantheon",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/84/gabriella-clare-marino-tlyzsnu8md0-unsplash/f889440210bc33761fcdb0c8c5a2238d.jpg",
+   "itemsCount": 6
+  },
+  {
+   "id": 89,
+   "name": "Galleria Borghese",
+   "slug": "galleria-borghese",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/89/depositphotos348398234l/ec36687972e6418526ee4de3f13b6f94.jpg",
+   "itemsCount": 2
+  },
+  {
+   "id": 100,
+   "name": "Temple of Antoninus and Faustina",
+   "slug": "temple-of-antoninus-and-faustina",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/100/rome-2426878_1920/66dd6e0dacebec4103bf5b8b8abb08a6.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 101,
+   "name": "Roman Forum and Palatine Hill",
+   "slug": "roman-forum-and-palatine-hill",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/101/rome-4819857_1920/dd3a98042e4388995264284b9e8cda00.jpg",
+   "itemsCount": 2
+  },
+  {
+   "id": 175,
+   "name": "Temple of Venus and Rome",
+   "slug": "tempio-di-venere-e-roma",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/175/5178790722_56961c84e0_k/f2718176cb18476725c813e87c581bbd.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 182,
+   "name": "Capitoline Hill",
+   "slug": "piazza-del-campidoglio",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/182/Piazza_del_Campidoglio_Roma/2245825b60196502123011f064e89b60.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 420,
+   "name": "Capitoline Museum",
+   "slug": "capitoline-museum",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/420/capitoline-hill-1156731_1920/3005703ba6841860afe336ff39bebfa7.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 421,
+   "name": "Wax Museum Rome",
+   "slug": "wax-museum-rome",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/421/unnamed-3/125281afc33038d953b6daa471b35823.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 422,
+   "name": "Stadio di Domiziano",
+   "slug": "stadio-di-domiziano",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/422/unnamed-1/7711a582958cb52c820a84352ebd0135.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 423,
+   "name": "Carcere Mamertino",
+   "slug": "carcere-mamertino",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/423/unnamed-4/01c473a8e622ccc5e5c396f585ea6788.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 424,
+   "name": "Leonardo da Vinci Experience",
+   "slug": "leonardo-da-vinci-experience",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/424/unnamed/d23c7b120afa2d53d3523d96f2b29205.jpg",
+   "itemsCount": 0
+  }
+ ],
+ "products": [
+  {
+   "id": 4900,
+   "title": "Paris: Pantheon Ticket & National Pride Audio Tour",
+   "slug": "paris-pantheon-in-app-audio-tour-and-ticket-where-the-nations-great-are-buried",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21466/depositphotos207178092l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21466/depositphotos207178092l/5dacee8255bb3940eca2eaa34ace5dd4.jpg",
+   "price": 18.52,
+   "exprice": 18.52,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.6,
+   "reviewsCount": 192,
+   "ratingsCount": 542,
+   "category": "History & Heritage",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "1 – 1.5 hours",
+   "durationMin": 60,
+   "durationMax": 90,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 22,
+   "title": "Paris: Musee d'Orsay Ticket & Audio Tour",
+   "slug": "museum-d-orsay-tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos355943198l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos355943198l/5dba0c70213a44a3e444d14c8bce3ee3.jpg",
+   "price": 25.13,
+   "exprice": 25.13,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.5,
+   "reviewsCount": 85,
+   "ratingsCount": 283,
+   "category": "Art & Museums",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "2 – 3 hours",
+   "durationMin": 120,
+   "durationMax": 180,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "WeGoTrip is a company creating memorable experiences through the in-app audio tours for self-guided travelers all around the world. Travel by your own rules with self-guided audio tours & museum tickets in one app. Better to see something once than hear about it a thousand times!",
+    "nickname": "wegotrip"
+   }
+  },
+  {
+   "id": 13095,
+   "title": "Paris: Rodin Museum Ticket & Audio Tour",
+   "slug": "rodin-museum-audio-tour-and-ticket-see-the-famous-gates-of-hell-the-thinker-and-the-kiss-with-your-4",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos185178428l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos185178428l/6e4d3c07f0717bc13b966c6664a38a2e.jpg",
+   "price": 19.35,
+   "exprice": 19.35,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.7,
+   "reviewsCount": 146,
+   "ratingsCount": 427,
+   "category": "Museum Tickets & Passes",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "1 hours",
+   "durationMin": 60,
+   "durationMax": 60,
+   "type": 3,
+   "tags": {
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "WeGoTrip is a company creating memorable experiences through the in-app audio tours for self-guided travelers all around the world. Travel by your own rules with self-guided audio tours & museum tickets in one app. Better to see something once than hear about it a thousand times!",
+    "nickname": "wegotrip"
+   }
+  },
+  {
+   "id": 196,
+   "title": "Paris: Les Invalides Skip-the-Line Access Ticket & Army Museum Audio Tour",
+   "slug": "les-invalides-visit-museum-army",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/12279/39arblaywu4iwqosnehstabvpnuyyw1korqpxgoort-vp8rs4urk4vgkasteeqq47y0s9ksx-avemplrhbktw.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/12279/39arblaywu4iwqosnehstabvpnuyyw1korqpxgoort-vp8rs4urk4vgkasteeqq47y0s9ksx-avemplrhbktw/ef3714cd8db62e441c07f90f3f912cf1.jpg",
+   "price": 21.03,
+   "exprice": 21.03,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.5,
+   "reviewsCount": 212,
+   "ratingsCount": 611,
+   "category": "Skip The Line Tickets",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "1 – 2 hours",
+   "durationMin": 60,
+   "durationMax": 120,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 7310,
+   "title": "La Conciergerie & La Sainte-Chapelle Ticket & In-App Audio Tour",
+   "slug": "la-conciergerie-and-la-sainte-chapelle-ticket-and-in-app-audio-tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos265974276l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos265974276l/1c9e9edd8ebb55437a3b879865365bcc.jpg",
+   "price": 47.33,
+   "exprice": 47.33,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.3,
+   "reviewsCount": 315,
+   "ratingsCount": 810,
+   "category": "Architecture",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "2 hours",
+   "durationMin": 120,
+   "durationMax": 120,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 113,
+   "title": "Paris: Orangerie Skip-the-Line Access Ticket & Impressionism Audio Tour",
+   "slug": "orangerie-museum",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/product/113/cover.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/product/113/cover/0f2b539cc7473b2d1ed7de76a6368962.jpg",
+   "price": 19.5,
+   "exprice": 19.5,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.2,
+   "reviewsCount": 154,
+   "ratingsCount": 407,
+   "category": "Art & Museums",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "1 – 1.5 hours",
+   "durationMin": 60,
+   "durationMax": 90,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 12486,
+   "title": "Paris: A Stroll Through Time with the Grande Galerie Ticket",
+   "slug": "paris-a-time-travelers-walk-from-louvre-to-boulevards",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/grande-galerie.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/grande-galerie/2157860d44d48074c8cebaa64199e130.jpg",
+   "price": 16.57,
+   "exprice": 16.57,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.5,
+   "reviewsCount": 160,
+   "ratingsCount": 437,
+   "category": "Art & Museums",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "2 hours",
+   "durationMin": 120,
+   "durationMax": 120,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "",
+    "name": "Kseniya",
+    "bio": "",
+    "nickname": "id200685"
+   }
+  },
+  {
+   "id": 12485,
+   "title": "Paris: A Journey Through Art and History starting with Atelier des Lumières Ticket",
+   "slug": "paris-an-artistic-and-historic-journey-on-foot",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/unnamed_i6Ylhp8.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/unnamed_i6Ylhp8/60da6c1fab84899f6d7c15e9c5960c3e.jpg",
+   "price": 25.65,
+   "exprice": 25.65,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.3,
+   "reviewsCount": 147,
+   "ratingsCount": 355,
+   "category": "History & Heritage",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "2 hours",
+   "durationMin": 120,
+   "durationMax": 120,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "",
+    "name": "Kseniya",
+    "bio": "",
+    "nickname": "id200685"
+   }
+  },
+  {
+   "id": 4287,
+   "title": "Paris: Catacombs Mysteries Audio Tour",
+   "slug": "catacombs-of-paris-explore-the-underground-realm-without-a-ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/18195/rom8232.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/18195/rom8232/7eb2bb5bf89f107b2b51da15f95cefac.jpg",
+   "price": 15.0,
+   "exprice": 15.0,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 5.0,
+   "reviewsCount": 3,
+   "ratingsCount": 3,
+   "category": "Walking Tours",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "1 – 1.5 hours",
+   "durationMin": 60,
+   "durationMax": 90,
+   "type": 1,
+   "tags": {
+    "audioguide": true,
+    "text": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "WeGoTrip is a company creating memorable experiences through the in-app audio tours for self-guided travelers all around the world. Travel by your own rules with self-guided audio tours & museum tickets in one app. Better to see something once than hear about it a thousand times!",
+    "nickname": "wegotrip"
+   }
+  },
+  {
+   "id": 3920,
+   "title": "Paris: Notre Dame Cathedral Rebirth Self-Guided Audio Tour",
+   "slug": "notre-dame-de-paris--the-worlds-greatest-gothic-church",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/1752155458668blob.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/1752155458668blob/f4d6ebee359c878cc3b6cbe525095092.jpg",
+   "price": 9.0,
+   "exprice": 9.0,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": null,
+   "reviewsCount": 0,
+   "ratingsCount": 0,
+   "category": "History & Heritage",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "45 minutes",
+   "durationMin": 45,
+   "durationMax": 45,
+   "type": 1,
+   "tags": {
+    "audioguide": true,
+    "text": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 2911,
+   "title": "Paris: Arc de Triomphe Ticket & Audio Tour",
+   "slug": "magnificent-arc-de-triomphe--see-paris-from-above",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/9325/xztus1nydc.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/9325/xztus1nydc/6b53709fb963f9b81f5fee34feab0a8b.jpg",
+   "price": 29.5,
+   "exprice": 29.5,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.5,
+   "reviewsCount": 347,
+   "ratingsCount": 842,
+   "category": "Architecture",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "1 hours",
+   "durationMin": 60,
+   "durationMax": 60,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "text": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 58,
+   "title": "Paris: La Sainte-Chapelle Ticket & Gothic Architecture Audio Tour",
+   "slug": "la-sainte-chapelle",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/14770/christian-burri-eyvu9u6lqw-unsplash.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/14770/christian-burri-eyvu9u6lqw-unsplash/58a7ce6696f6c804e1b440206473ab05.jpg",
+   "price": 47.33,
+   "exprice": 47.33,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.3,
+   "reviewsCount": 318,
+   "ratingsCount": 813,
+   "category": "Attraction Tickets",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "duration": "1 hours",
+   "durationMin": 60,
+   "durationMax": 60,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "text": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 12464,
+   "title": "Rome: Walking City Tour & Catacombs of Saint Callixtus Entry Ticket",
+   "slug": "eternal-echoes-a-rome-catacombs-to-castles-walking-tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/callisto.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/callisto/141da596a3adca9008e7988f2f1f02ac.jpg",
+   "price": 21.27,
+   "exprice": 21.27,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.5,
+   "reviewsCount": 124,
+   "ratingsCount": 273,
+   "category": "History & Heritage",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": "2 hours",
+   "durationMin": 120,
+   "durationMax": 120,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "",
+    "name": "Kseniya",
+    "bio": "",
+    "nickname": "id200685"
+   }
+  },
+  {
+   "id": 20800,
+   "title": "MagicLand: Open Date Ticket",
+   "slug": "magicland-open-date-ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208008aa39a4a1393471abf285b9268841059.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208008aa39a4a1393471abf285b9268841059/0417d920486a36d02389a2b836f8795e.jpg",
+   "price": 22.62,
+   "exprice": 22.62,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.5,
+   "reviewsCount": 83,
+   "ratingsCount": 149,
+   "category": "Entry tickets",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 6960,
+   "title": "Rome: Vatican Skip-the-Line Ticket & Audio Tour",
+   "slug": "vatican-ticket-and-in-app-audio-tour-museums-sistine-chapel-and-st-peters-church",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/product/6960/depositphotos502712826l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/product/6960/depositphotos502712826l/79b6229cfec4122b03c127bf1e598861.jpg",
+   "price": 54.5,
+   "exprice": 54.5,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 3.9,
+   "reviewsCount": 410,
+   "ratingsCount": 947,
+   "category": "History & Heritage",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": "3 hours",
+   "durationMin": 180,
+   "durationMax": 180,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "WeGoTrip is a company creating memorable experiences through the in-app audio tours for self-guided travelers all around the world. Travel by your own rules with self-guided audio tours & museum tickets in one app. Better to see something once than hear about it a thousand times!",
+    "nickname": "wegotrip"
+   }
+  },
+  {
+   "id": 27494,
+   "title": "Rome: Pantheon Entry Ticket & Audio Tour with a City Walk",
+   "slug": "rome-pantheon-entry-ticket-and-audio-tour-with-a-city-walk",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/19651ec8-06cd-4d01-801a-c2ab5e60517c_RtEiAjt.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/19651ec8-06cd-4d01-801a-c2ab5e60517c_RtEiAjt/49c6f05acbdadf6b9f9d2587ac0b2736.jpg",
+   "price": 23.0,
+   "exprice": 23.0,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 3.7,
+   "reviewsCount": 269,
+   "ratingsCount": 614,
+   "category": "Attraction Tickets",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": "2 hours",
+   "durationMin": 120,
+   "durationMax": 120,
+   "type": 3,
+   "tags": {
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/470901/id470901-avatar.png",
+    "name": "Voya",
+    "bio": "Voya Lantic creates simple and enjoyable self-guided travel experiences. We help travelers explore famous landmarks and hidden gems with easy-to-follow audio tours, practical tips, and engaging stories, making every journey more memorable.",
+    "nickname": "id470901"
+   }
+  },
+  {
+   "id": 20762,
+   "title": "Palazzo Barberini & Galleria Corsini: Entry Ticket",
+   "slug": "palazzo-barberini-and-galleria-corsini-entry-ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20762803cf41699bd4a4399adb4b4c5c34e12.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20762803cf41699bd4a4399adb4b4c5c34e12/a74871639a427036a3248485260578f1.jpg",
+   "price": 17.98,
+   "exprice": 17.98,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.3,
+   "reviewsCount": 67,
+   "ratingsCount": 198,
+   "category": "Entry tickets",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "hit": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 27550,
+   "title": "Rome: Colosseum, Roman Forum, Palatine Hill Audio Tour with a City Walk",
+   "slug": "rome-colosseum-roman-forum-palatine-hill-audio-tour-with-a-city-walk",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/ae53a85f-8ae3-4a2a-b36c-524911a66c53.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/ae53a85f-8ae3-4a2a-b36c-524911a66c53/54f19f887870f8eab4d84e68b52b34fd.jpg",
+   "price": 15.0,
+   "exprice": 15.0,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": null,
+   "reviewsCount": 0,
+   "ratingsCount": 0,
+   "category": "UNESCO sites",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": "2.5 hours",
+   "durationMin": 150,
+   "durationMax": 150,
+   "type": 3,
+   "tags": {
+    "new": true,
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/470901/id470901-avatar.png",
+    "name": "Voya",
+    "bio": "Voya Lantic creates simple and enjoyable self-guided travel experiences. We help travelers explore famous landmarks and hidden gems with easy-to-follow audio tours, practical tips, and engaging stories, making every journey more memorable.",
+    "nickname": "id470901"
+   }
+  },
+  {
+   "id": 20798,
+   "title": "Villa Gregoriana: Entry Ticket",
+   "slug": "villa-gregoriana-entry-ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/207982a78eccaf4cd41c6a6d4d94bee072272.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/207982a78eccaf4cd41c6a6d4d94bee072272/09bd039d609e5418220166375663a23a.jpeg",
+   "price": 13.5,
+   "exprice": 13.5,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.7,
+   "reviewsCount": 79,
+   "ratingsCount": 150,
+   "category": "Entry tickets",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 21324,
+   "title": "Ostia Antica Archaeological Park: Entry Ticket",
+   "slug": "ostia-antica-archaeological-park-entry-ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/213247dbd048af7b741e2bd6fe1b2b4d6c7ec.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/213247dbd048af7b741e2bd6fe1b2b4d6c7ec/7e2036f982b3704c092f859ee8c68955.jpg",
+   "price": 20.94,
+   "exprice": 20.94,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.4,
+   "reviewsCount": 76,
+   "ratingsCount": 120,
+   "category": "Entry tickets",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 27310,
+   "title": "Rome: Santa Maria Maggiore Priority Entry and Audio Tour",
+   "slug": "rome-santa-maria-maggiore-priority-entry-and-audio-tour-1",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/leonhardniederwimmer-church-72468681920_nEBESDx.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/leonhardniederwimmer-church-72468681920_nEBESDx/6846b74be58f840c4a2fbe92a48dafc6.jpg",
+   "price": 16.25,
+   "exprice": 16.25,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.0,
+   "reviewsCount": 44,
+   "ratingsCount": 93,
+   "category": "History & Heritage",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": "1 hours",
+   "durationMin": 60,
+   "durationMax": 60,
+   "type": 3,
+   "tags": {
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "WeGoTrip is a company creating memorable experiences through the in-app audio tours for self-guided travelers all around the world. Travel by your own rules with self-guided audio tours & museum tickets in one app. Better to see something once than hear about it a thousand times!",
+    "nickname": "wegotrip"
+   }
+  },
+  {
+   "id": 21596,
+   "title": "Basilica of Santa Maria Maggiore: Dome Entry Ticket",
+   "slug": "basilica-of-santa-maria-maggiore-dome-entry-ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/21596e96e3adafad242e89fb71912879c3f57.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/21596e96e3adafad242e89fb71912879c3f57/654118cc4920c8829e66e8fb82cb6d2c.jpeg",
+   "price": 13.75,
+   "exprice": 13.75,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 3.8,
+   "reviewsCount": 45,
+   "ratingsCount": 95,
+   "category": "Entry tickets",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 21597,
+   "title": "Entry to Case Romane del Celio",
+   "slug": "entry-to-case-romane-del-celio",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/21597e359faf53ddc4e38a0c23d6d6201c527.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/21597e359faf53ddc4e38a0c23d6d6201c527/b94417d43315cc28a190fcbc8357d9ed.jpg",
+   "price": 13.62,
+   "exprice": 13.62,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 4.1,
+   "reviewsCount": 15,
+   "ratingsCount": 27,
+   "category": "Entry tickets",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 20959,
+   "title": "Rome: Hop-on Hop-off Tiber Cruise Ticket",
+   "slug": "rome-hop-on-hop-off-tiber-cruise-ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20959dd96f9810ebf4ad38b98afc38445c567.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20959dd96f9810ebf4ad38b98afc38445c567/0eebac505c04260f643c0a8848953de0.jpg",
+   "price": 24.44,
+   "exprice": 24.44,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "rating": 3.7,
+   "reviewsCount": 89,
+   "ratingsCount": 159,
+   "category": "Entry tickets",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "en",
+   "author": {
+    "bio": ""
+   }
+  }
+ ],
+ "product_details": {
+  "4900": {
+   "id": 4900,
+   "slug": "paris-pantheon-in-app-audio-tour-and-ticket-where-the-nations-great-are-buried",
+   "title": "Paris: Pantheon Ticket & National Pride Audio Tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21466/depositphotos207178092l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21466/depositphotos207178092l/5dacee8255bb3940eca2eaa34ace5dd4.jpg",
+   "images": [
+    {
+     "id": 21469,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21469/depositphotos303893952l/2f3b7cb26cc1a005154764b5dd10b5f1.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21469/depositphotos303893952l.jpg"
+    },
+    {
+     "id": 21468,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21468/antonio-sessa-mx3zu-3nn4-unsplash/d7b4eb64fcda44cae02d7988256f7c41.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21468/antonio-sessa-mx3zu-3nn4-unsplash.jpg"
+    },
+    {
+     "id": 21374,
+     "description": "View of the main hall",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21374/pantheon-foucault-visit-the-hidden-paris1/0faa8b950cf4a5dec2c0729dce72cbb8.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21374/pantheon-foucault-visit-the-hidden-paris1.jpg"
+    },
+    {
+     "id": 21400,
+     "description": "Sculpted pediment",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21400/optimized-mat-zeurpxrhx68-unsplash/93141ffedb7eaa07023546deb0e91bf0.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21400/optimized-mat-zeurpxrhx68-unsplash.jpg"
+    },
+    {
+     "id": 21401,
+     "description": "Inside the dome",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21401/optimized-pexels-blue-arauz-14464336/5816c4d2ae32e478c538f56a015fddaf.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21401/optimized-pexels-blue-arauz-14464336.jpg"
+    },
+    {
+     "id": 21467,
+     "description": "Tomb of Voltaire",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21467/depositphotos243879662l/36ab8f60136a28a378183fb77d2d8fa4.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21467/depositphotos243879662l.jpg"
+    },
+    {
+     "id": 21464,
+     "description": "Foucault's Pendulum",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21464/depositphotos10610317l/fe412e064b54737c3f0a1ad00518d228.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21464/depositphotos10610317l.jpg"
+    },
+    {
+     "id": 21397,
+     "description": "Paris Pantheon",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/21397/frontal/a0974f6dd1decd30bff917d34e6bd7cc.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/21397/frontal.jpg"
+    }
+   ],
+   "description": "What started out as a church, ended up as a burial site for the great men and women of France, those who have positively influenced the nation and its development. With this in-app audio tour with ticket, you will learn that the Pantheon is a solemn yet beautiful monument of great significance to the French nation.\r\n\r\nThe monument is filled with artwork, from sculptures to frescos, paintings, tapestries, and more....all demonstrating the nation's fervor for the Republic. From the patriotic sculptures on the façade to the nationalistic artwork inside, the Pantheon honors the values of the Republic.  A stroll through the crypt, with its sombre tombs, will reinforce the sentiment of patriotism one feels in this sacred place.\r\n\r\nVisitors will also be intrigued by Foucault's pendulum, a scientific installation beneath the dome.  And for terrific views over the city, there is the newly-opened panoramic platform at the top of the dome.\r\n\r\nThis in-app audio tour will provide visitors with the opportunity to visit the Pantheon at their own pace and learn more about this unique monument.  \r\n\r\nNote! This tour is not affiliated with the Pantheon but is provided by an independent creator. Tickets are included for the customer's convenience.",
+   "lastModified": "2026-08-27 00:07",
+   "highlights": [
+    "Discover the grandeur of the nation's mausoleum guided by your own in-app audio tour with a ticket",
+    "Learn about Foucault's Pendulum and the discovery that the earth rotates on its axis",
+    "Wander around the tombs of the greatest minds of France such as Voltaire, Curie, Hugo, and more",
+    "Hear legends and stories of France's most revered saints such as Joan of Arc and St Genevieve",
+    "Choose to admire the panoramic views 35 meters on high, from the colossal Dome"
+   ],
+   "advisory_information": "Download the app and the digital audio tour on your smartphone before the visit. You will find recommendations on how to get to the staring point in the first step of the tour. If you have any questions or need any assistance, please email us at support@wegotrip.com.",
+   "distance": "2 km",
+   "duration": "1 – 1.5 hours",
+   "locale": "en",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "Place du Panthéon",
+   "startLocation": "Panthéon",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.3464138,
+     48.8462218
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": [
+    [
+     2.3454915,
+     48.8457836
+    ]
+   ],
+   "price": 18.52,
+   "exprice": 18.52,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 3335,
+     "pricingCategoryId": "2817",
+     "label": "Entrance Ticket",
+     "description": "Age: 18+",
+     "price": 4.67
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Entrance ticket to the Pantheon",
+    "Self-guided audio tour for your smartphone on the WeGoTrip app",
+    "Detailed route with step-by-step navigation through the Pantheon",
+    "Offline functionality, audio narration, photos, and written text explanations",
+    "Recommendations on further activities and places to visit"
+   ],
+   "exclusions": [
+    "Earphones and smartphone are not included – bring your own",
+    "Access to the panoramic platform of the dome (€3.50)",
+    "Food & beverages",
+    "Souvenirs",
+    "In-person tour guide"
+   ],
+   "importantInfo": [
+    "The tour is available only on the WeGoTrip app. This is a different app from the source or app you booked the tour if it's not WeGoTrip site or app",
+    "To ensure the quality of the download, please remember to do so before your visit",
+    "Please note that there is no staff at the meeting point or staff on site for this tour. You can start the tour at any time from the meeting point",
+    "An Android version 7.1+ or an iOS smartphone version 12+ is required for the audio guide. You will need around 100 MB of free space for the download"
+   ],
+   "rating": 4.6,
+   "reviewsCount": 192,
+   "ratingsCount": 542,
+   "reviews": [
+    {
+     "text": "Saaai niks aan!",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "raynish",
+     "avatar": "",
+     "rating": 1,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Magnifique endroit. Lieu de respect et à respecter surtout. \nNous avons pu traversé les salles sans problème car il n’y avait pas trop de monde. On circulait facilement.\n",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Élisabeth",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 4654,
+    "title": "Paris: Pantheon Ticket & National Pride Audio Tour",
+    "mediaSize": 68997274,
+    "eventsCount": 14,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "History & Heritage",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 23,
+     "title": "Attraction Tickets",
+     "slug": "attraction-tickets"
+    },
+    {
+     "id": 7,
+     "title": "History & Heritage",
+     "slug": "history-heritage"
+    },
+    {
+     "id": 6,
+     "title": "Art & Museums",
+     "slug": "art-museums"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 194,
+     "name": "Panthéon",
+     "slug": "pantheon-6269532",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/194/paris-2368437_1280/e8ec74a593efc7467e94fa6dfa9f25e6.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 60,
+   "durationMax": 90,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75",
+    "rating": 4.41,
+    "ratingsCount": 20347,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2026-06-16 15:03",
+   "url": "https://wegotrip.com/paris-d2988507/paris-pantheon-in-app-audio-tour-and-ticket-where-the-nations-great-are-buried-p4900/",
+   "provider": null
+  },
+  "22": {
+   "id": 22,
+   "slug": "museum-d-orsay-tour",
+   "title": "Paris: Musee d'Orsay Ticket & Audio Tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos355943198l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos355943198l/5dba0c70213a44a3e444d14c8bce3ee3.jpg",
+   "images": [
+    {
+     "id": 26170,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/julia-anseele-qjtnsmufiri-unsplashzjmwwup/1719e3f5a6c04fa27ce8c237d3f89f37.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/julia-anseele-qjtnsmufiri-unsplashzjmwwup.jpg"
+    },
+    {
+     "id": 26169,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/clock/0fa50ad07ada75425426f9edc1301b02.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/clock.jpg"
+    },
+    {
+     "id": 26172,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/selale-kiroglu-ifv-b1kpeqc-unsplash/f8904d9aefd7517e3244d8acbabb4389.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/selale-kiroglu-ifv-b1kpeqc-unsplash.jpg"
+    },
+    {
+     "id": 88228,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/diane-picchiottino-tpudmrrtkns-unsplash/f7adfdcec56bc1985fe8ae6e375702ae.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/diane-picchiottino-tpudmrrtkns-unsplash.jpg"
+    },
+    {
+     "id": 88229,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/diane-picchiottino-ki-zrxr6j4-unsplash/21b8256cde2750e1fa605c5bef581ab3.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/diane-picchiottino-ki-zrxr6j4-unsplash.jpg"
+    },
+    {
+     "id": 88230,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/diane-picchiottino-y5y1j9s1054-unsplash/5e3569493b15e2d8430da77786980663.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/diane-picchiottino-y5y1j9s1054-unsplash.jpg"
+    }
+   ],
+   "description": "Explore Musée d'Orsay's artistic treasures with this captivating in-app audio tour, complete with an entry ticket for a seamless experience. \r\n\r\nPerfect for first-time visitors or those with limited time (2-3 hours), this tour unveils around 40 main masterpieces from the museum's extensive collection.\r\n\r\nAs you enter the renowned museum housed in a converted railway station, let engaging narratives and insightful commentary serve as your personal guide. Immerse yourself in the vibrant history, fascinating stories, and breathtaking masterpieces that define Musée d'Orsay.\r\n\r\nHighlights include iconic works by celebrated artists like Monet, Van Gogh, and Degas, along with a journey through the museum's intriguing evolution from a railway station to a cultural landmark. The self-guided format allows you to explore at your own pace, lingering at the artworks that capture your imagination.\r\n\r\nWith your ticket, enjoy convenient access to Musée d'Orsay, bypassing long lines to maximize your time within. Delve into the beauty and brilliance housed within the historic walls of this Parisian gem—an enriching journey through the heart of art and culture.\r\n\r\nNote! This tour is not affiliated with the Musée d'Orsay but is provided by an independent creator. An e-ticket is included for the customer's convenience at no charge.",
+   "lastModified": "2026-08-27 00:06",
+   "highlights": [
+    "Explore one of the world's most iconic art galleries at your own pace with an in-app audio tour",
+    "Uncover timeless Impressionist treasures by Degas, Monet, Gauguin, Cézanne, and more",
+    "Experience artistic revolutions from the Academic art to ground-breaking Realism and to Modern Art",
+    "Learn about personal tragedies and inner demons that tormented Vincent van Gogh",
+    "Feel like you are at a busy train station and admire the view of the Seine through the huge clock"
+   ],
+   "advisory_information": "Download the app and the digital audio tour on your smartphone before the visit. You will find recommendations on how to get to the staring point in the first step of the tour. If you have any questions or need any assistance, please email us at support@wegotrip.com.",
+   "distance": "2 km",
+   "duration": "2 – 3 hours",
+   "locale": "en",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "1 Rue de la Légion d'Honneur, 75007 Paris, France",
+   "startLocation": "Musée d’Orsay Entrance",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.3265592,
+     48.8599706
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 25.13,
+   "exprice": 25.13,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 829,
+     "pricingCategoryId": "569",
+     "label": "Entrance Ticket",
+     "description": "",
+     "price": 8.38
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Entrance ticket to the Musee d'Orsay",
+    "Downloadable multimedia audio tour on WeGoTrip app",
+    "Detailed route with step-by-step navigation through museum's halls",
+    "Offline functionality, audio narration, photos, and written text explanations",
+    "Opening hours: Mon-Closed; Tue, Wed, Fri, Sat: 09:30 - 18:00; Thu: 09:30 - 21:45; Sun: 09:30 - 17:00"
+   ],
+   "exclusions": [
+    "Earphones and smartphone are not included – bring your own",
+    "In-person tour guide"
+   ],
+   "importantInfo": [
+    "The tour is available only on the WeGoTrip app. This is a different app from the source or app you booked the tour if it's not WeGoTrip site or app",
+    "To ensure the quality of the download, please remember to do so before your visit",
+    "Please note that there is no staff at the meeting point or staff on site for this tour. You can start the tour at any time from the meeting point",
+    "An Android version 7.1+ or an iOS smartphone version 12+ is required for the audio guide. You will need around 100 MB of free space for the download"
+   ],
+   "rating": 4.5,
+   "reviewsCount": 85,
+   "ratingsCount": 283,
+   "reviews": [
+    {
+     "text": "Prachtige collectie",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Ellen",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Toujours un plaisir et le bâtiment est vraiment magnifique ",
+     "locale": null,
+     "date": "2026-08-21 00:00:00",
+     "name": "F",
+     "avatar": "",
+     "rating": 4,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 12046,
+    "title": "Paris: Musee d'Orsay Ticket & Audio Tour",
+    "mediaSize": 45594874,
+    "eventsCount": 67,
+    "generated_by_ai": true
+   },
+   "accessCodes": [],
+   "category": "Art & Museums",
+   "categories": [
+    {
+     "id": 3,
+     "title": "Theme Tours",
+     "slug": "theme-tours"
+    },
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    },
+    {
+     "id": 4,
+     "title": "Family Friendly Tours",
+     "slug": "family-friendly-tours"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 24,
+     "title": "Museum Tickets & Passes",
+     "slug": "museum-tickets-passes"
+    },
+    {
+     "id": 11,
+     "title": "Literary, Art & Music Tours",
+     "slug": "literary-art-music-tours"
+    },
+    {
+     "id": 6,
+     "title": "Art & Museums",
+     "slug": "art-museums"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 165,
+     "name": "Orsay Museum",
+     "slug": "musee-dorsay",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/165/tmpn4s2kva5/a18d08fe3e79594a12bbddd7c8389f8d.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 120,
+   "durationMax": 180,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "WeGoTrip is a company creating memorable experiences through the in-app audio tours for self-guided travelers all around the world. Travel by your own rules with self-guided audio tours & museum tickets in one app. Better to see something once than hear about it a thousand times!",
+    "nickname": "wegotrip",
+    "rating": 4.35,
+    "ratingsCount": 168159,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2022-12-22 02:41",
+   "url": "https://wegotrip.com/paris-d2988507/museum-d-orsay-tour-p22/",
+   "provider": null
+  },
+  "13095": {
+   "id": 13095,
+   "slug": "rodin-museum-audio-tour-and-ticket-see-the-famous-gates-of-hell-the-thinker-and-the-kiss-with-your-4",
+   "title": "Paris: Rodin Museum Ticket & Audio Tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos185178428l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos185178428l/6e4d3c07f0717bc13b966c6664a38a2e.jpg",
+   "images": [
+    {
+     "id": 81337,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos34931571l/d56e4b12e7b3da5f082248cb494050dc.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos34931571l.jpg"
+    },
+    {
+     "id": 97350,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/jeunefilleauxfleursdanslescheveuxaugusterodinmuserodin311020182/64d12685953fa2afd4c056338295caa0.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/jeunefilleauxfleursdanslescheveuxaugusterodinmuserodin311020182.jpg"
+    },
+    {
+     "id": 97351,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/thekissbyaugusterodintate-07236/aefe5cc04a3bd14a66cb6a7b38bcafef.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/thekissbyaugusterodintate-07236.jpg"
+    },
+    {
+     "id": 81331,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos24936297l_wn8G7OL/940bdf2d78b16452cf4dca6cbcdd8bad.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos24936297l_wn8G7OL.jpg"
+    },
+    {
+     "id": 81332,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos68570877l-1/d54035573dd7a2c6cce3c6d5daa8b20c.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos68570877l-1.jpg"
+    },
+    {
+     "id": 81338,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos12887375l-1/dc860503d41b71ebb022025cce3a6dea.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos12887375l-1.jpg"
+    },
+    {
+     "id": 81339,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos96347372l/57b2c646726c518afbf974094ef464d5.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos96347372l.jpg"
+    }
+   ],
+   "description": "Explore the Rodin Museum in Paris with this self-guided audio tour, which includes an entrance ticket! Auguste Rodin is one of the most significant sculptors in the history of art. He is known for his deep understanding of the human soul and his ability to capture emotions and anxieties using various materials.\r\n\r\nYou will visit the mansion that once served as the sculptor’s studio and see models of some of his most important works. The stories behind these masterpieces will unfold as you explore the collection at your own pace guided by an engaging audio commentary on your phone. Then, you will take a walk through the garden and see The Gates of Hell, The Kiss, and The Thinker. You will also find works by Camille Claudel, his student and lover, and also a very talented sculptress in her own right.  \r\n\r\nPrepare to plunge into the fascinating world of Rodin!\r\n\r\nNote! This tour is not affiliated with the Rodin Museum but is provided by an independent creator. An e-ticket is included for the customer's convenience at no charge.",
+   "lastModified": "2026-08-27 00:07",
+   "highlights": [
+    "Explore the Rodin Museum and park with a self-guided audio tour on your phone",
+    "See the famous Gates of Hell, The Thinker, and The Kiss with your own eyes",
+    "Learn about Rodin's style and method, and how they are connected to Impressionism",
+    "Get to know Camille Claudel, one of the most talented female sculptors",
+    "Stroll through the picturesque park filled with the master's sculptures"
+   ],
+   "advisory_information": null,
+   "distance": "1 km",
+   "duration": "1 hours",
+   "locale": "en",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "Rue de Varenne, 77",
+   "startLocation": "Rodin Museum",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.3158354,
+     48.8553072
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": [
+    [
+     2.3165959419561277,
+     48.85541416982035
+    ],
+    [
+     2.3158354,
+     48.8553072
+    ]
+   ],
+   "price": 19.35,
+   "exprice": 19.35,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 12539,
+     "pricingCategoryId": "14360",
+     "label": "Adult (18+)",
+     "description": "",
+     "price": 6.45
+    }
+   ],
+   "types": {},
+   "inclusions": [
+    "Downloadable multimedia audio tour on WeGoTrip app",
+    "Ticket to The Rodin Museum"
+   ],
+   "exclusions": [
+    "Earphones — please bring your own",
+    "Personal guide - this is an audio tour"
+   ],
+   "importantInfo": [],
+   "rating": 4.7,
+   "reviewsCount": 146,
+   "ratingsCount": 427,
+   "reviews": [
+    {
+     "text": "Parfait. Ras",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Michel",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Très belle expérience,aucune file d’attente à l’entrée du musée.\nLe cadre est magnifique et les œuvres de Rodin sont superbes et mises en valeur dans le jardin très bien entretenu et très agréable.\nL’hôtel de Biron qui accueille les œuvres moins imposantes de Rodin est très un bel écrin .",
+     "locale": null,
+     "date": "2026-08-21 00:00:00",
+     "name": "Unknown",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 12866,
+    "title": "Paris: Rodin Museum Ticket & Audio Tour",
+    "mediaSize": 85789207,
+    "eventsCount": 19,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "Museum Tickets & Passes",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 23,
+     "title": "Attraction Tickets",
+     "slug": "attraction-tickets"
+    },
+    {
+     "id": 24,
+     "title": "Museum Tickets & Passes",
+     "slug": "museum-tickets-passes"
+    },
+    {
+     "id": 10,
+     "title": "Cultural Tours",
+     "slug": "cultural-tours"
+    },
+    {
+     "id": 6,
+     "title": "Art & Museums",
+     "slug": "art-museums"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 8304,
+     "name": "Rodin Museum",
+     "slug": "rodin-museum-12162799",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/8304/depositphotos185178428l/d483f6f779cb48b8ab718636b28f5475.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 60,
+   "durationMax": 60,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "WeGoTrip is a company creating memorable experiences through the in-app audio tours for self-guided travelers all around the world. Travel by your own rules with self-guided audio tours & museum tickets in one app. Better to see something once than hear about it a thousand times!",
+    "nickname": "wegotrip",
+    "rating": 4.35,
+    "ratingsCount": 168159,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2025-04-16 07:14",
+   "url": "https://wegotrip.com/paris-d2988507/rodin-museum-audio-tour-and-ticket-see-the-famous-gates-of-hell-the-thinker-and-the-kiss-with-your-4-p13095/",
+   "provider": null
+  },
+  "196": {
+   "id": 196,
+   "slug": "les-invalides-visit-museum-army",
+   "title": "Paris: Les Invalides Skip-the-Line Access Ticket & Army Museum Audio Tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/12279/39arblaywu4iwqosnehstabvpnuyyw1korqpxgoort-vp8rs4urk4vgkasteeqq47y0s9ksx-avemplrhbktw.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/12279/39arblaywu4iwqosnehstabvpnuyyw1korqpxgoort-vp8rs4urk4vgkasteeqq47y0s9ksx-avemplrhbktw/ef3714cd8db62e441c07f90f3f912cf1.jpg",
+   "images": [
+    {
+     "id": 12280,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/12280/p-ljz5sgls94jbkbltbfw1n10b71bjt6z8tiwye88wpcwvb-gkywuivbburn71slyz9eckry2loddz_yavB35n/9956aa3586e2afbffad0d660663f0357.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/12280/p-ljz5sgls94jbkbltbfw1n10b71bjt6z8tiwye88wpcwvb-gkywuivbburn71slyz9eckry2loddz_yavB35n.jpg"
+    },
+    {
+     "id": 12281,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/12281/depositphotos565054684xl/02f4cc6e60ba6e199f2cecb768a2edc2.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/12281/depositphotos565054684xl.jpg"
+    },
+    {
+     "id": 12294,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/12294/depositphotos538580062l/e8cccfe5d724fb515dded6213b4fbb68.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/12294/depositphotos538580062l.jpg"
+    },
+    {
+     "id": 12293,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/12293/18ocsosntyuxziz4o8tg5aslyw-gkyblwwpo0luw0nubaklg9dn0zlkbh74bo5s5bhznyzyud9v6xo-yppu/a39f5e5c2b63cf25a91c60cb43aa4489.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/12293/18ocsosntyuxziz4o8tg5aslyw-gkyblwwpo0luw0nubaklg9dn0zlkbh74bo5s5bhznyzyud9v6xo-yppu.jpg"
+    },
+    {
+     "id": 12295,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/12295/depositphotos1983590xl/ec438db85464cd80a1b1faf46f3feb47.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/12295/depositphotos1983590xl.jpg"
+    },
+    {
+     "id": 12992,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/12992/depositphotos431312182xl/e5f17a208a658e02bd84d38be393f931.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/12992/depositphotos431312182xl.jpg"
+    }
+   ],
+   "description": "Explore Les Invalides and the Army Museum and discover one of the most prestigious monuments in the heart of Paris. \n\nWhile walking through the halls of the museum the audio guide will relate the fascinating history of this place and explain the most interesting exhibits. You'll see the collection of medieval armor and weapons, one of the largest in the world. \n\nExhibits in the museum cover the wars fought by Louis XIV through to the Cold War, with every major conflict in between.  Artifacts, weapons, and uniforms help bring each moment to life.\n\nYou will visit the beautiful Cathedral – a soldier's church – where classical concerts are offered in the evening. Your visit also takes you to the Dome of the Church, which since 1861 has been home to the monumental tomb of Napoleon Bonaparte. \n\nThe tour finishes outside the church for a unique photo opportunity, while discovering the architectural details of the cathedral.\n\nThis tour is not affiliated with Les Invalides and the Army Museum but is provided by an independent creator. A ticket is included for the customer's convenience.",
+   "lastModified": "2026-08-27 00:03",
+   "highlights": [
+    "Discover one of the world's largest collections of medieval arms & armor with an in-app audio tour",
+    "Visit the Dome of the church and see the tomb of Napoleon Bonaparte",
+    "Listen about the history of war while exploring the arms and weapons used in different wars",
+    "Admire the baroque architecture of the Dome & the Cathedral"
+   ],
+   "advisory_information": "Download the app and the digital audio tour on your smartphone before the visit. You will find recommendations on how to get to the staring point in the first step of the tour. If you have any questions or need any assistance, please email us at support@wegotrip.com.",
+   "distance": "1 km",
+   "duration": "1 – 2 hours",
+   "locale": "en",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "129 Rue de Grenelle",
+   "startLocation": "Les Invalides entrance",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.3127059,
+     48.856529
+    ]
+   },
+   "finishAddress": "2 Avenue de Tourville",
+   "finishLocation": "Outside the Cathedral",
+   "finishLocationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.312442061901843,
+     48.854094717547405
+    ]
+   },
+   "boundingCircle": {
+    "coords": {
+     "lng": 2.3123688442023997,
+     "lat": 48.85612457484397
+    },
+    "radius": 245.26281773986253
+   },
+   "routePoints": [
+    [
+     2.312808461213334,
+     48.858310530530154
+    ],
+    [
+     2.3126798598719978,
+     48.856988173545886
+    ],
+    [
+     2.3125625,
+     48.8558125
+    ],
+    [
+     2.3125934,
+     48.85579329999999
+    ],
+    [
+     2.3119292271914653,
+     48.85393861915778
+    ],
+    [
+     2.3122504411621274,
+     48.85441394784352
+    ]
+   ],
+   "price": 21.03,
+   "exprice": 21.03,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 857,
+     "pricingCategoryId": "2241",
+     "label": "Entrance Ticket",
+     "description": "",
+     "price": 7.01
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Entrance ticket to Les Invalides",
+    "Self-guided audio tour for your smartphone on the WeGoTrip app",
+    "Detailed route with step-by-step navigation through museum's halls",
+    "Suggestions of things to do in the area after your visit"
+   ],
+   "exclusions": [
+    "Earphones — you should bring your own",
+    "Coverage of temporary or special exhibits is not included",
+    "Earphones and smartphone are not included – bring your own",
+    "In-person tour guide"
+   ],
+   "importantInfo": [
+    "The tour is available only on the WeGoTrip app. This is a different app from the source or app you booked the tour if it's not WeGoTrip site or app",
+    "To ensure the quality of the download, please remember to do so before your visit",
+    "Please note that there is no staff at the meeting point or staff on site for this tour. You can start the tour at any time from the meeting point",
+    "An Android version 7.1+ or an iOS smartphone version 12+ is required for the audio guide. You will need around 100 MB of free space for the download"
+   ],
+   "rating": 4.5,
+   "reviewsCount": 212,
+   "ratingsCount": 611,
+   "reviews": [
+    {
+     "text": "Il sito è di indubbio valore storico. Ma le audioguide non ci sono e la app che si scarica per la visita con un QR code è davvero poco agevole e di difficile consultazione: da nessuno strumento si capisce da quale piano può iniziare la visita; trovare la corrispondenza tra numeri della app e numeri degli oggetti esposti è davvero complicato non essendo a disposizione una piantina della selezione delle opere proposte dalla app. Molto interessante la tomba di Napoleone.",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Fabrizio",
+     "avatar": "",
+     "rating": 3,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "niet in de lange wachtrij",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Unknown",
+     "avatar": "",
+     "rating": 4,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 273,
+    "title": "Paris: Les Invalides Skip-the-Line Access Ticket & Army Museum Audio Tour",
+    "mediaSize": 124269613,
+    "eventsCount": 26,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "Skip The Line Tickets",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    },
+    {
+     "id": 4,
+     "title": "Family Friendly Tours",
+     "slug": "family-friendly-tours"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 24,
+     "title": "Museum Tickets & Passes",
+     "slug": "museum-tickets-passes"
+    },
+    {
+     "id": 7,
+     "title": "History & Heritage",
+     "slug": "history-heritage"
+    },
+    {
+     "id": 6,
+     "title": "Art & Museums",
+     "slug": "art-museums"
+    },
+    {
+     "id": 26,
+     "title": "Skip The Line Tickets",
+     "slug": "skip-line-tickets"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 2063,
+     "name": "St Louis des Invalides Cathedral",
+     "slug": "st-louis-des-invalides-cathedral-6269537",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2063/andri-wyss-E8IzFUFGoM4-unsplash/a770cb1b9b95ff0e7211a82e65488bd7.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 2065,
+     "name": "Tomb of Napoleon Bonaparte",
+     "slug": "tomb-of-napoleon-bonaparte",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2065/Patio_de_honor_del_palacio_de_Los_Inv%C3%A1lidos_Par%C3%ADs/abdfa046a6deda9e019cc2e8e9589360.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 2061,
+     "name": "Museum of Relief Maps",
+     "slug": "museum-of-relief-maps",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2061/alexander-kagan-t9Td0zfDTwI-unsplash/ccf85608a518411d9840f4ad77861eb3.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 2058,
+     "name": "The Army Museum",
+     "slug": "the-army-museum",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2058/hotel-des-invalides-a-paris-1160x627/8120c829404acb7c8aa13283882a0881.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 2062,
+     "name": "Historial Charles de Gaulle",
+     "slug": "historial-charles-de-gaulle",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2062/chris-karidis-nnzkZNYWHaU-unsplash/f654fd9c56d320cb3dfe4ae5f0fb6146.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 2064,
+     "name": "Dôme des Invalides",
+     "slug": "dome-des-invalides",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2064/tmpu75vrg0l/bed14b892514a6eef2ab296c1410f5a2.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 60,
+   "durationMax": 120,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75",
+    "rating": 4.41,
+    "ratingsCount": 20347,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2026-06-16 14:54",
+   "url": "https://wegotrip.com/paris-d2988507/les-invalides-visit-museum-army-p196/",
+   "provider": null
+  },
+  "7310": {
+   "id": 7310,
+   "slug": "la-conciergerie-and-la-sainte-chapelle-ticket-and-in-app-audio-tour",
+   "title": "La Conciergerie & La Sainte-Chapelle Ticket & In-App Audio Tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos265974276l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos265974276l/1c9e9edd8ebb55437a3b879865365bcc.jpg",
+   "images": [
+    {
+     "id": 27276,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/christian-burri-eyvu9u6lqw-unsplash/13bde2a787a6259ae7cb1b1bf909389c.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/christian-burri-eyvu9u6lqw-unsplash.jpg"
+    },
+    {
+     "id": 27277,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos700791372l/a9461cbc0c903b9ce3a52810b91e0b7b.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos700791372l.jpg"
+    },
+    {
+     "id": 27278,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/stained-glass-windows-in-upper-chapel-/5418a75475490094fc7a9dd35a8779e7.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/stained-glass-windows-in-upper-chapel-.jpg"
+    },
+    {
+     "id": 27279,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/room-gfa599bb441920/23a6675ef48374435945bbe355317ea7.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/room-gfa599bb441920.jpg"
+    },
+    {
+     "id": 27280,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/hannah-wernecke-pv7ouzgbiga-unsplash/77b26aa893a5bfe427460752c7d90629.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/hannah-wernecke-pv7ouzgbiga-unsplash.jpg"
+    }
+   ],
+   "description": "Explore the historic Conciergerie and the awe-inspiring Sainte-Chapelle with an in-app audio tour!\nBoth buildings were part of the original Royal Court, the first in France, established in the 10th Century.  The Conciergerie served as the first Royal Palace, while the Sainte Chapelle was built as the Royal Chapel for the Kings of France.\n\nCommencing at the Conciergerie, a medieval palace standing for over a millennium, delve into its rich history. Originally a residence for the kings of the Capetian dynasty, it was transformed into a prison during the French Revolution. Immerse yourself in this unique site, listening to audio commentary that introduces you to notable prisoners like Marie Antoinette.\n\nContinue the tour and discover the magnificent Sainte-Chapelle, celebrated for its Gothic splendor. Marvel at its stunning stained-glass windows dating back to the 13th century, illustrating biblical scenes. This architectural marvel captures the essence of French Gothic design and achieves the impossible: 70% of the building's surface is composed of stained-glass!\n\nNote! This tour is not affiliated with the Conciergerie and the Sainte-Chapelle but is provided by an independent creator.",
+   "lastModified": "2026-08-27 00:04",
+   "highlights": [
+    "Explore La Conciergerie and La Sainte-Chapelle with a self-guided audio tour",
+    "As you walk through the Conciergerie, hear about the French Revolution of 1789 and its bloody aftermath",
+    "Step inside the incredible Sainte-Chapelle to marvel at its stained-glass windows",
+    "See the Renaissance-era architecture of the charming Place Dauphine",
+    "Learn how they build a medieval church that is three quarters stained glass"
+   ],
+   "advisory_information": null,
+   "distance": "3 km",
+   "duration": "2 hours",
+   "locale": "en",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "Boulevard du Palais, 2",
+   "startLocation": "La Conciergerie",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.3454953,
+     48.8560114
+    ]
+   },
+   "finishAddress": "Boulevard du Palais, 10",
+   "finishLocation": "Sainte-Chapelle",
+   "finishLocationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.3449609,
+     48.855375
+    ]
+   },
+   "boundingCircle": {
+    "coords": {
+     "lng": 2.344374589052582,
+     "lat": 48.855992177226355
+    },
+    "radius": 167.39511454042557
+   },
+   "routePoints": [
+    [
+     2.345624181803019,
+     48.85512209027199
+    ],
+    [
+     2.3425083,
+     48.8565422
+    ],
+    [
+     2.346240878105164,
+     48.856230529535225
+    ],
+    [
+     2.346037030220032,
+     48.85578577943623
+    ],
+    [
+     2.3439288139343266,
+     48.85686226418071
+    ]
+   ],
+   "price": 47.33,
+   "exprice": 47.33,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 5206,
+     "pricingCategoryId": "183938",
+     "label": "Adult (18+)",
+     "description": "",
+     "price": 15.0
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Ticket to the Conciergerie and the Sainte-Chapelle",
+    "Downloadable multimedia audio tour on the WeGoTrip app",
+    "Detailed route with step-by-step navigation",
+    "Tips and recommendations on where to go and what to see after the tour"
+   ],
+   "exclusions": [
+    "Earphones — please bring your own"
+   ],
+   "importantInfo": [],
+   "rating": 4.3,
+   "reviewsCount": 315,
+   "ratingsCount": 810,
+   "reviews": [
+    {
+     "text": "Quer um local quer outro vale muito a pena visitar. A Conciergerie é uma surpresa logo quando se entra com o salão e é interessante visitar o espaço onde esteve presa Maria Antonieta nos últimos momentos de vida. A Sainte Chapelle é linda com os seus vitrais! ",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Margarida",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Le fait d être en possession d un billet permet une entrée rapide dans les lieux à visiter !",
+     "locale": null,
+     "date": "2026-08-21 00:00:00",
+     "name": "Christine",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 6976,
+    "title": "La Conciergerie & La Sainte-Chapelle Ticket & In-App Audio Tour",
+    "mediaSize": 133316459,
+    "eventsCount": 31,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "Architecture",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 24,
+     "title": "Museum Tickets & Passes",
+     "slug": "museum-tickets-passes"
+    },
+    {
+     "id": 8,
+     "title": "Architecture",
+     "slug": "architecture"
+    },
+    {
+     "id": 6,
+     "title": "Art & Museums",
+     "slug": "art-museums"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 8007,
+     "name": "Quai de l'Horloge",
+     "slug": "quai-de-lhorloge-12162501",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/8007/Pont_Notre_Dame_et_vue_sur_la_Conciergerie/37ab042e4985774c60409fa8b8737636.JPG",
+     "itemsCount": 1
+    },
+    {
+     "id": 9097,
+     "name": "Place Dauphine",
+     "slug": "place-dauphine-12163593",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/9097/placedauphineparisbuildingsno10-16unsplash/daa5bdf806c82ccd26a26bce890c658b.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 7992,
+     "name": "La Conciergerie",
+     "slug": "la-conciergerie-12162486",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/7992/tmpulxui8bb/e0a44a9123ac10b5d8721a125fc76bae.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 169,
+     "name": "Holy Chapel",
+     "slug": "la-sainte-chapelle",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/169/tmpkwmvqiz6/b7671601e06901c20c15d0ce837484b6.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 120,
+   "durationMax": 120,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75",
+    "rating": 4.41,
+    "ratingsCount": 20347,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2026-06-16 15:08",
+   "url": "https://wegotrip.com/paris-d2988507/la-conciergerie-and-la-sainte-chapelle-ticket-and-in-app-audio-tour-p7310/",
+   "provider": null
+  },
+  "113": {
+   "id": 113,
+   "slug": "orangerie-museum",
+   "title": "Paris: Orangerie Skip-the-Line Access Ticket & Impressionism Audio Tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/product/113/cover.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/product/113/cover/0f2b539cc7473b2d1ed7de76a6368962.jpg",
+   "images": [
+    {
+     "id": 17909,
+     "description": "The Water Lilies Gallery",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17909/art-g0ab842bf21920-unsplash/eca07fee9bcf8d83ec951ea0afd9249e.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17909/art-g0ab842bf21920-unsplash.jpg"
+    },
+    {
+     "id": 56959,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/olive-treee/d297ce49ef2c1a9cfa899e31108e0c18.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/olive-treee.jpg"
+    },
+    {
+     "id": 56960,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/andi-cin/91d06a1121b5323a9a66004007a3c007.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/andi-cin.jpg"
+    },
+    {
+     "id": 56961,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos387278508l/7288212b22604e0646ab56aa5e8405ed.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos387278508l.jpg"
+    },
+    {
+     "id": 17914,
+     "description": "Detail of one of the Water Lily paintings",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17914/15a1-wl1png/6ded7308a4c434deb63bdcd044a5ef9c.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17914/15a1-wl1png.jpg"
+    },
+    {
+     "id": 17908,
+     "description": "Discover Monet's Water Lilies with our Audio Tour",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17908/photo-montage_NLpdnDT/3e3306f91096e159b28952c81adb3a9e.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17908/photo-montage_NLpdnDT.jpg"
+    },
+    {
+     "id": 17913,
+     "description": "Detail of one of the Water Lily paintings",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17913/15b1-wl2png/007a107a259f081e4cc7f719f90aae31.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17913/15b1-wl2png.jpg"
+    },
+    {
+     "id": 17916,
+     "description": "The gardens at Giverny",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17916/monet-gbeaea25581280/69b815b107fd17d62c67d6b46f671dbf.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17916/monet-gbeaea25581280.jpg"
+    },
+    {
+     "id": 17917,
+     "description": "Monet in his garden, 1910",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17917/14a-monet-in-garden-1900/5d69006fd6fc1a7ba88fe3464369c3f3.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17917/14a-monet-in-garden-1900.jpg"
+    },
+    {
+     "id": 17979,
+     "description": "Cézanne paintings from the Walter-Guillaume collection",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17979/cezanne-edit/095a48241146d26886f44d1b094c9c34.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17979/cezanne-edit.jpg"
+    },
+    {
+     "id": 17980,
+     "description": "Renoir paintings from the Walter-Guillaume collection",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17980/more-renoir/cdedc1271f598671345211b6d1861176.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17980/more-renoir.jpg"
+    },
+    {
+     "id": 17981,
+     "description": "Picasso paintings from the Walter-Guillaume collection",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17981/picasso/26f03851f1ae52f574bfbb13fa9ae631.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17981/picasso.jpg"
+    },
+    {
+     "id": 17977,
+     "description": "The Water Lilies Gallery",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/17977/cover-photo/b234439c54549517ca2138f52215c801.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/17977/cover-photo.jpg"
+    }
+   ],
+   "description": "This is a self-guided audio tour of the Orangerie Museum, a gallery of Impressionist and Post-Impressionist paintings. Show your smartphone ticket at the \"Visitors with Tickets\" line.\r\n\r\nThe larger-than-life Water Lilies by Monet are the main attraction, but they are far from the only reason to visit. Situated in an old greenhouse in the heart of Paris, this museum is also notable for having the Walter Guillaume collection of Impressionist and Post-Impressionist art. \r\n\r\nThis in-app audio tour explains how Impressionism was born and how Monet's painting technique evolved over time. You will gain insights on the genesis of the Water Lily collection, Monet's creative vision, and how the Orangerie was adapted to accommodate the paintings. \r\n\r\nThe amazing Walter Guillaume collection on the Lower Level allows the visitor to understand the evolution from Impressionism to Modern Art. The influence of African Art on the early Modernists led them to create the first abstract paintings. \r\n\r\nThe visitor will also discover that the Orangerie building, once a greenhouse, was part of a large palace, a twin to the Louvre, constructed by Queen Catherine de Medici in 1564. \r\n\r\nThis tour is not affiliated with the Orangerie Museum but is provided by an independent creator.",
+   "lastModified": "2026-08-27 00:01",
+   "highlights": [
+    "Immerse yourself in the atmosphere of the Impressionists with a self-guided audio tour",
+    "Savor Monet’s masterpieces in the Water Lilies Gallery",
+    "Learn how Impressionism was born & how it led the transition to modern art",
+    "Discover the rich history of the Orangerie Museum"
+   ],
+   "advisory_information": "Download the app and the digital audio tour on your smartphone before the visit. You will find recommendations on how to get to the staring point in the first step of the tour. If you have any questions or need any assistance, please email us at support@wegotrip.com.",
+   "distance": "500 m",
+   "duration": "1 – 1.5 hours",
+   "locale": "en",
+   "city": {
+    "id": 2988507,
+    "name": "Paris",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "Jardin Tuileries",
+   "startLocation": "Musée de l'Orangerie",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.3226724,
+     48.8637884
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": [
+    [
+     2.3226875,
+     48.86381249999999
+    ]
+   ],
+   "price": 19.5,
+   "exprice": 19.5,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 9149,
+     "pricingCategoryId": "1997",
+     "label": "Entrance Ticket",
+     "description": "",
+     "price": 6.5
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Self-guided audio tour for your smartphone on the WeGoTrip app",
+    "Step-by-step navigation through museum halls",
+    "Coverage of the permanent collections",
+    "Skip-the-line ticket to Orangerie Museum (\"Visitors with Tickets\" line)"
+   ],
+   "exclusions": [
+    "Earphones — you should bring your own",
+    "Coverage of temporary exhibits is not included",
+    "Earphones and smartphone are not included – bring your own",
+    "In-person tour guide"
+   ],
+   "importantInfo": [
+    "Coverage of temporary exhibits is not included",
+    "The tour is available only on the WeGoTrip app. This is a different app from the source or app you booked the tour if it's not WeGoTrip site or app",
+    "To ensure the quality of the download, please remember to do so before your visit",
+    "Please note that there is no staff at the meeting point or staff on site for this tour. You can start the tour at any time from the meeting point",
+    "An Android version 7.1+ or an iOS smartphone version 12+ is required for the audio guide. You will need around 100 MB of free space for the download"
+   ],
+   "rating": 4.2,
+   "reviewsCount": 154,
+   "ratingsCount": 407,
+   "reviews": [
+    {
+     "text": "ツアー参加の自由行動を計画、予約させていただきました。やはりチケット予約をしておくと確実に入場でき、本当に助かりました。",
+     "locale": null,
+     "date": "2026-08-17 00:00:00",
+     "name": "Satomi",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Comme au musée d’Orsay les lieux trop exigus ne se prêtent pas aux expositions temporaires attirant un public important. Le meilleur endroit en la matière demeure le Petit Palais.",
+     "locale": null,
+     "date": "2026-08-08 00:00:00",
+     "name": "Alain",
+     "avatar": "",
+     "rating": 3,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 13040,
+    "title": "Paris: Orangerie Skip-the-Line Access Ticket & Impressionism Audio Tour",
+    "mediaSize": 36130626,
+    "eventsCount": 21,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "Art & Museums",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    },
+    {
+     "id": 4,
+     "title": "Family Friendly Tours",
+     "slug": "family-friendly-tours"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 24,
+     "title": "Museum Tickets & Passes",
+     "slug": "museum-tickets-passes"
+    },
+    {
+     "id": 6,
+     "title": "Art & Museums",
+     "slug": "art-museums"
+    },
+    {
+     "id": 26,
+     "title": "Skip The Line Tickets",
+     "slug": "skip-line-tickets"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 3575,
+     "name": "Place de la Concorde",
+     "slug": "place-de-la-concorde",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/3575/tmpmui3txhv/589880cc43417b2da326ad009b51a21d.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 3574,
+     "name": "Tuileries Garden",
+     "slug": "jardin-des-tuileries",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/3574/kirsten-drew-NIGy5J-pQJs-unsplash/8ccb0ce0b007305d38c3d54e430c6aca.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 56,
+     "name": "Orangerie Museum",
+     "slug": "orangerie-museum",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/56/Orangerie_Museum_audio_tours_and_entry_tickets/69819e492772fb0d1327448c702fb1e4.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 60,
+   "durationMax": 90,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75",
+    "rating": 4.41,
+    "ratingsCount": 20347,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2026-06-16 14:49",
+   "url": "https://wegotrip.com/paris-d2988507/orangerie-museum-p113/",
+   "provider": null
+  },
+  "12464": {
+   "id": 12464,
+   "slug": "eternal-echoes-a-rome-catacombs-to-castles-walking-tour",
+   "title": "Rome: Walking City Tour & Catacombs of Saint Callixtus Entry Ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/callisto.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/callisto/141da596a3adca9008e7988f2f1f02ac.jpg",
+   "images": [
+    {
+     "id": 141215,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/nick-castelli-hgmcuy9phok-unsplash/8c9f939964c0b35b16abf78e2b947bf7.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/nick-castelli-hgmcuy9phok-unsplash.jpg"
+    },
+    {
+     "id": 80351,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos192730520l/87929055d2db44411bcddeb9a54967a9.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos192730520l.jpg"
+    },
+    {
+     "id": 80280,
+     "description": "© L&#39;Osservatore Tiburtino",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/g-jhxvs928/3c12da0e1ea6c1e76a61b2e0229d5b08.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/g-jhxvs928.jpg"
+    },
+    {
+     "id": 141216,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/unnamed-5/3439317c5dd03ae2445ee73f1c13e16e.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/unnamed-5.jpg"
+    }
+   ],
+   "description": "Embark on a self-guided audio tour designed for anyone with an interest in exploring the depths of Rome beyond the well-trodden tourist paths. Perfect for the traveler who enjoys a blend of ancient history and modern vibrancy, this tour offers an engaging way to connect with Rome's layered past and colorful present. Starting at the historic Catacombs of Saint Callixtus and ending at the poetic Catacombs of Commodilla, participants will navigate the winding narratives of the Eternal City, propelled by detailed narratives accessible through their own device. The route leads from the solemn pathways beneath Rome's surface to the vivacious streets of neighborhoods like Garbatella, inviting an exploration of not only Rome's catacombs but also its marvelous basilicas, iconic garden homes, and spirited street art murals. The journey brings to light the hidden gems nestled within the city's bustling landscape and uncovers the silent stories of early Christians intertwined with the daily rhythms of modern Roman life. Memorable experiences along the way include standing in the hallowed halls of the Basilica of Saint Paul Outside the Walls and contemplating the vivid street art of Garbatella. Throughout the tour, the contrasts of Rome's imperious history and its contemporary culture will captivate the mind and senses, leaving travelers with a profound understanding of the heart and soul of this timeless metropolis.",
+   "lastModified": "2026-08-27 00:07",
+   "highlights": [
+    "Explore Rome with an In-App Audio Tour that brings history to your ears",
+    "Discover ancient Christian symbols in the Catacombs of Saint Callixtus",
+    "See the Basilica of Saint Paul Outside the Walls, a monument to perseverance",
+    "Admire the Circus of Maxentius, reliving the thrills of chariot races"
+   ],
+   "advisory_information": null,
+   "distance": "10 km",
+   "duration": "2 hours",
+   "locale": "en",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "country": {
+    "id": 3175395,
+    "name": "Italy",
+    "slug": "italy"
+   },
+   "address": "Via Appia Antica, 110/126, 00179 Roma RM, Italy",
+   "startLocation": "Catacombs of Saint Callixtus",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.5107043,
+     41.8589433
+    ]
+   },
+   "finishAddress": "Piazzale San Paolo, 1a",
+   "finishLocation": "Basilica of Saint Paul Outside The Walls",
+   "finishLocationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.4761771,
+     41.858785
+    ]
+   },
+   "boundingCircle": {
+    "coords": {
+     "lng": 12.4992191,
+     "lat": 41.857016349999995
+    },
+    "radius": 1986.7591457337378
+   },
+   "routePoints": [
+    [
+     12.489282,
+     41.861967
+    ],
+    [
+     12.5161847,
+     41.8559245
+    ],
+    [
+     12.5107043,
+     41.8589433
+    ],
+    [
+     12.4873233,
+     41.8606527
+    ],
+    [
+     12.5222611,
+     41.8547175
+    ],
+    [
+     12.5208814,
+     41.8520657
+    ],
+    [
+     12.5055437,
+     41.8589106
+    ],
+    [
+     12.4761771,
+     41.858785
+    ],
+    [
+     12.483505,
+     41.8611791
+    ]
+   ],
+   "price": 21.27,
+   "exprice": 21.27,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 11130,
+     "pricingCategoryId": "42657",
+     "label": "Adult - Tour in English",
+     "description": "",
+     "price": 7.5
+    },
+    {
+     "id": 11131,
+     "pricingCategoryId": "42662",
+     "label": "Child - Tour in English",
+     "description": "",
+     "price": 6.0
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Entrance ticket to Catacombs of Saint Callixtus",
+    "Downloadable self-guided audio tour via the WeGoTrip app",
+    "Detailed route from stop to stop with live GPS map on your smartphone"
+   ],
+   "exclusions": [
+    "Audio tour inside Catacombs of Saint Callixtus",
+    "Earphones are not included — please bring your own",
+    "Tickets to the attractions along the way are not included"
+   ],
+   "importantInfo": [],
+   "rating": 4.5,
+   "reviewsCount": 124,
+   "ratingsCount": 273,
+   "reviews": [
+    {
+     "text": "Comfort guided a great tour. \n",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Risha",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Todo fenomenal!!!",
+     "locale": null,
+     "date": "2026-08-21 00:00:00",
+     "name": "LUIS",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 12188,
+    "title": "Rome: Walking City Tour & Catacombs of Saint Callixtus Entry Ticket",
+    "mediaSize": 87517704,
+    "eventsCount": 11,
+    "generated_by_ai": true
+   },
+   "accessCodes": [],
+   "category": "History & Heritage",
+   "categories": [
+    {
+     "id": 11,
+     "title": "Walking Tours",
+     "slug": "walking-tours"
+    },
+    {
+     "id": 2,
+     "title": "Sightseeing Tours",
+     "slug": "sightseeing-tours"
+    },
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 10,
+     "title": "Cultural Tours",
+     "slug": "cultural-tours"
+    },
+    {
+     "id": 7,
+     "title": "History & Heritage",
+     "slug": "history-heritage"
+    },
+    {
+     "id": 1,
+     "title": "Walking Tours",
+     "slug": "walking-tours"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 18063,
+     "name": "Catacombs of Domitilla",
+     "slug": "catacombs-of-domitilla",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/18063/tmpq91l3s63/34727e22fabb6b07c428db41b6d4e58c.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 28214,
+     "name": "Catacombe di Commodilla",
+     "slug": "catacombe-di-commodilla",
+     "preview": "",
+     "itemsCount": 1
+    },
+    {
+     "id": 18064,
+     "name": "Circus of Maxentius",
+     "slug": "circus-of-maxentius-12172578",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/18064/tmpos6kop89/8b1d67a5e3e911b304d076bb9c685254.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 14990,
+     "name": "Catacombs of St. Callixtus",
+     "slug": "catacombs-of-st-callixtus",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/14990/tmpmptffy7/4d3139492f75483bae3bdf57e910bb9c.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 18065,
+     "name": "Mausoleo di Cecilia Metella",
+     "slug": "mausoleo-di-cecilia-metella",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/18065/tmpm2ji8ha2/650af05a96391ec3d3049dc29c9ba2be.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 120,
+   "durationMax": 120,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "",
+    "name": "Kseniya",
+    "bio": "",
+    "nickname": "id200685",
+    "rating": 4.44,
+    "ratingsCount": 9996,
+    "year_since": "2024"
+   },
+   "lastUpdatedByAuthor": "2024-09-27 06:10",
+   "url": "https://wegotrip.com/rome-d3169070/eternal-echoes-a-rome-catacombs-to-castles-walking-tour-p12464/",
+   "provider": null
+  },
+  "20800": {
+   "id": 20800,
+   "slug": "magicland-open-date-ticket",
+   "title": "MagicLand: Open Date Ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208008aa39a4a1393471abf285b9268841059.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208008aa39a4a1393471abf285b9268841059/0417d920486a36d02389a2b836f8795e.jpg",
+   "images": [
+    {
+     "id": 127315,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208009cad58ebe5d84e9f9575f047c126cb53/a988d6c9527e6e0d4af94c837db9c9db.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208009cad58ebe5d84e9f9575f047c126cb53.jpg"
+    },
+    {
+     "id": 127316,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208002d5fe830c6bc49db98793b665bec426c/bd1ab47a4e71185e653ffb5456fdf629.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208002d5fe830c6bc49db98793b665bec426c.jpg"
+    },
+    {
+     "id": 127317,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800e82eb3b60f384d5a9adeaeafb1af2c39/96589548ef13444cfa18ba7849c3db86.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800e82eb3b60f384d5a9adeaeafb1af2c39.jpg"
+    },
+    {
+     "id": 127318,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800c74c1be3caef4fe0a7b84da020b80cad/b0051f0823806e20c8ad1607b373c0dd.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800c74c1be3caef4fe0a7b84da020b80cad.jpg"
+    },
+    {
+     "id": 127319,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2080051a9e87f60564f3ea131893d762deb30/ed7403adec6ebe9bf0b21908a4ad6b22.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2080051a9e87f60564f3ea131893d762deb30.jpg"
+    },
+    {
+     "id": 127320,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2080085d03b16462e4754a3b8db91c9e783dc/7fc32bfa32cdf66e856333cf66fd0917.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2080085d03b16462e4754a3b8db91c9e783dc.jpg"
+    },
+    {
+     "id": 127321,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2080073c898d37d2e4662b07582a0788f47f9/a1311c5c7747e4abbf8ae17bb0f24c13.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2080073c898d37d2e4662b07582a0788f47f9.jpg"
+    },
+    {
+     "id": 127322,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208004106e90dbe53421680f9112975932d57/adbefed5b8b3d23b1bd759f651024a50.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208004106e90dbe53421680f9112975932d57.jpg"
+    },
+    {
+     "id": 127323,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208002a20ef3926da47d7847e121f59c0d578/0295aa12466168cdd0e864814c9a4bb4.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208002a20ef3926da47d7847e121f59c0d578.jpg"
+    },
+    {
+     "id": 127324,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800eccfee40d33f432490e6513247be1fde/d61a44d5ce35ebed7ad8ebd36032f5ec.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800eccfee40d33f432490e6513247be1fde.jpg"
+    },
+    {
+     "id": 127325,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208007ac7b6b5585248ae9b90e6a3ca1b1cc2/af41d712b44162458a272d46bedcebb0.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208007ac7b6b5585248ae9b90e6a3ca1b1cc2.jpg"
+    },
+    {
+     "id": 127326,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2080011dff569a21a4394981b87f55b946b72/339fbc64b49d9f6b1500858de301171f.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2080011dff569a21a4394981b87f55b946b72.jpg"
+    },
+    {
+     "id": 127327,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208006d3636f6887743d492af9f209b21266d/52030b100a7553102d79867a2bb47bf8.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208006d3636f6887743d492af9f209b21266d.jpg"
+    },
+    {
+     "id": 127328,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800a338d5e5b9b24ab5967b0dbc072bed4d/5d91171e65bcb921bd528016788744ff.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800a338d5e5b9b24ab5967b0dbc072bed4d.jpg"
+    },
+    {
+     "id": 127329,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800c2efd78da8f9479dbdcf7d4234ff5a10/b27dd1617c9b9d1426189da6a9dce86a.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800c2efd78da8f9479dbdcf7d4234ff5a10.jpg"
+    },
+    {
+     "id": 127330,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208002efd1fb41d6740238a9e5069f7aeb8e7/b96e67877d597e24c50abc68d10a8593.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208002efd1fb41d6740238a9e5069f7aeb8e7.jpg"
+    },
+    {
+     "id": 127331,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208007e738f84dd5f4787a137a3f762383fff/eee753e0b290d6a4e5c0f0f4e25d478a.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208007e738f84dd5f4787a137a3f762383fff.jpg"
+    },
+    {
+     "id": 127332,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/208005085f7b160de46ed9238809b1eb0e6ab/c51ada06249a269763e2a50281463b7b.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/208005085f7b160de46ed9238809b1eb0e6ab.jpg"
+    },
+    {
+     "id": 127333,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2080061b9f138912645728e24055a79741fa7/04c903b5e31c5130cdb218a8e505cf59.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2080061b9f138912645728e24055a79741fa7.jpg"
+    },
+    {
+     "id": 127334,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2080011fd7c8c4db5464eb491e8a19d2bfead/434aa67ffc616ae2a89d32f28ee698a4.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2080011fd7c8c4db5464eb491e8a19d2bfead.jpg"
+    },
+    {
+     "id": 127335,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800064d8ecdb17d434fa9649511a1c01717/86f7ed345d38fdd0abe19d4f707d883b.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800064d8ecdb17d434fa9649511a1c01717.jpg"
+    },
+    {
+     "id": 127336,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800425fd4dda702400ab7b40c22106a17c9/08e7fce55b717ca835eebdbedbf385b1.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800425fd4dda702400ab7b40c22106a17c9.jpg"
+    },
+    {
+     "id": 127337,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800ea1fa2154d3342e58098a2ed720cd39e/0f0711637d92b90e663485de293a212a.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800ea1fa2154d3342e58098a2ed720cd39e.jpg"
+    },
+    {
+     "id": 127338,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800c44ab3b91b434e328f9a5b7b6d554d96/bcfbbe8e60ec93c8dc5098ac1447b813.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800c44ab3b91b434e328f9a5b7b6d554d96.jpg"
+    },
+    {
+     "id": 127339,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800c7675dfae73b4678b7515384e45c97a4/00e6d1d25c1e7955dbf25459d32918aa.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800c7675dfae73b4678b7515384e45c97a4.jpg"
+    },
+    {
+     "id": 127340,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20800fde7bb9c4394418486fc5361bdff9b88/1d23c4ae91234f8a3b909476b5a37bb8.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20800fde7bb9c4394418486fc5361bdff9b88.jpg"
+    }
+   ],
+   "description": "The name says it all: MagicLand. It's a place full of magic that manages to keep the kids entertained and content for a full day, without taking a toll on adults! And, it's just 45 minutes out of Rome!\r\n \r\nExplore lush jungles alive with rides, slides, and good vibes. Jump on board a boat to escape an erupting volcano, race around jungle-reclaimed temple ruins in off-road vehicles, go wild in Italy's biggest playground, and scream your way down looping roller coasters.",
+   "lastModified": "2026-08-27 00:06",
+   "highlights": [],
+   "advisory_information": null,
+   "distance": null,
+   "duration": null,
+   "locale": "en",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "country": {
+    "id": 3175395,
+    "name": "Italy",
+    "slug": "italy"
+   },
+   "address": "Via della Pace",
+   "startLocation": "Via della Pace",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.9601049,
+     41.764572
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 22.62,
+   "exprice": 22.62,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [],
+   "types": {},
+   "inclusions": [],
+   "exclusions": [],
+   "importantInfo": [],
+   "rating": 4.5,
+   "reviewsCount": 83,
+   "ratingsCount": 149,
+   "reviews": [
+    {
+     "text": "Pedi o reembolso por motivos graves e não foi consedido",
+     "locale": null,
+     "date": "2026-08-21 00:00:00",
+     "name": "Mónica",
+     "avatar": "",
+     "rating": 1,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Bella giornata, il parco è bello e ben organizzato. Da rifare. ",
+     "locale": null,
+     "date": "2026-08-19 00:00:00",
+     "name": "Claudio",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": null,
+   "accessCodes": [],
+   "category": "Entry tickets",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    }
+   ],
+   "subcategories": [],
+   "attractions": [
+    {
+     "id": 37870,
+     "name": "MagicLand",
+     "slug": "magicland",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/None/photokeyaizasyccsokeemfb2t5ldahhtceqv9a0nq2zxk-and-photoreferenceaxqcqnqqaicl5eok4kvekgt38ye9bxa38xhtbnsanaqdqrd0b6baz4w00s1ol3bixi0wx8xekgp9tk16ano0jb-gy2wbl_xmQQRgJ/7c616f089eccd4bee67809f71da49a5b.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "lastUpdatedByAuthor": "2025-05-25 00:46",
+   "url": "https://wegotrip.com/rome-d3169070/magicland-open-date-ticket-p20800/",
+   "provider": null
+  },
+  "6960": {
+   "id": 6960,
+   "slug": "vatican-ticket-and-in-app-audio-tour-museums-sistine-chapel-and-st-peters-church",
+   "title": "Rome: Vatican Skip-the-Line Ticket & Audio Tour",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/product/6960/depositphotos502712826l.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/product/6960/depositphotos502712826l/79b6229cfec4122b03c127bf1e598861.jpg",
+   "images": [
+    {
+     "id": 25439,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos185057386l/f15b8d70e8a26887d6a3cd9d7af38996.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos185057386l.jpg"
+    },
+    {
+     "id": 25441,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos618612544l/26178cd0d37a23d70a9921caf625448d.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos618612544l.jpg"
+    },
+    {
+     "id": 25440,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos383371032l/fccd7a8a0f5aea4aaf0a6ac51dcd3c17.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos383371032l.jpg"
+    },
+    {
+     "id": 25442,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/sistine-11288521280/ada7067696a417401468012dfebb57cf.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/sistine-11288521280.jpg"
+    },
+    {
+     "id": 25443,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos48914771l/53f49c7c8be9ded23c6b2fd700fa5c7d.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos48914771l.jpg"
+    },
+    {
+     "id": 25444,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos76398005l/ae004ef75243ca2157d72d95f403134c.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos76398005l.jpg"
+    },
+    {
+     "id": 25445,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos10341792l/22f672bb94e1ec83647a9ec16f19240b.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos10341792l.jpg"
+    }
+   ],
+   "description": "Embark on a captivating self-guided audio tour, which includes an entrance ticket, through the Vatican, a symbol of the Church's power and wealth, the birthplace of Catholic Christianity, and the historic abode of popes. This independent exploration unravels the Vatican's narrative—a small yet globally influential state.\r\n\r\nThis immersive in-app audio guide delves into the Vatican Museums, a treasury of diverse artworks spanning centuries and continents. Acquired by the Roman Catholic Church over five centuries, these priceless pieces create an expansive collection, now housed in a vast complex of 1400 halls from 20 museums—a testament to grandiosity in itself. While it's impossible to cover every inch, our curated route highlights key landmarks. \r\n\r\nTraverse the Pio-Clementino Museum, stroll through the resplendent Gallery of the Chandeliers and the Gallery of the Geographical Maps, and marvel at the renowned Raphael’s Rooms. \r\n\r\nWitness iconic sculptures like Apollo Belvedere and the Laocoon, and appreciate the awe-inspiring paintings within the Sistine Chapel. \r\n\r\nThe journey concludes with a visit to St. Peter's Basilica, one of the world's most exquisite cathedrals. Join us on this enriching odyssey through the Vatican's cultural and artistic treasures!\r\n\r\nNote! This tour is not affiliated with the Vatican Museums but is provided by an independent creator. Ticket is included for a customer's convenience at no charge.",
+   "lastModified": "2026-08-27 00:06",
+   "highlights": [
+    "Explore the Vatican's cultural and artistic treasures with your own in-app audio tour",
+    "Be guided through the must-sees of the vast collection of the Vatican Museums",
+    "Marvel at the Sistine Chapel and learn how Michelangelo created his masterpiece",
+    "Experience the grandeur of the St. Peter's Basilica and the breathtaking beauty of Pieta",
+    "Unravel the Vatican's narrative—a small yet globally influential state"
+   ],
+   "advisory_information": null,
+   "distance": "5 km",
+   "duration": "3 hours",
+   "locale": "en",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "country": {
+    "id": 3175395,
+    "name": "Italy",
+    "slug": "italy"
+   },
+   "address": "Viale Vaticano, 100, 00192 Roma RM, Italy",
+   "startLocation": "Vatican Museums",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.4536413,
+     41.9064878
+    ]
+   },
+   "finishAddress": "St. Peter's Basilica, Piazza San Pietro, Vatican City",
+   "finishLocation": "St. Peter's Basilica",
+   "finishLocationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.4539367,
+     41.90216669999999
+    ]
+   },
+   "boundingCircle": {
+    "coords": {
+     "lng": 12.455334184837646,
+     "lat": 41.9041528910799
+    },
+    "radius": 315.13599160949974
+   },
+   "routePoints": [
+    [
+     12.454148801428355,
+     41.9050487783
+    ],
+    [
+     12.457278454336985,
+     41.90221659278679
+    ],
+    [
+     12.454055340357831,
+     41.90658867740826
+    ],
+    [
+     12.455426044050261,
+     41.90411104983457
+    ],
+    [
+     12.455111131149225,
+     41.90601805152554
+    ],
+    [
+     12.453389915338306,
+     41.901717104751555
+    ],
+    [
+     12.453587636428766,
+     41.90217322866161
+    ],
+    [
+     12.454512064362648,
+     41.90217455535941
+    ],
+    [
+     12.45415092361674,
+     41.902480681911534
+    ],
+    [
+     12.454939476125391,
+     41.90217722765257
+    ],
+    [
+     12.455604769846744,
+     41.902197206781906
+    ],
+    [
+     12.454034441589197,
+     41.90177940961486
+    ],
+    [
+     12.454243209345359,
+     41.90412479437321
+    ],
+    [
+     12.454392379606302,
+     41.906521078890705
+    ],
+    [
+     12.454124093055725,
+     41.90599022638597
+    ],
+    [
+     12.454805350850664,
+     41.90644523924667
+    ],
+    [
+     12.454554421828743,
+     41.90330999451576
+    ],
+    [
+     12.454408402975893,
+     41.9029078711508
+    ],
+    [
+     12.455132236804928,
+     41.9027561104917
+    ]
+   ],
+   "price": 54.5,
+   "exprice": 54.5,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 4856,
+     "pricingCategoryId": "125508",
+     "label": "Adults (18+)",
+     "description": "",
+     "price": 15.0
+    },
+    {
+     "id": 4858,
+     "pricingCategoryId": "125509",
+     "label": "Children (6-17)",
+     "description": "",
+     "price": 12.0
+    },
+    {
+     "id": 25137,
+     "pricingCategoryId": "125507",
+     "label": "Infant (0-5)",
+     "description": "",
+     "price": 5.0
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Skip-the-line entrance ticket to the Vatican Museums & Sistine Chapel",
+    "Downloadable multimedia audio tour on the WeGoTrip app",
+    "Detailed route from stop to stop with live GPS map on your smartphone",
+    "Offline functionality, audio narration, photos, and written text explanations"
+   ],
+   "exclusions": [
+    "Earphones — please bring your own"
+   ],
+   "importantInfo": [],
+   "rating": 3.9,
+   "reviewsCount": 410,
+   "ratingsCount": 947,
+   "reviews": [
+    {
+     "text": "Het is druk en lang wachten voor controle (hoezo fast track) verder is er veel te zien. Je mag overal foto’s maken behalve in sixtijnse kapel.",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Unknown",
+     "avatar": "",
+     "rating": 3,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Very good organized ",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Violeta",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 18834,
+    "title": "Rome: Vatican Skip-the-Line Ticket & Audio Tour",
+    "mediaSize": 177525736,
+    "eventsCount": 28,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "History & Heritage",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 7,
+     "title": "History & Heritage",
+     "slug": "history-heritage"
+    },
+    {
+     "id": 6,
+     "title": "Art & Museums",
+     "slug": "art-museums"
+    },
+    {
+     "id": 26,
+     "title": "Skip The Line Tickets",
+     "slug": "skip-line-tickets"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 11601,
+     "name": "Basilica of Saint Paul Outside The Walls",
+     "slug": "basilica-of-saint-paul-outside-the-walls",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/11601/tmpo8p7i116/1795f215588b999ce9ede99b2ac1d9e9.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 188,
+     "name": "St. Peter's Basilica",
+     "slug": "st-peters-basilica",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/188/tmpqj92h3t4/b03d919b3ca0e53a2b1260820fb59715.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 190,
+     "name": "Vatican museum",
+     "slug": "vatican-museums",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/190/tmple809xx1/d9bb2a4a328be02e8afb96417c102291.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 191,
+     "name": "Sistine Chapel",
+     "slug": "sistine-chapel",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/191/tmpbpy1vjur/5cd20b0869ac83dbdf74c3bd1f05b40f.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 180,
+   "durationMax": 180,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "WeGoTrip is a company creating memorable experiences through the in-app audio tours for self-guided travelers all around the world. Travel by your own rules with self-guided audio tours & museum tickets in one app. Better to see something once than hear about it a thousand times!",
+    "nickname": "wegotrip",
+    "rating": 4.35,
+    "ratingsCount": 168159,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2023-12-07 14:45",
+   "url": "https://wegotrip.com/rome-d3169070/vatican-ticket-and-in-app-audio-tour-museums-sistine-chapel-and-st-peters-church-p6960/",
+   "provider": null
+  },
+  "27494": {
+   "id": 27494,
+   "slug": "rome-pantheon-entry-ticket-and-audio-tour-with-a-city-walk",
+   "title": "Rome: Pantheon Entry Ticket & Audio Tour with a City Walk",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/19651ec8-06cd-4d01-801a-c2ab5e60517c_RtEiAjt.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/19651ec8-06cd-4d01-801a-c2ab5e60517c_RtEiAjt/49c6f05acbdadf6b9f9d2587ac0b2736.jpg",
+   "images": [
+    {
+     "id": 153111,
+     "description": "The Pantheon’s magnificent coffered dome and iconic oculus, illuminated by natural sunlight from above.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/img8264_Ecll8cT/61b598e3fad17c40205960b721dd774b.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/img8264_Ecll8cT.jpg"
+    },
+    {
+     "id": 153113,
+     "description": "The Pantheon’s magnificent High Altar, reflecting its transformation from an ancient Roman temple into an active Catholic church.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/img8273-2_V6GFi6I/ed64b8d5e9d210371594cee14218b1e8.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/img8273-2_V6GFi6I.jpg"
+    },
+    {
+     "id": 153192,
+     "description": "The Trevi Fountain is a stunning Baroque masterpiece in Rome, featuring dramatic sculptures, crystal-clear waters, and timeless architecture at the heart of the city.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/6e27e713-b749-4b9f-9297-434c1c752f6c/c25ec4cdd12844d136e3952b876bd305.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/6e27e713-b749-4b9f-9297-434c1c752f6c.jpg"
+    },
+    {
+     "id": 153112,
+     "description": "The Pantheon seen from above, highlighting its remarkable architecture and the lively Piazza della Rotonda.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/panth3eon_K1Za3UP/9e1acc5c297cab112d5cb1defb1554cb.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/panth3eon_K1Za3UP.jpg"
+    },
+    {
+     "id": 153114,
+     "description": "The tomb of King Victor Emmanuel II, Italy’s first king, resting inside the historic Pantheon.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/img8271-2_uKTcOuO/77e0e2ed2f266bb57cb65174ae5e63df.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/img8271-2_uKTcOuO.jpg"
+    },
+    {
+     "id": 153116,
+     "description": "The breathtaking interior of the Pantheon, where the world’s largest unreinforced concrete dome and its famous oculus create an unforgettable architectural masterpiece.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/1d220ada-eae0-491e-b31d-db0c661857b8_Yg2XeHt/812eb35e5789c10a0d733300f3840900.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/1d220ada-eae0-491e-b31d-db0c661857b8_Yg2XeHt.jpg"
+    },
+    {
+     "id": 153118,
+     "description": "The iconic façade of the Pantheon, featuring towering granite Corinthian columns and the famous inscription honoring Marcus Agrippa.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2e27aa5d-e760-428e-b304-899cf282a6d4-2_WcbukTQ/db189cf0d98509752bf7d620d2a56305.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2e27aa5d-e760-428e-b304-899cf282a6d4-2_WcbukTQ.jpg"
+    },
+    {
+     "id": 153188,
+     "description": "Explore Piazza di Pietra and the Temple of Hadrian, where ancient Roman columns meet the beauty of modern Rome. A stunning glimpse into the city’s rich history and architecture.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/dedc46fe-1bd7-404e-80db-334ca6151e9f/d6350264f63582e18e205738f047cdcd.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/dedc46fe-1bd7-404e-80db-334ca6151e9f.jpg"
+    },
+    {
+     "id": 153191,
+     "description": "Discover Piazza Colonna and the magnificent Column of Marcus Aurelius, a remarkable symbol of ancient Rome surrounded by historic architecture and the vibrant atmosphere of the city.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/90ae663f-8f2c-4768-a953-35580bcce755/67cffb4aa14705b9bdcd80b7f20e74f3.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/90ae663f-8f2c-4768-a953-35580bcce755.jpg"
+    }
+   ],
+   "description": "Discover the Pantheon in Rome with an included entry ticket and a self-guided audio tour, complemented by a city walk. \r\n\r\nStart the tour outside by exploring the magnificent façade and portico of the Pantheon. Then, step inside and explore one of the world’s best-preserved ancient temples and its history. Discover the Pantheon’s magnificent dome and learn how Roman engineers achieved this architectural miracle. Visit the tombs of Italy's kings and queens and the resting place of Raphael. Learn why this illustrious artist is buried here. \r\n\r\nAfter you visit the Pantheon, continue your experience with a curated audio route through Rome’s historic streets, featuring highlights such as Piazza di Pietra & Temple of Hadrian. Finish your walk at the Trevi Fountain – one of the most iconic landmarks in all of Italy. Enjoy the flexibility to explore independently with no live guide required.",
+   "lastModified": "2026-08-27 00:06",
+   "highlights": [
+    "Explore the Pantheon with your ticket included and a self-guided audio tour with a city walk",
+    "Discover the Pantheon’s ancient interior, famous oculus, marble details, and stories of Rome’s past",
+    "Visit the tomb of Raphael and some of Italy's most famous kings and queens",
+    "After you visit the Pantheon, continue through the streets of Rome and its isonic landmarks",
+    "Experience the Trevi Fountain and learn the legends behind Rome’s most famous Baroque masterpiece"
+   ],
+   "advisory_information": null,
+   "distance": "0.9km",
+   "duration": "2 hours",
+   "locale": "en",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "country": {
+    "id": 3175395,
+    "name": "Italy",
+    "slug": "italy"
+   },
+   "address": "Piazza della Rotonda",
+   "startLocation": "Pantheon",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.4768729,
+     41.8986108
+    ]
+   },
+   "finishAddress": "Piazza di Trevi",
+   "finishLocation": "Piazza di Trevi",
+   "finishLocationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.4833357,
+     41.9007639
+    ]
+   },
+   "boundingCircle": {
+    "coords": {
+     "lng": 12.48009295,
+     "lat": 41.89989385
+    },
+    "radius": 302.38367779256714
+   },
+   "routePoints": [
+    [
+     12.4768729,
+     41.8986108
+    ],
+    [
+     12.4793788,
+     41.8998085
+    ],
+    [
+     12.4800855,
+     41.9011769
+    ],
+    [
+     12.483313,
+     41.9009325
+    ]
+   ],
+   "price": 23.0,
+   "exprice": 23.0,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 28555,
+     "pricingCategoryId": "165539",
+     "label": "Adult",
+     "description": "",
+     "price": 11.0
+    },
+    {
+     "id": 28676,
+     "pricingCategoryId": "165541",
+     "label": "Child",
+     "description": "",
+     "price": 5.0
+    }
+   ],
+   "types": {},
+   "inclusions": [
+    "Self-guided audio tour for your smartphone on the WeGoTrip app",
+    "Expert commentary on the Pantheon’s history, architecture, and engineering",
+    "Hidden facts, fascinating secrets, and historical insights"
+   ],
+   "exclusions": [
+    "Earphones — please bring your own",
+    "Live tour guide",
+    "Transportation to and from the meeting point"
+   ],
+   "importantInfo": [],
+   "rating": 3.7,
+   "reviewsCount": 269,
+   "ratingsCount": 614,
+   "reviews": [
+    {
+     "text": "L’accueil est génial par le monsieur en charge de l’application. \nJ’ai trouvé les explications un peu légère et courte. ",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Vincent",
+     "avatar": "",
+     "rating": 3,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Incredible building",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Sophie",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 21003,
+    "title": "Rome: Pantheon Entry Ticket & Audio Tour with a City Walk",
+    "mediaSize": 79558885,
+    "eventsCount": 12,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "Attraction Tickets",
+   "categories": [
+    {
+     "id": 11,
+     "title": "Walking Tours",
+     "slug": "walking-tours"
+    },
+    {
+     "id": 2,
+     "title": "Sightseeing Tours",
+     "slug": "sightseeing-tours"
+    },
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 23,
+     "title": "Attraction Tickets",
+     "slug": "attraction-tickets"
+    },
+    {
+     "id": 1,
+     "title": "Walking Tours",
+     "slug": "walking-tours"
+    },
+    {
+     "id": 49,
+     "title": "UNESCO sites",
+     "slug": "unesco-sites"
+    },
+    {
+     "id": 58,
+     "title": "Activities for couples",
+     "slug": "activities-for-couples"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 10269,
+     "name": "Temple of Hadrian",
+     "slug": "temple-of-hadrian-12164775",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/10269/tmp57ilv7oz/3496fcee066b24919798f7540a16d329.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 45546,
+     "name": "Piazza Colonna",
+     "slug": "piazza-colonna-12200076",
+     "preview": "",
+     "itemsCount": 1
+    },
+    {
+     "id": 83,
+     "name": "Trevi Fountain",
+     "slug": "trevi-fountain",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/83/tmpi8q6com0/cf4265c58b64fa302b341397d957049d.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 84,
+     "name": "Pantheon",
+     "slug": "pantheon",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/84/gabriella-clare-marino-tlyzsnu8md0-unsplash/f889440210bc33761fcdb0c8c5a2238d.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 120,
+   "durationMax": 120,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/470901/id470901-avatar.png",
+    "name": "Voya",
+    "bio": "Voya Lantic creates simple and enjoyable self-guided travel experiences. We help travelers explore famous landmarks and hidden gems with easy-to-follow audio tours, practical tips, and engaging stories, making every journey more memorable.",
+    "nickname": "id470901",
+    "rating": 3.85,
+    "ratingsCount": 876,
+    "year_since": "2026"
+   },
+   "lastUpdatedByAuthor": "2026-07-25 07:33",
+   "url": "https://wegotrip.com/rome-d3169070/rome-pantheon-entry-ticket-and-audio-tour-with-a-city-walk-p27494/",
+   "provider": null
+  },
+  "20762": {
+   "id": 20762,
+   "slug": "palazzo-barberini-and-galleria-corsini-entry-ticket",
+   "title": "Palazzo Barberini & Galleria Corsini: Entry Ticket",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20762803cf41699bd4a4399adb4b4c5c34e12.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20762803cf41699bd4a4399adb4b4c5c34e12/a74871639a427036a3248485260578f1.jpg",
+   "images": [
+    {
+     "id": 130529,
+     "description": ".",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/207620f513fc3348f4960ba2b4d034e04519f/14dd7dc3576f718d6821e47bf95930c9.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/207620f513fc3348f4960ba2b4d034e04519f.jpeg"
+    },
+    {
+     "id": 130530,
+     "description": ".",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/20762c352fb389fb5489abef89c30f8c7dfaa/b1a6f99e084ec3522eda904b43b62ef6.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/20762c352fb389fb5489abef89c30f8c7dfaa.jpg"
+    },
+    {
+     "id": 130531,
+     "description": ".",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/207623087c6f8a98243c08bc76545d99e4840/b6991ccb3e86a994d6b75691953edc56.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/207623087c6f8a98243c08bc76545d99e4840.jpg"
+    },
+    {
+     "id": 130532,
+     "description": ".",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/207625667f792e214409e966f1344d0f6a825/6eba3d546f8e44c99325fc8325312a52.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/207625667f792e214409e966f1344d0f6a825.jpg"
+    },
+    {
+     "id": 130533,
+     "description": ".",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2076207a54f3c9b91414496862e67416164c5/e1f4d25e9bc7bb288711faa344dfcb1f.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2076207a54f3c9b91414496862e67416164c5.jpg"
+    }
+   ],
+   "description": "Age before beauty? Not when it comes to art! See both combined at Palazzo Barberini, home to Renaissance highlights from Raphael, Caravaggio and more. See the frescoed ceiling, crucifixes and works by regional painters of popes and cardinals and get free access to Palazzo Corsini.",
+   "lastModified": "2026-08-27 00:05",
+   "highlights": [],
+   "advisory_information": null,
+   "distance": null,
+   "duration": null,
+   "locale": "en",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "country": {
+    "id": 3175395,
+    "name": "Italy",
+    "slug": "italy"
+   },
+   "address": "13,Via delle Quattro Fontane",
+   "startLocation": "13,Via delle Quattro Fontane",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.489845,
+     41.903294
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 17.98,
+   "exprice": 17.98,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [],
+   "types": {
+    "hit": true
+   },
+   "inclusions": [],
+   "exclusions": [],
+   "importantInfo": [],
+   "rating": 4.3,
+   "reviewsCount": 67,
+   "ratingsCount": 198,
+   "reviews": [
+    {
+     "text": "Due belle esposizioni in palazzi stupendi. Vale davvero la pena",
+     "locale": null,
+     "date": "2026-08-09 00:00:00",
+     "name": "Grazia",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "A must see if you’re interested in the Baroque period and Mannerists, the Caravaggios alone are worth a visit.\n\nThere is no rushing or timed visit here, one can take the time to enjoy the artworks. ",
+     "locale": null,
+     "date": "2026-08-01 00:00:00",
+     "name": "MURALI",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": null,
+   "accessCodes": [],
+   "category": "Entry tickets",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Entry tickets",
+     "slug": "sightseeing-tickets-passes"
+    }
+   ],
+   "subcategories": [],
+   "attractions": [
+    {
+     "id": 37840,
+     "name": "Palazzo Barberini",
+     "slug": "palazzo-barberini-12192354",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/None/photokeyaizasyccsokeemfb2t5ldahhtceqv9a0nq2zxk-and-photoreferenceaxqcqnqeeyhhg0ztyi8lbqelblqslvdhnmw0rn9knidqi9grflsfkrnsdde2hqwdkhdkiygccufo9htgcbyjgefpak4yc_knzKER9/0a2bce46bf23ae7d1789c3dfbe582e8b.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "lastUpdatedByAuthor": "2025-05-24 23:28",
+   "url": "https://wegotrip.com/rome-d3169070/palazzo-barberini-and-galleria-corsini-entry-ticket-p20762/",
+   "provider": null
+  },
+  "27550": {
+   "id": 27550,
+   "slug": "rome-colosseum-roman-forum-palatine-hill-audio-tour-with-a-city-walk",
+   "title": "Rome: Colosseum, Roman Forum, Palatine Hill Audio Tour with a City Walk",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/ae53a85f-8ae3-4a2a-b36c-524911a66c53.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/ae53a85f-8ae3-4a2a-b36c-524911a66c53/54f19f887870f8eab4d84e68b52b34fd.jpg",
+   "images": [
+    {
+     "id": 153479,
+     "description": "A panoramic view inside the Colosseum overlooking the arena and underground hypogeum, showcasing the immense scale of Rome’s iconic amphitheater.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/6505f93d-5f75-49fe-92ea-cd5e5405f7cc/907e937e1d71db5d4aa2a1cac7186e5d.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/6505f93d-5f75-49fe-92ea-cd5e5405f7cc.jpg"
+    },
+    {
+     "id": 153480,
+     "description": "A close-up view of the Colosseum’s hypogeum, showcasing the underground tunnels and chambers beneath the ancient arena.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/29b8c9e4-1a8c-4b3b-a6f7-25db1e479c39/195f09e5a82c97a53e3387fe62f4ffc5.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/29b8c9e4-1a8c-4b3b-a6f7-25db1e479c39.jpg"
+    },
+    {
+     "id": 153481,
+     "description": "A wide-angle view of the Arch of Constantine beside the Colosseum, showcasing one of Ancient Rome’s best-preserved triumphal arches.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/c7fc6c77-364a-46de-9df7-e7b27005c583/e727186dc4350f954f6fa7b28e5e9b27.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/c7fc6c77-364a-46de-9df7-e7b27005c583.jpg"
+    },
+    {
+     "id": 153482,
+     "description": "A panoramic view of the Roman Forum, showcasing ancient temples, historic ruins, and the legendary heart of Ancient Rome",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/156a9d6d-597b-4648-96ce-851499d3fe0f/2396a54ebee84d25ae88314af3822129.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/156a9d6d-597b-4648-96ce-851499d3fe0f.jpg"
+    },
+    {
+     "id": 153483,
+     "description": "A panoramic view of the Roman Forum, showcasing its ancient temples, historic ruins, and remarkable archaeological landscape.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/d08142b2-2e5f-489d-ad91-dc50dc0e2896/fc74f04058e15356d8536c246664119a.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/d08142b2-2e5f-489d-ad91-dc50dc0e2896.jpg"
+    },
+    {
+     "id": 153484,
+     "description": "A close-up view of the Temple of Saturn overlooking the historic ruins of the Roman Forum.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/a92c87fe-0408-42bc-9fbe-88e382c6fde1/cc904d84aa81fe4ee04f25f031860a8b.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/a92c87fe-0408-42bc-9fbe-88e382c6fde1.jpg"
+    },
+    {
+     "id": 153485,
+     "description": "A panoramic view from Palatine Hill overlooking the Roman Forum and the Colosseum, showcasing the heart of Ancient Rome.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/31367f0e-c898-4db0-baa8-9c496cd47f39/6884211c5462ff8255b097e4fbd6c492.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/31367f0e-c898-4db0-baa8-9c496cd47f39.jpg"
+    },
+    {
+     "id": 153486,
+     "description": "A panoramic view of Piazza del Campidoglio, showcasing Michelangelo’s elegant square, the Marcus Aurelius statue, and Palazzo Senatorio",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/c163a826-5bde-4825-9c8f-081111db86b5/b8c17782b0432f2ebe0abc9d3d8acdeb.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/c163a826-5bde-4825-9c8f-081111db86b5.jpg"
+    },
+    {
+     "id": 153487,
+     "description": "A wide-angle view of the Victor Emmanuel II Monument, showcasing Rome’s iconic white marble landmark at Piazza Venezia",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/6433ac60-596a-4e1f-8e69-20ef57c11157/6dd9b79751a81fa73e52dc96a70e78ca.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/6433ac60-596a-4e1f-8e69-20ef57c11157.jpg"
+    }
+   ],
+   "description": "Experience the Colosseum and Ancient Rome with an immersive self-guided audio tour and a carefully designed city walk that brings the Eternal City’s greatest stories to life.\r\n\r\nGo beyond a simple visit as you explore the Colosseum, Roman Forum, and Palatine Hill, uncovering the legends of gladiators, mighty emperors, triumphal arches, ancient temples, and the rise and fall of the Roman Empire.\r\n\r\nContinue your adventure through the historic heart of Rome with a curated walking route connecting the Arch of Constantine, Capitoline Hill, Piazza del Campidoglio, and Piazza Venezia. Explore at your own pace while listening to engaging stories, fascinating historical insights, and local recommendations.\r\n\r\nWhether it’s your first time in Rome or you’re returning to discover more, this experience combines flexibility, storytelling, and unforgettable landmarks into one seamless journey.",
+   "lastModified": "2026-08-27 00:02",
+   "highlights": [
+    "Discover the legendary Colosseum and uncover the stories of gladiators and ancient spectacles",
+    "Explore the Roman Forum and Palatine Hill, where emperors, senators, and Roman history come to life",
+    "Admire breathtaking views from Capitoline Hill overlooking the heart of Ancient Rome",
+    "Walk through iconic landmarks including the Arch of Constantine and Piazza Venezia",
+    "Learn fascinating historical insights with an immersive self-guided audio tour at your own pace"
+   ],
+   "advisory_information": null,
+   "distance": "2.5km",
+   "duration": "2.5 hours",
+   "locale": "en",
+   "city": {
+    "id": 3169070,
+    "name": "Rome",
+    "slug": "rome"
+   },
+   "country": {
+    "id": 3175395,
+    "name": "Italy",
+    "slug": "italy"
+   },
+   "address": "Piazza del Colosseo, 1",
+   "startLocation": "Piazza del Colosseo, 1",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.4942703,
+     41.8899689
+    ]
+   },
+   "finishAddress": "Piazza del Campidoglio, 1, 00186 Roma RM, Italy",
+   "finishLocation": "Capitoline Hill",
+   "finishLocationGeo": {
+    "type": "Point",
+    "coordinates": [
+     12.4828652,
+     41.8932621
+    ]
+   },
+   "boundingCircle": {
+    "coords": {
+     "lng": 12.487805644187926,
+     "lat": 41.89212567824233
+    },
+    "radius": 578.3299274511978
+   },
+   "routePoints": [
+    [
+     12.4930075,
+     41.8909537
+    ],
+    [
+     12.4906782,
+     41.8898113
+    ],
+    [
+     12.4864378,
+     41.8920906
+    ],
+    [
+     12.4875481,
+     41.8886559
+    ],
+    [
+     12.482603788375854,
+     41.89554097134273
+    ],
+    [
+     12.48460935309012,
+     41.895595456484656
+    ]
+   ],
+   "price": 15.0,
+   "exprice": 15.0,
+   "currency": "€",
+   "currencyCode": "EUR",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Euro"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 28718,
+     "pricingCategoryId": "1",
+     "label": "Personal",
+     "description": "",
+     "price": 15.0
+    }
+   ],
+   "types": {
+    "new": true
+   },
+   "inclusions": [
+    "Self-guided audio tour with offline access",
+    "Ancient Rome city walk with maps and historical insights"
+   ],
+   "exclusions": [
+    "Entry ticket to the Colosseum IS NOT INCLUDED",
+    "Earphones — please bring your own",
+    "Live tour guide or hotel pickup"
+   ],
+   "importantInfo": [],
+   "rating": null,
+   "reviewsCount": 0,
+   "ratingsCount": 0,
+   "reviews": [],
+   "tour": {
+    "id": 21059,
+    "title": "Rome: Colosseum, Roman Forum, Palatine Hill Audio Tour with a City Walk",
+    "mediaSize": 70297918,
+    "eventsCount": 8,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "UNESCO sites",
+   "categories": [
+    {
+     "id": 11,
+     "title": "Walking Tours",
+     "slug": "walking-tours"
+    },
+    {
+     "id": 1,
+     "title": "Culture & History",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 42,
+     "title": "Neighborhood tours",
+     "slug": "neighborhood-tours"
+    },
+    {
+     "id": 49,
+     "title": "UNESCO sites",
+     "slug": "unesco-sites"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 10604,
+     "name": "Palatine Hill",
+     "slug": "palatine-hill-12165112",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/10604/tmpq98afkx/0f57491949e410a6c757b2adc89e4d5a.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 9358,
+     "name": "Arc of Constantine",
+     "slug": "arc-of-constantine",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/9358/tmpxsjbsj9k/a768164c4985ebf820b9e4e10178ca8c.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 8309,
+     "name": "Roman Forum",
+     "slug": "roman-forum-12162804",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/8309/tmp36tkfb7x/b0017ba276400a863f8ba078a730cc06.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 182,
+     "name": "Capitoline Hill",
+     "slug": "piazza-del-campidoglio",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/182/Piazza_del_Campidoglio_Roma/2245825b60196502123011f064e89b60.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 82,
+     "name": "Colosseum",
+     "slug": "colosseum",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/82/tmpw99ffnf/55cba9c57ed1008dab7fc83b4265d41b.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 150,
+   "durationMax": 150,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/470901/id470901-avatar.png",
+    "name": "Voya",
+    "bio": "Voya Lantic creates simple and enjoyable self-guided travel experiences. We help travelers explore famous landmarks and hidden gems with easy-to-follow audio tours, practical tips, and engaging stories, making every journey more memorable.",
+    "nickname": "id470901",
+    "rating": 3.85,
+    "ratingsCount": 876,
+    "year_since": "2026"
+   },
+   "lastUpdatedByAuthor": "2026-08-10 08:28",
+   "url": "https://wegotrip.com/rome-d3169070/rome-colosseum-roman-forum-palatine-hill-audio-tour-with-a-city-walk-p27550/",
+   "provider": null
+  }
+ }
+}

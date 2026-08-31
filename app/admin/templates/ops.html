@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Ops · WeGoTrip Content Engine{% endblock %}
+{% block content %}
+<h1>Ops</h1>
+<p class="subtitle">Run a job by hand, inspect the schedule and the effective configuration.</p>
+
+<h2>Manual jobs</h2>
+<div class="actions">
+  <form method="post" action="/admin/ops/run">
+    <button class="btn" name="job" value="seed">Seed reference data</button>
+    <button class="btn" name="job" value="sync_catalog">Sync catalogue</button>
+    <button class="btn" name="job" value="discover_topics">Discover topics</button>
+    <button class="btn" name="job" value="generate">Generate articles</button>
+    <button class="btn" name="job" value="schedule">Schedule publications</button>
+    <button class="btn" name="job" value="publish_queue">Process publication queue</button>
+    <button class="btn" name="job" value="cleanup">Cleanup</button>
+  </form>
+</div>
+
+<h2>Scheduler</h2>
+<table>
+  <thead><tr><th>Job</th><th>Next run</th></tr></thead>
+  <tbody>
+  {% for job in scheduler_jobs %}
+    <tr><td>{{ job.id }}</td><td class="muted small">{{ job.next_run }}</td></tr>
+  {% else %}
+    <tr><td colspan="2" class="muted small">Scheduler is not running in this process.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Publication queue</h2>
+<table>
+  <thead><tr><th>Article</th><th>Target</th><th>Channel</th><th>Status</th>
+             <th class="num">Attempts</th><th>Scheduled</th><th>Error</th></tr></thead>
+  <tbody>
+  {% for item in queue %}
+    <tr>
+      <td><a href="/admin/articles/{{ item.article_id }}">#{{ item.article_id }}</a></td>
+      <td>{{ item.target }}</td>
+      <td class="small">{{ item.channel }}</td>
+      <td><span class="badge {{ status_class(item.status) }}">{{ item.status }}</span></td>
+      <td class="num">{{ item.attempts }}</td>
+      <td class="muted small nowrap">{{ item.scheduled_for.strftime('%Y-%m-%d %H:%M') }}</td>
+      <td class="muted small wrap">{{ item.last_error or '—' }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7" class="muted small">Queue is empty.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Effective configuration</h2>
+<div class="grid grid-2">
+  <div class="card">
+    <h3>Models &amp; budget</h3>
+    <table>
+      <tr><td>Writer</td><td class="mono">{{ config.writer_model }}</td></tr>
+      <tr><td>Utility</td><td class="mono">{{ config.utility_model }}</td></tr>
+      <tr><td>Fallback</td><td class="mono">{{ config.fallback_model }}</td></tr>
+      <tr><td>Review</td><td class="mono">{{ config.review_model }}</td></tr>
+      <tr><td>LLM provider</td><td class="mono">{{ config.llm_provider }}</td></tr>
+      <tr><td>Daily budget</td><td>${{ '%.2f'|format(config.daily_budget) }}</td></tr>
+      <tr><td>EN per day</td><td>{{ config.en_min }}–{{ config.en_max }}</td></tr>
+      <tr><td>RU per day</td><td>{{ config.ru_min }}–{{ config.ru_max }}</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Publishing &amp; policy</h3>
+    <table>
+      <tr><td>EN channel</td><td class="mono">{{ channels.en }}</td></tr>
+      <tr><td>RU channel</td><td class="mono">{{ channels.ru }}</td></tr>
+      <tr><td>Test channel</td><td class="mono">{{ channels.test or 'not configured' }}</td></tr>
+      <tr><td>Auto-publish EN / RU</td><td>{{ config.auto_en }} / {{ config.auto_ru }}</td></tr>
+      <tr><td>Min post interval</td><td>{{ config.min_interval }} min</td></tr>
+      <tr><td>Generated covers</td><td>{{ config.generated_covers }}</td></tr>
+      <tr><td>Hashtags</td><td>{{ config.hashtags }} (max {{ config.max_hashtags }})</td></tr>
+      <tr><td>Catalog provider</td><td class="mono">{{ config.catalog_provider }}</td></tr>
+      <tr><td>Telegram dry run</td><td>{{ config.dry_run }}</td></tr>
+    </table>
+  </div>
+</div>
+{% endblock %}

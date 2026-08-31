@@ -1,0 +1,58 @@
+[
+ {
+  "id": 6,
+  "rate": 535.986781,
+  "code": "KZT",
+  "symbol": "₸",
+  "name": "Kazakhstani tenge"
+ },
+ {
+  "id": 2,
+  "rate": 1.164578,
+  "code": "USD",
+  "symbol": "$",
+  "name": "The US Dollar"
+ },
+ {
+  "id": 8,
+  "rate": 38.296021,
+  "code": "THB",
+  "symbol": "฿",
+  "name": "Thai Baht"
+ },
+ {
+  "id": 5,
+  "rate": 3.513782,
+  "code": "BYN",
+  "symbol": "BYN",
+  "name": "Беларускі рубель"
+ },
+ {
+  "id": 4,
+  "rate": 0.857531,
+  "code": "GBP",
+  "symbol": "£",
+  "name": "British pound"
+ },
+ {
+  "id": 1,
+  "rate": 1.0,
+  "code": "EUR",
+  "symbol": "€",
+  "name": "Euro"
+ },
+ {
+  "id": 7,
+  "rate": 0.938231,
+  "code": "CHF",
+  "symbol": "CHF",
+  "name": "Swiss franc"
+ },
+ {
+  "id": 3,
+  "rate": 99.862587,
+  "code": "RUB",
+  "symbol": "₽",
+  "name": "Russian rubble"
+ }
+]

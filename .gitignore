@@ -1,0 +1,27 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+.env
+.env.local
+*.sqlite3
+*.db
+data/
+var/
+# Encrypted credential store and its master key — never commit either.
+secrets.enc
+master.key
+*.pem
+*.key
+.DS_Store
+.idea/
+.vscode/

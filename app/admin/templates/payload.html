@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Telegram payload · {{ article.primary_query }}{% endblock %}
+{% block content %}
+<h1>Telegram <code>sendRichMessage</code> payload</h1>
+<p class="subtitle">
+  {{ stats.blocks }} blocks · {{ stats.characters }} characters · {{ stats.media }} media
+  {% if errors %}<span class="badge err">{{ errors|length }} validation error(s)</span>
+  {% else %}<span class="badge ok">valid</span>{% endif %}
+</p>
+
+{% if errors %}
+<div class="card"><h3>Errors</h3><ul>{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul></div>
+{% endif %}
+
+<div class="card">
+  <h3>Outbound links</h3>
+  <ul class="small mono wrap">
+    {% for url in urls %}<li>{{ url }}</li>{% else %}<li class="muted">none</li>{% endfor %}
+  </ul>
+</div>
+
+<h2>Payload</h2>
+<textarea readonly spellcheck="false">{{ payload_json }}</textarea>
+<div class="actions"><a class="btn" href="/admin/articles/{{ article.id }}">← Back to article</a></div>
+{% endblock %}

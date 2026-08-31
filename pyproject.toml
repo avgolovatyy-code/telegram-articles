@@ -1,0 +1,69 @@
+[project]
+name = "wegotrip-telegram-content-engine"
+version = "0.1.0"
+description = "Search-intent driven Telegram publishing engine for the WeGoTrip catalog"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "sqlalchemy>=2.0.36",
+    "alembic>=1.14",
+    "psycopg[binary]>=3.2",
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    "httpx>=0.28",
+    "jinja2>=3.1",
+    "python-multipart>=0.0.20",
+    "apscheduler>=3.11,<4",
+    "typer>=0.15",
+    "structlog>=24.4",
+    "tenacity>=9.0",
+    "python-slugify>=8.0",
+    "pymorphy3>=2.0",
+    "pyyaml>=6.0",
+    "cryptography>=42.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "respx>=0.22",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "types-python-slugify",
+]
+
+[project.scripts]
+wgt = "app.cli:app"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.setuptools.package-data]
+app = ["**/*.yaml", "**/*.yml", "**/*.json", "**/*.html", "**/*.css", "**/*.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [".venv", "migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM", "RUF"]
+ignore = ["B008", "RUF001", "RUF002", "RUF003", "SIM108"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true
+warn_unused_ignores = false
+disallow_untyped_defs = false
+exclude = "(^migrations/|^tests/)"

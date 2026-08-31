@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title or article.primary_query }} · Article{% endblock %}
+{% block content %}
+<h1>{{ article.title or article.primary_query }}</h1>
+<p class="subtitle">
+  <span class="badge {{ article.market }}">{{ article.market|upper }}</span>
+  <span class="badge {{ status_class(article.status) }}">{{ article.status }}</span>
+  {{ article.entity_type }} · {{ article.entity_name }} · intent <code>{{ article.intent }}</code>
+</p>
+
+<div class="actions">
+  <form method="post" action="/admin/articles/{{ article.id }}/action">
+    <button class="btn" name="action" value="regenerate">Regenerate</button>
+    <button class="btn" name="action" value="verify">Verify again</button>
+    <button class="btn ok" name="action" value="approve">Approve</button>
+    <button class="btn" name="action" value="publish_test">Publish to test</button>
+    <button class="btn primary" name="action" value="publish">Publish now</button>
+    <button class="btn danger" name="action" value="reject">Reject</button>
+  </form>
+  <form method="post" action="/admin/articles/{{ article.id }}/schedule">
+    <input type="datetime-local" name="when" required>
+    <button class="btn" type="submit">Schedule</button>
+  </form>
+  <a class="btn" href="/admin/articles/{{ article.id }}/edit">Edit JSON</a>
+  <a class="btn" href="/admin/articles/{{ article.id }}/payload">Telegram payload</a>
+</div>
+
+{% if article.validation_issues %}
+<div class="card">
+  <h3>Validation issues</h3>
+  <ul>{% for issue in article.validation_issues %}<li>{{ issue }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<div class="grid grid-2">
+  <div>
+    <h2>Telegram preview</h2>
+    <div class="preview">{{ preview|safe }}</div>
+  </div>
+
+  <div>
+    <h2>Quality</h2>
+    <div class="card">
+      <table>
+        {% for key, value in (article.quality_scores or {}).items() %}
+          {% if key != 'issues' %}
+          <tr><td>{{ key }}</td><td class="num">{{ '%.2f'|format(value) if value is number else value }}</td></tr>
+          {% endif %}
+        {% endfor %}
+        <tr><td>overall</td><td class="num">{{ '%.2f'|format(article.quality_score) if article.quality_score else '—' }}</td></tr>
+        <tr><td>characters</td><td class="num">{{ article.char_count }}</td></tr>
+        <tr><td>estimated cost</td><td class="num">${{ '%.4f'|format(article.estimated_cost_usd) }}</td></tr>
+        <tr><td>actual cost</td><td class="num">${{ '%.4f'|format(article.actual_cost_usd) }}</td></tr>
+        <tr><td>generation attempts</td><td class="num">{{ article.generation_attempts }}</td></tr>
+        <tr><td>version</td><td class="num">{{ article.current_version }}</td></tr>
+      </table>
+    </div>
+
+    <h2>Search</h2>
+    <div class="card small">
+      <div><strong>Primary query:</strong> {{ article.primary_query }}</div>
+      {% if article.secondary_queries %}
+      <div class="muted">Secondary: {{ article.secondary_queries|join(' · ') }}</div>
+      {% endif %}
+      <div class="muted">Topic slug: <code>{{ article.topic_slug }}</code></div>
+    </div>
+
+    <h2>Products</h2>
+    <table>
+      <thead><tr><th>Product</th><th>Placement</th><th class="num">Rank</th><th>Link</th></tr></thead>
+      <tbody>
+      {% for link in article.products %}
+        <tr>
+          <td>{{ link.snapshot.get('title', link.product_external_id) }}
+              <div class="muted small">#{{ link.product_external_id }}
+                {% if not link.active %}<span class="badge err">inactive</span>{% endif %}</div></td>
+          <td>{{ link.placement }}</td>
+          <td class="num">{{ '%.3f'|format(link.rank_score) }}</td>
+          <td class="small mono wrap">
+            <a href="{{ link.affiliate_url }}" rel="nofollow noopener" target="_blank">affiliate</a>
+            {% if link.tracking_url %} · <a href="{{ link.tracking_url }}" target="_blank">tracked</a>{% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4" class="muted small">No products attached.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <h2>Media</h2>
+    <table>
+      <thead><tr><th>Role</th><th>Kind</th><th>Source</th><th>URL</th></tr></thead>
+      <tbody>
+      {% for item in article.media %}
+        <tr>
+          <td>{{ item.role }}</td>
+          <td>{{ item.kind }}</td>
+          <td>{{ item.source_entity_type }} <span class="badge">{{ item.source }}</span></td>
+          <td class="small mono wrap"><a href="{{ item.url }}" target="_blank">{{ item.url[:70] }}…</a></td>
+        </tr>
+      {% else %}
+        <tr><td colspan="4" class="muted small">No media attached.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <h2>Claim ledger</h2>
+    <table>
+      <thead><tr><th>Claim</th><th>Type</th><th>Category</th><th>Status</th><th>Source</th></tr></thead>
+      <tbody>
+      {% for claim in article.claims %}
+        <tr>
+          <td class="small wrap">{{ claim.claim }}</td>
+          <td class="small">{{ claim.claim_type }}</td>
+          <td class="small">{{ claim.category }}</td>
+          <td><span class="badge {{ claim_class(claim.status) }}">{{ claim.status }}</span></td>
+          <td class="small mono wrap">
+            {% if claim.source_url %}
+            <a href="{{ claim.source_url }}" target="_blank" rel="nofollow noopener">
+              {{ claim.source_title or claim.source_url[:50] }}</a>
+            <div class="muted">tier {{ claim.source_tier }}</div>
+            {% else %}<span class="muted">—</span>{% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="muted small">No checkable claims were detected.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    {% if article.sources %}
+    <h2>Sources</h2>
+    <ul class="small">
+      {% for source in article.sources %}
+      <li><a href="{{ source.url }}" target="_blank" rel="nofollow noopener">
+        {{ source.title or source.url }}</a> <span class="muted">tier {{ source.tier }}</span></li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    {% if article.publications %}
+    <h2>Publications</h2>
+    <table>
+      <thead><tr><th>Target</th><th>Channel</th><th>Message</th><th>When</th></tr></thead>
+      <tbody>
+      {% for publication in article.publications %}
+        <tr>
+          <td><span class="badge {{ 'ok' if publication.target == 'production' else '' }}">{{ publication.target }}</span></td>
+          <td class="small">{{ publication.channel_username }}</td>
+          <td class="small">
+            {% if publication.message_url %}
+            <a href="{{ publication.message_url }}" target="_blank">#{{ publication.message_id }}</a>
+            {% else %}#{{ publication.message_id }}{% endif %}
+          </td>
+          <td class="muted small nowrap">{{ publication.published_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

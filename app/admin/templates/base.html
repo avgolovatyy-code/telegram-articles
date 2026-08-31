@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}WeGoTrip Content Engine{% endblock %}</title>
+  <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/admin">WeGoTrip <span>Content Engine</span></a>
+  <nav>
+    <a href="/admin" class="{{ 'active' if active == 'dashboard' }}">Dashboard</a>
+    <a href="/admin/topics" class="{{ 'active' if active == 'topics' }}">Topics</a>
+    <a href="/admin/articles" class="{{ 'active' if active == 'articles' }}">Articles</a>
+    <a href="/admin/analytics" class="{{ 'active' if active == 'analytics' }}">Analytics</a>
+    <a href="/admin/ops" class="{{ 'active' if active == 'ops' }}">Ops</a>
+  </nav>
+  <div class="budget-chip" title="Daily AI budget">
+    ${{ '%.2f'|format(budget.spent_usd) }} / ${{ '%.2f'|format(budget.budget_usd) }}
+  </div>
+</header>
+
+{% if messages %}
+<div class="flash-stack">
+  {% for level, text in messages %}
+  <div class="flash flash-{{ level }}">{{ text }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+  <span>Affiliate marker <code>coupon={{ referer_id }}</code></span>
+  <span>EN → {{ channels.en }} · RU → {{ channels.ru }}</span>
+  <span>Test channel: {{ channels.test or 'not configured' }}</span>
+</footer>
+</body>
+</html>

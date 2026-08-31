@@ -1,0 +1,3758 @@
+{
+ "market": "ru",
+ "countries": [
+  {
+   "id": 783754,
+   "code": "AL",
+   "name": "Албания",
+   "slug": "albania"
+  },
+  {
+   "id": 3865483,
+   "code": "AR",
+   "name": "Аргентина",
+   "slug": "argentina"
+  },
+  {
+   "id": 174982,
+   "code": "AM",
+   "name": "Армения",
+   "slug": "armenia"
+  },
+  {
+   "id": 2077456,
+   "code": "AU",
+   "name": "Австралия",
+   "slug": "australia"
+  },
+  {
+   "id": 2782113,
+   "code": "AT",
+   "name": "Австрия",
+   "slug": "austria"
+  },
+  {
+   "id": 587116,
+   "code": "AZ",
+   "name": "Азербайджан",
+   "slug": "azerbaijan"
+  },
+  {
+   "id": 3374084,
+   "code": "BB",
+   "name": "Барбадос",
+   "slug": "barbados"
+  },
+  {
+   "id": 630336,
+   "code": "BY",
+   "name": "Беларусь",
+   "slug": "belarus"
+  },
+  {
+   "id": 2802361,
+   "code": "BE",
+   "name": "Бельгия",
+   "slug": "belgium"
+  },
+  {
+   "id": 3469034,
+   "code": "BR",
+   "name": "Бразилия",
+   "slug": "brazil"
+  },
+  {
+   "id": 732800,
+   "code": "BG",
+   "name": "Болгария",
+   "slug": "bulgaria"
+  },
+  {
+   "id": 1831722,
+   "code": "KH",
+   "name": "Камбоджа",
+   "slug": "cambodia"
+  },
+  {
+   "id": 6251999,
+   "code": "CA",
+   "name": "Канада",
+   "slug": "canada"
+  },
+  {
+   "id": 3895114,
+   "code": "CL",
+   "name": "Чили",
+   "slug": "chile"
+  },
+  {
+   "id": 1814991,
+   "code": "CN",
+   "name": "Китай",
+   "slug": "china"
+  },
+  {
+   "id": 3686110,
+   "code": "CO",
+   "name": "Колумбия",
+   "slug": "colombia"
+  },
+  {
+   "id": 3624060,
+   "code": "CR",
+   "name": "Коста-Рика",
+   "slug": "costa-rica"
+  },
+  {
+   "id": 3202326,
+   "code": "HR",
+   "name": "Хорватия",
+   "slug": "croatia"
+  },
+  {
+   "id": 7626836,
+   "code": "CW",
+   "name": "Кюрасао",
+   "slug": "curacao"
+  },
+  {
+   "id": 146669,
+   "code": "CY",
+   "name": "Кипр",
+   "slug": "cyprus"
+  }
+ ],
+ "cities": [
+  {
+   "id": 3128760,
+   "name": "Барселона",
+   "slug": "barcelona",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/1/la-sagrada/bec0309d3b44a1366d5a3d2a69797d9a.jpg",
+   "itemsCount": 30,
+   "country": "Испания"
+  },
+  {
+   "id": 2988507,
+   "name": "Париж",
+   "slug": "paris",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/3/istock_639337086.d4c5b151051.original/b60097b5641bddbc381fa4fc1abc7819.jpg",
+   "itemsCount": 43,
+   "country": "Франция"
+  },
+  {
+   "id": 2643743,
+   "name": "Лондон",
+   "slug": "london",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/8/marcin-nowak-iXqTqC-f6jI-unsplash/e63a87802e8d1bc5a9193503f038100a.jpg",
+   "itemsCount": 29,
+   "country": "Великобритания"
+  },
+  {
+   "id": 745044,
+   "name": "Стамбул",
+   "slug": "istanbul",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/29/istanbul-4866138_1920/ceb65c10a5126f46be0e6603c1c528e5.jpg",
+   "itemsCount": 21,
+   "country": "Турция"
+  },
+  {
+   "id": 3117735,
+   "name": "Мадрид",
+   "slug": "madrid",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/14/madrid-327979_1920/aeab1930167a78284c4757398be7e9ec.jpg",
+   "itemsCount": 17,
+   "country": "Испания"
+  },
+  {
+   "id": 2759794,
+   "name": "Амстердам",
+   "slug": "amsterdam",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/4/Amsterdam-kanaly/0211399a5b5adab6151613d7dd78917b.jpg",
+   "itemsCount": 24,
+   "country": "Нидерланды"
+  },
+  {
+   "id": 292223,
+   "name": "Дубай",
+   "slug": "dubai",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/89/wael-hneini-QJKEa9n3yN8-unsplash/cb4eff4de63e9a4890fbb625ba5304cc.jpg",
+   "itemsCount": 34,
+   "country": "Объединенные Арабские Эмираты"
+  },
+  {
+   "id": 4887398,
+   "name": "Чикаго",
+   "slug": "chicago",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/33/4_Mignificant_Mile_4r8qtoc/ce105b8954a2cb996d82e12ca67c96a7.jpg",
+   "itemsCount": 12,
+   "country": "США"
+  },
+  {
+   "id": 3164603,
+   "name": "Венеция",
+   "slug": "venice",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/11/0_t5OOS3vSifE0pZEy/ccf02eb1009904e65e1be72653ca3cce.jpg",
+   "itemsCount": 16,
+   "country": "Италия"
+  },
+  {
+   "id": 5128581,
+   "name": "Нью-Йорк",
+   "slug": "new-york-city",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/7/ben-o-bro-wpU4veNGnHg-unsplash_1/e56b18bd2c95d2d7cea8f10fa195e565.jpg",
+   "itemsCount": 9,
+   "country": "США"
+  },
+  {
+   "id": 2969679,
+   "name": "Версаль",
+   "slug": "versailles",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/347/Depositphotos_8713789_L/e67dcce28bd0160bb8aad7469b42a0d5.jpg",
+   "itemsCount": 2,
+   "country": "Франция"
+  },
+  {
+   "id": 5368361,
+   "name": "Лос-Анджелес",
+   "slug": "los-angeles-5368361",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/330/LA/2ff2be2546afcca9247c906d56b9c730.jpg",
+   "itemsCount": 9,
+   "country": "США"
+  },
+  {
+   "id": 2950159,
+   "name": "Берлин",
+   "slug": "berlin",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/13/florian-wehde-1uWanmgkd5g-unsplash/43395737bf9ed4a5ddf0ce5b6a458b40.jpg",
+   "itemsCount": 26,
+   "country": "Германия"
+  },
+  {
+   "id": 3173435,
+   "name": "Милан",
+   "slug": "milan",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/5/alba_in_piazza_del_duomo_a_milano_italy_n_2_by_zefirino-d4v4eez/be34d9adb3a42f917004ffc240f727f2.jpg",
+   "itemsCount": 15,
+   "country": "Италия"
+  },
+  {
+   "id": 3122453,
+   "name": "Фигерас",
+   "slug": "figueres",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/601/Depositphotos_196681672_XL_1/b7cb32acc01372fcb98a805314628279.jpg",
+   "itemsCount": 1,
+   "country": "Испания"
+  },
+  {
+   "id": 3176959,
+   "name": "Флоренция",
+   "slug": "florence",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/12/shutterstock_337498682/bf5d2377af37f23867cc83eb42e8c5ea.jpg",
+   "itemsCount": 16,
+   "country": "Италия"
+  },
+  {
+   "id": 2800866,
+   "name": "Брюссель",
+   "slug": "brussels",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/31/brussels-4682216_1920_UJFrMlD/d64ab0c2e13625416c7b6aa493bc633d.jpg",
+   "itemsCount": 8,
+   "country": "Бельгия"
+  },
+  {
+   "id": 3169070,
+   "name": "Рим",
+   "slug": "rome",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/2/shutterstock_226922599/c60d6e64bf42a900d03b1d701b5504c2.jpg",
+   "itemsCount": 23,
+   "country": "Италия"
+  },
+  {
+   "id": 1,
+   "name": "Mont Saint-Michel",
+   "slug": "mont-saint-michel",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/46/monte-st-michele/b203237960842ee6853f27a86043102e.jpg",
+   "itemsCount": 2,
+   "country": "Франция"
+  },
+  {
+   "id": 1151254,
+   "name": "Пхукет",
+   "slug": "phuket",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/city/142/d09fd185d183d0bad0b5d182_d18dd0bad181d0bad183d180d181d0b8d0b8/3996ee15b06cb875d94679ef4bccf6ec.jpg",
+   "itemsCount": 7,
+   "country": "Тайланд"
+  }
+ ],
+ "selected_city_ids": [
+  "3128760",
+  "2988507"
+ ],
+ "attractions": [
+  {
+   "id": 4795,
+   "name": "Museu Picasso de Barcelona",
+   "slug": "museu-picasso-de-barcelona",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/4795/tmpz7s8s0gu/d48d08b802ab48574335007b0fffc401.jpg",
+   "itemsCount": 3
+  },
+  {
+   "id": 4801,
+   "name": "Palau de la Musica Catalana",
+   "slug": "palau-de-la-musica-catalana",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/4801/tmpqq054w9j/bcf7233dbbae36ff2a5095091d6fab94.jpg",
+   "itemsCount": 3
+  },
+  {
+   "id": 26,
+   "name": "Basílica de la Sagrada Família",
+   "slug": "basilica-de-la-sagrada-familia",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/26/21744595630457f649a36b/24777a96a12bdd8fe1409a26b2674989.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 5435,
+   "name": "Güell Palace",
+   "slug": "guell-palace",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/5435/tmp5ulm70l4/07b55b5c7ef91583b47e897e2c471592.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 158,
+   "name": "Дом Мила",
+   "slug": "casa-mila",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/158/tmpq47imlsm/056c62bffd87b2d2ab685d324d7d75ce.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 155,
+   "name": "Park Guell",
+   "slug": "park-guell",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/155/tmph1xsdzb/846ce4ba0ce11c27f81b9105c3a8a922.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 156,
+   "name": "Собор Санта Мария дель Пи",
+   "slug": "basilica-de-santa-maria-del-pi",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/156/tmplvatzkd2/e3f074471bd866083dbfabcc1ed2ace5.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 157,
+   "name": "Собор Святого Креста и Святой Евлалии",
+   "slug": "catedral-de-barcelona",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/157/Catedral_de_Barcelona/eb96647504fd2ae7b98fb44992b2fe90.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 160,
+   "name": "Palau Reial Major",
+   "slug": "palau-reial-major",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/160/Barcelona._Palau_Reial_Major_i_muralla_romana_vistos_des_de_la_Via_Laietana_14743200145/57a7101563933629237654e51d21cf8a.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 5501,
+   "name": "Manzana de la Discordia",
+   "slug": "manzana-de-la-discordia",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/5501/Depositphotos_116050670_L/5cdcbc7532b3588a00f4c0949f4a6545.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 20,
+   "name": "Площадь Каталонии",
+   "slug": "plaza-de-cataluna",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/20/tmpiy9qbhsi/9e5e2e59f995bb713352cc9675450ea5.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 5504,
+   "name": "Музей современного искусства",
+   "slug": "museum-of-contemporary-art-macba",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/5504/Barcelona_-_Museu_dArt_Contemporani_de_Barcelona_MACBA_2/ef6a6d5c712d6644b9354540722d21b4.jpg",
+   "itemsCount": 0
+  },
+  {
+   "id": 2285,
+   "name": "Лувр",
+   "slug": "musee-du-louvre",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2285/michael-fousert-9s5mwnvwdxq-unsplash/20da6d76e6d9acdb73b241fbcbb8c048.jpg",
+   "itemsCount": 3
+  },
+  {
+   "id": 171,
+   "name": "Парижские катакомбы",
+   "slug": "catacombes-de-paris",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/171/tmp5cxhe0rc/84dd327111fe5d6eb261610ea875ee2f.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 6228,
+   "name": "Кладбище Монпарнас",
+   "slug": "montparnasse-cemetery",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/6228/Depositphotos_8507861_XL_1/102ea1cac88be737401cff085fa7e0da.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 412,
+   "name": "Башня Монпарнас",
+   "slug": "montparnasse-tower",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/6223/montparnasse-tower-gc340503b8_1920/6e1af6c09cc9a9b09147c7ba6eeda8f2.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 169,
+   "name": "Сент-Шапель",
+   "slug": "la-sainte-chapelle",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/169/tmpkwmvqiz6/b7671601e06901c20c15d0ce837484b6.jpg",
+   "itemsCount": 4
+  },
+  {
+   "id": 3575,
+   "name": "Площадь Согласия",
+   "slug": "place-de-la-concorde",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/3575/tmpmui3txhv/589880cc43417b2da326ad009b51a21d.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 56,
+   "name": "Музей Оранжери",
+   "slug": "orangerie-museum",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/56/Orangerie_Museum_audio_tours_and_entry_tickets/69819e492772fb0d1327448c702fb1e4.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 165,
+   "name": "Музей Орсе",
+   "slug": "musee-dorsay",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/165/tmpn4s2kva5/a18d08fe3e79594a12bbddd7c8389f8d.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 2065,
+   "name": "Tomb of Napoleon Bonaparte",
+   "slug": "tomb-of-napoleon-bonaparte",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2065/Patio_de_honor_del_palacio_de_Los_Inv%C3%A1lidos_Par%C3%ADs/abdfa046a6deda9e019cc2e8e9589360.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 2064,
+   "name": "Дом инвалидов",
+   "slug": "dome-des-invalides",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2064/tmpu75vrg0l/bed14b892514a6eef2ab296c1410f5a2.jpg",
+   "itemsCount": 3
+  },
+  {
+   "id": 2058,
+   "name": "Музей армии",
+   "slug": "the-army-museum",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2058/hotel-des-invalides-a-paris-1160x627/8120c829404acb7c8aa13283882a0881.jpg",
+   "itemsCount": 1
+  },
+  {
+   "id": 2062,
+   "name": "История Шарля де Голля",
+   "slug": "historial-charles-de-gaulle",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2062/chris-karidis-nnzkZNYWHaU-unsplash/f654fd9c56d320cb3dfe4ae5f0fb6146.jpg",
+   "itemsCount": 1
+  }
+ ],
+ "products": [
+  {
+   "id": 15956,
+   "title": "Захватывающий Монжуик: билет на канатную дорогу и аудиоэкскурсия в приложении",
+   "slug": "zahvatyivayuschij-monzhuik-bilet-na-kanatnuyu-dorogu-i-audioekskursiya-v-prilozhenii",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/c53efb6c93ce4d7d96cc4b327de1f2c5.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/c53efb6c93ce4d7d96cc4b327de1f2c5/025d86dc265909830f08b34fa8ea411a.jpg",
+   "price": 2328.94,
+   "exprice": 2328.94,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.3,
+   "reviewsCount": 362,
+   "ratingsCount": 952,
+   "category": "История и достояние",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": "1.5 – 2 hours",
+   "durationMin": 90,
+   "durationMax": 120,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/509/.picture",
+    "name": "Agnieszka",
+    "bio": "",
+    "nickname": "id509"
+   }
+  },
+  {
+   "id": 15957,
+   "title": "Каса-Мила (Ла Педрера): билет и аудиоэкскурсия-квиз в приложении",
+   "slug": "kasa-mila-la-pedrera-bilet-i-audioekskursiya-v-prilozhenii",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/6_B0kE53v.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/6_B0kE53v/2c9cdf6caec1ecd32a2c2b3c6987619c.jpg",
+   "price": 4211.47,
+   "exprice": 4211.47,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.6,
+   "reviewsCount": 290,
+   "ratingsCount": 846,
+   "category": "Достопримечательности",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": "1 – 1.5 hours",
+   "durationMin": 60,
+   "durationMax": 90,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "Путешествия лишают тебя дара речи, а потом превращают в лучшего рассказчика",
+    "nickname": "wegotrip"
+   }
+  },
+  {
+   "id": 22679,
+   "title": "Mies van der Rohe Pavilion: Билет с входом без очереди",
+   "slug": "mies-van-der-rohe-pavilion-bilet-s-vhodom-bez-ocheredi",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/ff6a804870c24da9a1fd94b2d8e31cfe.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/ff6a804870c24da9a1fd94b2d8e31cfe/3831691b5f26cc886d136b570cb3a313.jpg",
+   "price": 1030.65,
+   "exprice": 1030.65,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.6,
+   "reviewsCount": 92,
+   "ratingsCount": 301,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "hit": true,
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 25180,
+   "title": "Барселона: Билет в музей Пикассо и аудиотур с прогулкой по Эль Борну",
+   "slug": "barselona-bilet-v-muzej-pikasso-i-audiotur-s-progulkoj-po-el-bornu",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/picasso-museumezavspf_xshkwLp.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/picasso-museumezavspf_xshkwLp/31bfa0c632e048fd86a4ca4a11cb84af.jpg",
+   "price": 2405.84,
+   "exprice": 2405.84,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": null,
+   "reviewsCount": 0,
+   "ratingsCount": 0,
+   "category": "Искусство и музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": "3 hours",
+   "durationMin": 180,
+   "durationMax": 180,
+   "type": 3,
+   "tags": {
+    "hit": true,
+    "audioguide": true,
+    "text": true,
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/34785/id34785-avatar_MYZztGl.png",
+    "name": "Alexandra",
+    "bio": "Привет! Я гид, путешественник и креатор контента для путешественников 🌍 С помощью аудиоэкскурсий я делюсь своей страстью к моим любимым местам, городам и музеям! Путешествуй со мной по моим маршрутам и слушай удивительные истории!",
+    "nickname": "id34785"
+   }
+  },
+  {
+   "id": 23111,
+   "title": "Музей искусств и искусства: Билет с входом без очереди",
+   "slug": "muzej-iskusstv-i-iskusstva-bilet-s-vhodom-bez-ocheredi",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/46d518f49f5c4549b526d94503869716.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/46d518f49f5c4549b526d94503869716/580582455f52c878c35e4e87d6134229.jpg",
+   "price": 1030.65,
+   "exprice": 1030.65,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.8,
+   "reviewsCount": 48,
+   "ratingsCount": 61,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 23389,
+   "title": "White Rabbit барселоны: входной билет",
+   "slug": "white-rabbit-barselonyi-vhodnoj-bilet",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/7531d180579c4f8283223b6121a34312.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/7531d180579c4f8283223b6121a34312/697a4015f187914e425ac066443c31e4.jpeg",
+   "price": 2118.22,
+   "exprice": 2118.22,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.7,
+   "reviewsCount": 45,
+   "ratingsCount": 85,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 22734,
+   "title": "Музей Бенкси в Барселоне: Билет с входом без очереди",
+   "slug": "muzej-benksi-v-barselone-bilet-s-vhodom-bez-ocheredi",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/dd59e4eabfc24a8a8e6e9d55b8a9fd5b.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/dd59e4eabfc24a8a8e6e9d55b8a9fd5b/1ed58657d07df359d0b32a28f9496b8a.jpeg",
+   "price": 1556.96,
+   "exprice": 1556.96,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.7,
+   "reviewsCount": 101,
+   "ratingsCount": 218,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 23044,
+   "title": "Египетский музей Барселоны: Входной билет",
+   "slug": "egipetskij-muzej-barselonyi-vhodnoj-bilet",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/248c3bc59f8d471a96b83a5820977cac.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/248c3bc59f8d471a96b83a5820977cac/419096a5070f42721baa946af0c15f57.jpg",
+   "price": 1601.9,
+   "exprice": 1601.9,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.5,
+   "reviewsCount": 62,
+   "ratingsCount": 92,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 23079,
+   "title": "Европейский музей современного искусства: Входной билет",
+   "slug": "evropejskij-muzej-sovremennogo-iskusstva-vhodnoj-bilet",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/440d483d3480477da3ade6a59067152b.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/440d483d3480477da3ade6a59067152b/6c38c60b4e4f28af1574e07aa041d1a9.jpeg",
+   "price": 1488.05,
+   "exprice": 1488.05,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.4,
+   "reviewsCount": 52,
+   "ratingsCount": 87,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 22998,
+   "title": "Эротический музей Барселоны: Билет с входом без очереди",
+   "slug": "eroticheskij-muzej-barselonyi-bilet-s-vhodom-bez-ocheredi",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/fad93bc9936c4760bc794bc2a70b6c5c.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/fad93bc9936c4760bc794bc2a70b6c5c/60f612d5182d1664f9c90898dfc18574.jpeg",
+   "price": 1765.68,
+   "exprice": 1765.68,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.4,
+   "reviewsCount": 53,
+   "ratingsCount": 110,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 22856,
+   "title": "Музей парадоксов в Барселоне: Билет с входом без очереди",
+   "slug": "muzej-paradoksov-v-barselone-bilet-s-vhodom-bez-ocheredi",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/10959b46ca7b478ba5f9c934dae1eb25.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/10959b46ca7b478ba5f9c934dae1eb25/13a9afda8a2e58fc207c84f1f1cd88d3.jpg",
+   "price": 1800.64,
+   "exprice": 1800.64,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.3,
+   "reviewsCount": 69,
+   "ratingsCount": 146,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 22839,
+   "title": "Музей Тапиеса: проход без билета",
+   "slug": "muzej-tapiesa-prohod-bez-bileta",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/133f1ada861443be9890f4aa02dfa71c.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/133f1ada861443be9890f4aa02dfa71c/bc6ddf07eba70af904f625e3ae6d1efb.jpg",
+   "price": 1765.68,
+   "exprice": 1765.68,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.2,
+   "reviewsCount": 68,
+   "ratingsCount": 161,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 14426,
+   "title": "Париж: Билет в Лувр и аудиоэкскурсия по главным шедеврам",
+   "slug": "audiotur-v-prilozhenii-muzej-luvr-s-biletom-shedevryi-tsivilizatsii",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/image-1vcqhonr_k1s5LQa.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/image-1vcqhonr_k1s5LQa/82f4e4c213f52f6bab8422baef80817e.jpg",
+   "price": 5021.4,
+   "exprice": 5021.4,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.2,
+   "reviewsCount": 36,
+   "ratingsCount": 88,
+   "category": "Достопримечательности",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": "3 – 4 hours",
+   "durationMin": 180,
+   "durationMax": 240,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "text": true,
+    "hit": true,
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 22987,
+   "title": "Вилла Савойя: Входной билет",
+   "slug": "villa-savojya-vhodnoj-bilet",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/c58e717be1254cd5a4357091600b251f.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/c58e717be1254cd5a4357091600b251f/b1aae2c971f03c689af285526803c5df.jpg",
+   "price": 1030.65,
+   "exprice": 1030.65,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.8,
+   "reviewsCount": 81,
+   "ratingsCount": 135,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 23059,
+   "title": "Дворец Шантийи: вход только в сады",
+   "slug": "dvorets-shantiji-vhod-tolko-v-sadyi",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/42d7b09c57754f948c69b3bae9abf087.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/42d7b09c57754f948c69b3bae9abf087/919bed2b8ab508c46a725549db6fe2f6.jpg",
+   "price": 1048.62,
+   "exprice": 1048.62,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.6,
+   "reviewsCount": 60,
+   "ratingsCount": 102,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 22784,
+   "title": "Крепость архитектуры и наследия: Билет с входом без очереди",
+   "slug": "krepost-arhitekturyi-i-naslediya-bilet-s-vhodom-bez-ocheredi",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/5f767a93610b49d39c68032828382a39.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/5f767a93610b49d39c68032828382a39/ec8e86824d86c70a207f171fbc5d8671.jpg",
+   "price": 1488.05,
+   "exprice": 1488.05,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.6,
+   "reviewsCount": 49,
+   "ratingsCount": 128,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 16161,
+   "title": "Пантеон в Париже: билет и аудиоэкскурсия в приложении",
+   "slug": "panteon-v-parizhe-bilet-i-audioekskursiya-v-prilozhenii",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos207178092l_Dyx1vtK.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos207178092l_Dyx1vtK/431bc5136df2c498fbb87b22fc0acd16.jpg",
+   "price": 2286.0,
+   "exprice": 2286.0,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.6,
+   "reviewsCount": 192,
+   "ratingsCount": 538,
+   "category": "Достопримечательности",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": "1 – 1.5 hours",
+   "durationMin": 60,
+   "durationMax": 90,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 22825,
+   "title": "Musée National de la Marine: Входной билет",
+   "slug": "muse-national-de-la-marine-vhodnoj-bilet",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/cfa559e620d64b94a0f5cd0dca78d20f.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/cfa559e620d64b94a0f5cd0dca78d20f/03756d58a4366679c8fa6238837f3b89.jpeg",
+   "price": 1715.75,
+   "exprice": 1715.75,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.5,
+   "reviewsCount": 90,
+   "ratingsCount": 227,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 14621,
+   "title": "Музей армии во Дворце инвалидов в Париже: билет и аудиоэкскурсия в приложении",
+   "slug": "bilet-i-audiotur-v-prilozhenii-les-invalides-znakomstvo-s-muzeem-armii",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/39arblaywu4iwqosnehstabvpnuyyw1korqpxgoort-vp8rs4urk4vgkasteeqq47y0s9ksx-avemplrhbktw_5wvHM5m.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/39arblaywu4iwqosnehstabvpnuyyw1korqpxgoort-vp8rs4urk4vgkasteeqq47y0s9ksx-avemplrhbktw_5wvHM5m/51126068fb478503bd1aaf02a43522be.jpg",
+   "price": 2200.11,
+   "exprice": 2200.11,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.5,
+   "reviewsCount": 210,
+   "ratingsCount": 607,
+   "category": "История и достояние",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": "1 – 2 hours",
+   "durationMin": 60,
+   "durationMax": 120,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75"
+   }
+  },
+  {
+   "id": 14370,
+   "title": "Музей д'Орсэ за 2 часа: Билет и аудиотур в приложении WeGoTrip",
+   "slug": "muzej-dorse-za-2-chasa-bilet-i-audiotur-v-prilozhenii-wegotrip",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos355943198l_0pkCOCm.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos355943198l_0pkCOCm/ecfdfd66259d482588a590a789635a4f.jpg",
+   "price": 2629.55,
+   "exprice": 2629.55,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.4,
+   "reviewsCount": 82,
+   "ratingsCount": 274,
+   "category": "Искусство и музеи",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": "2 – 3 hours",
+   "durationMin": 120,
+   "durationMax": 180,
+   "type": 3,
+   "tags": {
+    "audioguide": true,
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "Путешествия лишают тебя дара речи, а потом превращают в лучшего рассказчика",
+    "nickname": "wegotrip"
+   }
+  },
+  {
+   "id": 23292,
+   "title": "Мир попугаев: дневной билет",
+   "slug": "mir-popugaev-dnevnoj-bilet",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/61002506366c49e4844f07e3ade4bdd6.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/61002506366c49e4844f07e3ade4bdd6/a2b6bf20a85fa7261c5924349c02b4da.jpeg",
+   "price": 2237.06,
+   "exprice": 2237.06,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.3,
+   "reviewsCount": 63,
+   "ratingsCount": 128,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 23106,
+   "title": "Cité de l'Histoire: Входной билет",
+   "slug": "cit-de-lhistoire-vhodnoj-bilet",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/78db44cd549346858f982f68035af6dd.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/78db44cd549346858f982f68035af6dd/ec103bb70010d3c7190c3516a94abef4.jpg",
+   "price": 1763.68,
+   "exprice": 1763.68,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.3,
+   "reviewsCount": 62,
+   "ratingsCount": 113,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 23115,
+   "title": "Замок Рамбуйе: Входной билет",
+   "slug": "zamok-rambuje-vhodnoj-bilet",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/60cc71f1b24f42269a83f5e85bc1d08c.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/60cc71f1b24f42269a83f5e85bc1d08c/03abb01698c7d053906cd25752969491.jpg",
+   "price": 1278.32,
+   "exprice": 1278.32,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.2,
+   "reviewsCount": 54,
+   "ratingsCount": 91,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  },
+  {
+   "id": 23533,
+   "title": "Искупительная часовня: Входной билет",
+   "slug": "iskupitelnaya-chasovnya-vhodnoj-bilet",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/b1936f8f1e4349aa8a836fa318f24c76.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/b1936f8f1e4349aa8a836fa318f24c76/00315b5759f5f8c16d6625b06d641744.jpg",
+   "price": 782.97,
+   "exprice": 782.97,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "rating": 4.8,
+   "reviewsCount": 7,
+   "ratingsCount": 11,
+   "category": "Билеты в музеи",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "duration": null,
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "tags": {
+    "available": true
+   },
+   "locale": "ru",
+   "author": {
+    "bio": ""
+   }
+  }
+ ],
+ "product_details": {
+  "15956": {
+   "id": 15956,
+   "slug": "zahvatyivayuschij-monzhuik-bilet-na-kanatnuyu-dorogu-i-audioekskursiya-v-prilozhenii",
+   "title": "Захватывающий Монжуик: билет на канатную дорогу и аудиоэкскурсия в приложении",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/c53efb6c93ce4d7d96cc4b327de1f2c5.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/c53efb6c93ce4d7d96cc4b327de1f2c5/025d86dc265909830f08b34fa8ea411a.jpg",
+   "images": [
+    {
+     "id": 95292,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/8b7c100e08f14c4b84ddb4d48074d21c/3c1cd80e112c0289e123b8bcaeb8a331.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/8b7c100e08f14c4b84ddb4d48074d21c.jpg"
+    },
+    {
+     "id": 95293,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/a2-2-1440x830/e81a7bdc71cbbffdacee56d9b910f509.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/a2-2-1440x830.jpg"
+    },
+    {
+     "id": 95294,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/acf454f0d11b42a5a2069b7cb333c33b/1d87fa7e5096ea0156b7c12cb0821f16.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/acf454f0d11b42a5a2069b7cb333c33b.jpg"
+    },
+    {
+     "id": 95295,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/castelldemontjuic-fossatentrada-barcelonacatalonia/5172bc856cdc981774e9c28794251df7.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/castelldemontjuic-fossatentrada-barcelonacatalonia.jpg"
+    },
+    {
+     "id": 95296,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/shutterstock549200332-min/6579f172b4c128a92b43d6ed539eca10.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/shutterstock549200332-min.jpg"
+    },
+    {
+     "id": 95298,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/10553015330471539187324538784077041405175525njgpdja3/665bf3f6a4f7425e36f97c9625322165.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/10553015330471539187324538784077041405175525njgpdja3.jpg"
+    }
+   ],
+   "description": "Прокатитесь на фуникулере и окунитесь в мир удивительных достопримечательностей горы Монжуик с помощью этого увлекательного аудиотура в приложении.\r\n\r\nГора Монжуик занимает особое место в истории Барселоны. Здесь происходили важные события во время Гражданской войны в Испании, а также проходили летние Олимпийские игры 1992 года. Сегодня на горе можно увидеть множество достопримечательностей, включая прекрасный замок, Фонд Жоана Миро и Олимпийский стадион.\r\n\r\nНо это не всё, чем знаменита гора Монжуик. Она также славится своими великолепными садами и парками, что делает её популярным местом для любителей природы и активного отдыха.\r\n\r\nОтправляйтесь в незабываемое путешествие на легендарную гору! Поднимитесь на знаменитой канатной дороге и насладитесь панорамными видами, которые оставят у вас незабываемые впечатления.\r\n\r\nАудогид расскажет вам о богатой истории горы Монжуик и её значении для жителей Барселоны. Вы узнаете о многочисленных достопримечательностях, которые стоит посетить, а также получите увлекательные сведения об архитектуре, культуре и истории этого уникального места.",
+   "lastModified": "2026-08-27 00:07",
+   "highlights": [
+    "Откройте для себя основные достопримечательности горы Монжуик с помощью этой увлекательной аудиоэкскурсии с гидом",
+    "Поднимитесь на фуникулере на вершину Монжуик и насладитесь потрясающим видом на Барселону",
+    "Узнайте о летних Олимпийских играх 1992 года и о том, как они преобразили Барселону.",
+    "Узнайте больше об истории Каталонии и ее ярких традициях"
+   ],
+   "advisory_information": "Download the app and the digital audio tour on your smartphone before the visit. You will find recommendations on how to get to the staring point in the first step of the tour. If you have any questions or need any assistance, please email us at support@wegotrip.com.",
+   "distance": "4 km",
+   "duration": "1.5 – 2 hours",
+   "locale": "ru",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "country": {
+    "id": 2510769,
+    "name": "Spain",
+    "slug": "spain"
+   },
+   "address": "Авингуда Мирамар, 30",
+   "startLocation": "Авингуда Мирамар, 30",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.1634823,
+     41.3687601
+    ]
+   },
+   "finishAddress": "Ctra. de Miramar, 38",
+   "finishLocation": "Сады Моссен-Костс-и-Ллобера",
+   "finishLocationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.172314694442745,
+     41.368893405358435
+    ]
+   },
+   "boundingCircle": {
+    "coords": {
+     "lng": 2.1600859424331667,
+     "lat": 41.366824834789426
+    },
+    "radius": 1115.7952919721183
+   },
+   "routePoints": [
+    [
+     2.1719992160797124,
+     41.37059716188977
+    ],
+    [
+     2.1598509,
+     41.3686304
+    ],
+    [
+     2.1530829081148495,
+     41.36906549331115
+    ],
+    [
+     2.1477006,
+     41.3688688
+    ],
+    [
+     2.1503840500538156,
+     41.36431944280227
+    ],
+    [
+     2.164918184280396,
+     41.363052507689076
+    ],
+    [
+     2.1688392,
+     41.3671975
+    ],
+    [
+     2.1686943,
+     41.3679683
+    ],
+    [
+     2.1724712848663335,
+     41.36953436066377
+    ]
+   ],
+   "price": 2328.94,
+   "exprice": 2328.94,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 15056,
+     "pricingCategoryId": "123938",
+     "label": "Adult - Round-trip ticket",
+     "description": "Age: 13+",
+     "price": 720.05
+    },
+    {
+     "id": 15177,
+     "pricingCategoryId": "123939",
+     "label": "Child - Round-trip ticket",
+     "description": "Age: 4 - 12",
+     "price": 523.31
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Загружаемый мультимедийный аудиотур в приложении WeGoTrip",
+    "Подробный маршрут от остановки до остановки с живой GPS-картой на вашем смартфоне",
+    "Билет на канатную дорогу Монжуик туда и обратно",
+    "Самостоятельный аудиотур для вашего смартфона в приложении WeGoTrip"
+   ],
+   "exclusions": [
+    "Наушники - пожалуйста, принесите свои",
+    "Билеты в музеи и достопримечательности по пути следования",
+    "Наушники и смартфон в стоимость не входят - приносите свои",
+    "Персональный гид"
+   ],
+   "importantInfo": [],
+   "rating": 4.3,
+   "reviewsCount": 362,
+   "ratingsCount": 952,
+   "reviews": [
+    {
+     "text": "Veel geld voor een minimale ervaring. De organisatie is prima maar de kabelbaan viel ons echt tegen. ",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Harriët",
+     "avatar": "",
+     "rating": 2,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Müll",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Unknown",
+     "avatar": "",
+     "rating": 1,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 16245,
+    "title": "Захватывающий Монжуик: билет на канатную дорогу и аудиоэкскурсия в приложении",
+    "mediaSize": 16692093,
+    "eventsCount": 9,
+    "generated_by_ai": true
+   },
+   "accessCodes": [],
+   "category": "История и достояние",
+   "categories": [
+    {
+     "id": 4,
+     "title": "Семейные туры",
+     "slug": "family-friendly-tours"
+    },
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Культура и история",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 25,
+     "title": "Обзорные билеты",
+     "slug": "sightseeing-tickets"
+    },
+    {
+     "id": 7,
+     "title": "История и достояние",
+     "slug": "history-heritage"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 8137,
+     "name": "Mount Montjuïc",
+     "slug": "mount-montjuic",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/8137/27314031148_9b55eb61de_k/79dc76abe9a828cc2950deba8dfb085b.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 3630,
+     "name": "Museu Olímpic i de l'Esport Joan Antoni Samaranch",
+     "slug": "museu-olimpic-i-de-lesport-joan-antoni-samaranch",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/3630/montjuic-g2e5e853fc_1920_jOJyLaQ/bb84a646af73afb3623f3271c4d2936f.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 7972,
+     "name": "Montjuïc Castle",
+     "slug": "montjuic-castle-12162466",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/7972/tmpdoole36z/86b061fac636bbc46ef1c4d798a7a520.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 7993,
+     "name": "Montjuïc Cable Car",
+     "slug": "montjuic-cable-car",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/7993/d7dc43665fac488c8b01c7f112985f57_1/b0d8b6b6c3f6bc876644ba119c034856.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 3633,
+     "name": "Fundació Joan Miró",
+     "slug": "fundacio-joan-miro",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/3633/Depositphotos_8082675_XL_1/c0eab3d8b7b5b4367fb667012de54c85.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 90,
+   "durationMax": 120,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/509/.picture",
+    "name": "Agnieszka",
+    "bio": "",
+    "nickname": "id509",
+    "rating": 4.27,
+    "ratingsCount": 1909,
+    "year_since": "2020"
+   },
+   "lastUpdatedByAuthor": "2025-02-25 12:12",
+   "url": "https://wegotrip.ru/barcelona-d3128760/zahvatyivayuschij-monzhuik-bilet-na-kanatnuyu-dorogu-i-audioekskursiya-v-prilozhenii-p15956/",
+   "provider": null
+  },
+  "15957": {
+   "id": 15957,
+   "slug": "kasa-mila-la-pedrera-bilet-i-audioekskursiya-v-prilozhenii",
+   "title": "Каса-Мила (Ла Педрера): билет и аудиоэкскурсия-квиз в приложении",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/6_B0kE53v.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/6_B0kE53v/2c9cdf6caec1ecd32a2c2b3c6987619c.jpg",
+   "images": [
+    {
+     "id": 95299,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/gaudi-12852941920/25f05cc09edec906bb76bf8a189fe3a7.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/gaudi-12852941920.jpg"
+    },
+    {
+     "id": 95300,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2_jvC5chf/98774a8def5e60ac7af70cc48182d277.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2_jvC5chf.jpg"
+    },
+    {
+     "id": 95301,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/7_iX8wM9i/4fbe07f53138c2aeebdf947e522239d7.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/7_iX8wM9i.jpg"
+    },
+    {
+     "id": 95302,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/4_vbDWS44/4c933a94c595b35eff94c47a4518d80d.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/4_vbDWS44.jpg"
+    }
+   ],
+   "description": "С помощью увлекательного аудио-квиза в приложении вы откройте для себя один из самых узнаваемых символов Барселоны —  дом Каса Мила. Вам не нужно стоять в очереди или спешить за экскурсоводом — билеты и аудиогид доступны в приложении, что позволит вам насладиться выдающейся архитектурой и интерьерами здания в своем собственном темпе.\r\n\r\nПутешествие в мир Гауди начинается у Каса Мила — дома, наполненного тайнами и историями, которые вам предстоит раскрыть, слушая аудиогид и отвечая на вопросы квиза. Дом Каса Мила — последний из построенных Гауди архитектурных объектов в Испании. Исследуя его архитектуру и интерьеры, вы узнаете, как он стал одним из главных символов каталонского модернизма.  \r\n\r\nЗатем вы пройдете по Пасео-де-Грасиа — одной из самых престижных и важных улиц города. По пути вы сможете полюбоваться впечатляющими шедеврами, созданными самыми известными архитекторами того времени, включая Антонио Гауди. Увидите его знаменитое творение — дом \"Каса Бальо\", который воплощает море и мир грез.",
+   "lastModified": "2026-08-27 00:06",
+   "highlights": [
+    "Исследуйте красоту и сложность Каса Мила с помощью увлекательного аудиотура в приложении",
+    "Откройте для себя замысловатые интерьеры, созданные гениальным каталонским архитектором Антонио Гауди.",
+    "Раскройте тайны Каса Мила и узнайте о невероятных вдохновителях шедевра Гайди",
+    "Познакомьтесь с соратниками Антонио Гауди и узнайте больше о каталонском модернизме",
+    "Поразитесь сюрреалистическим изображениям террасы на крыше и узнайте, как они были созданы."
+   ],
+   "advisory_information": "Download the app and the digital audio tour on your smartphone before the visit. You will find recommendations on how to get to the staring point in the first step of the tour. If you have any questions or need any assistance, please email us at support@wegotrip.com.",
+   "distance": "1 km",
+   "duration": "1 – 1.5 hours",
+   "locale": "ru",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "country": {
+    "id": 2510769,
+    "name": "Spain",
+    "slug": "spain"
+   },
+   "address": "Пасео-де-Грасиа, 92",
+   "startLocation": "Каса Мила",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.1619614,
+     41.39538049999999
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": [
+    [
+     2.1619024,
+     41.3952155
+    ]
+   ],
+   "price": 4211.47,
+   "exprice": 4211.47,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 15057,
+     "pricingCategoryId": "135",
+     "label": "Adult",
+     "description": "",
+     "price": 1347.23
+    },
+    {
+     "id": 15190,
+     "pricingCategoryId": "136",
+     "label": "Youth",
+     "description": "",
+     "price": 632.17
+    },
+    {
+     "id": 15191,
+     "pricingCategoryId": "2480",
+     "label": "Student",
+     "description": "",
+     "price": 911.8
+    },
+    {
+     "id": 15192,
+     "pricingCategoryId": "2481",
+     "label": "Senior",
+     "description": "",
+     "price": 931.78
+    },
+    {
+     "id": 15193,
+     "pricingCategoryId": "150",
+     "label": "Child",
+     "description": "",
+     "price": 523.31
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Билет на проход в Каса Мила Ла Педрера",
+    "Самостоятельный аудиотур для вашего смартфона в приложении WeGoTrip"
+   ],
+   "exclusions": [
+    "Наушники - приносите свои",
+    "Билет в Дом Бальо (€35)",
+    "Наушники и смартфон в стоимость не входят - приносите свои",
+    "Персональный гид"
+   ],
+   "importantInfo": [],
+   "rating": 4.6,
+   "reviewsCount": 290,
+   "ratingsCount": 846,
+   "reviews": [
+    {
+     "text": "Ottima esperienza ",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Giuseppe",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Noi abbiamo preso l'entrata con audio guida che ha funzionato molto bene ",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "francesco",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 15736,
+    "title": "Каса-Мила (Ла Педрера): билет и аудиоэкскурсия-квиз в приложении",
+    "mediaSize": 62757944,
+    "eventsCount": 31,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "Достопримечательности",
+   "categories": [
+    {
+     "id": 4,
+     "title": "Семейные туры",
+     "slug": "family-friendly-tours"
+    },
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Культура и история",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 23,
+     "title": "Достопримечательности",
+     "slug": "attraction-tickets"
+    },
+    {
+     "id": 8,
+     "title": "Архитектура",
+     "slug": "architecture"
+    },
+    {
+     "id": 7,
+     "title": "История и достояние",
+     "slug": "history-heritage"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 158,
+     "name": "Дом Мила",
+     "slug": "casa-mila",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/158/tmpq47imlsm/056c62bffd87b2d2ab685d324d7d75ce.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 60,
+   "durationMax": 90,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/1/path32.png",
+    "name": "WeGoTrip",
+    "bio": "Путешествия лишают тебя дара речи, а потом превращают в лучшего рассказчика",
+    "nickname": "wegotrip",
+    "rating": 4.35,
+    "ratingsCount": 168159,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2025-06-20 11:09",
+   "url": "https://wegotrip.ru/barcelona-d3128760/kasa-mila-la-pedrera-bilet-i-audioekskursiya-v-prilozhenii-p15957/",
+   "provider": null
+  },
+  "22679": {
+   "id": 22679,
+   "slug": "mies-van-der-rohe-pavilion-bilet-s-vhodom-bez-ocheredi",
+   "title": "Mies van der Rohe Pavilion: Билет с входом без очереди",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/ff6a804870c24da9a1fd94b2d8e31cfe.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/ff6a804870c24da9a1fd94b2d8e31cfe/3831691b5f26cc886d136b570cb3a313.jpg",
+   "images": [
+    {
+     "id": 113849,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/8627ab0326674038ac2123306126b480/72079af080913f0b8bc5784b3e47a87f.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/8627ab0326674038ac2123306126b480.jpg"
+    },
+    {
+     "id": 113850,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/cf1ae38054cb42d896f33652f1034574/754976b541c7f3afd8fd2daa024e9210.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/cf1ae38054cb42d896f33652f1034574.jpg"
+    },
+    {
+     "id": 113851,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/cfc48a13b29d42c8ae489f2f3c740e0e/c67d58a454caaf4dcb39fc6cc2fb04e4.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/cfc48a13b29d42c8ae489f2f3c740e0e.jpg"
+    }
+   ],
+   "description": "Германия поручила Людвигу Мису ван дер Роэ и Лилли Райху создать пространство для представления своей страны на международной выставке в Барселоне в 1929 году. По окончании мероприятия павильон был демонтирован, но его никогда не забывали. Скорее, он превратился в ориентир, который не только оказал глубокое влияние на поколения архитекторов и художников, но и заложил основы современной архитектуры.\r\n\r\nЧрезвычайная чистота его форм, трезвость, линейное взаимодействие между интерьерами и экстерьерами, четкие контрасты в палитре материалов, изысканно подобранных и привезенных из Альп, Тиволи, Атласа и Тиноса, - все это создает идеальный баланс в этом сокровище. Современная архитектура, реконструкция которой (1986 год) позволяет нам наслаждаться ею сегодня.",
+   "lastModified": "2026-08-27 00:03",
+   "highlights": [],
+   "advisory_information": null,
+   "distance": null,
+   "duration": null,
+   "locale": "ru",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "country": {
+    "id": 2510769,
+    "name": "Spain",
+    "slug": "spain"
+   },
+   "address": "7 Avinguda Francesc Ferrer i Guàrdia",
+   "startLocation": "7 Avinguda Francesc Ferrer i Guàrdia",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.1501628,
+     41.3706091
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 1030.65,
+   "exprice": 1030.65,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [],
+   "types": {
+    "hit": true
+   },
+   "inclusions": [],
+   "exclusions": [],
+   "importantInfo": [],
+   "rating": 4.6,
+   "reviewsCount": 92,
+   "ratingsCount": 301,
+   "reviews": [
+    {
+     "text": "Despite having tickets, the man wouldn’t let us in. Absolutely stupid situation. ",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Unknown",
+     "avatar": "",
+     "rating": 1,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Très belle visite !!",
+     "locale": null,
+     "date": "2026-08-09 00:00:00",
+     "name": "cathy",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": null,
+   "accessCodes": [],
+   "category": "Билеты в музеи",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    }
+   ],
+   "subcategories": [],
+   "attractions": [
+    {
+     "id": 29205,
+     "name": "Mies van der Rohe Pavilion",
+     "slug": "mies-van-der-rohe-pavilion",
+     "preview": "",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "lastUpdatedByAuthor": "2025-05-24 18:27",
+   "url": "https://wegotrip.ru/barcelona-d3128760/mies-van-der-rohe-pavilion-bilet-s-vhodom-bez-ocheredi-p22679/",
+   "provider": null
+  },
+  "25180": {
+   "id": 25180,
+   "slug": "barselona-bilet-v-muzej-pikasso-i-audiotur-s-progulkoj-po-el-bornu",
+   "title": "Барселона: Билет в музей Пикассо и аудиотур с прогулкой по Эль Борну",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/picasso-museumezavspf_xshkwLp.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/picasso-museumezavspf_xshkwLp/31bfa0c632e048fd86a4ca4a11cb84af.jpg",
+   "images": [
+    {
+     "id": 139669,
+     "description": "Passeig del Born",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2_p4Lbrbx/c9686c26620047d9a35116d2a86113b0.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2_p4Lbrbx.jpg"
+    },
+    {
+     "id": 139675,
+     "description": "Museum Picasso",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos420593828l_jqRHIMW/6cb89484238c46a961c06ad24a940849.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos420593828l_jqRHIMW.jpg"
+    },
+    {
+     "id": 139672,
+     "description": "Santa Maria Del Mar Basilica",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/3_fCs9DUw/5fc249c18b5ab2237fb4856fbc618ec2.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/3_fCs9DUw.jpg"
+    },
+    {
+     "id": 139671,
+     "description": "Parc de la Ciutadella",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/5_t6oGG3v/91ab1891b31f21c62e3d81145a6eb095.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/5_t6oGG3v.jpg"
+    },
+    {
+     "id": 139670,
+     "description": "Santa Caterina Market",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/4_Jw1uR9u/b77509117e4d63d4a5ce9f0eacbc1cf4.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/4_Jw1uR9u.jpg"
+    },
+    {
+     "id": 139674,
+     "description": "Picasso Museum",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos239153318xl_6Ch70e8/a30e5abf26c43ff6684506d9e1919965.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos239153318xl_6Ch70e8.jpg"
+    },
+    {
+     "id": 139673,
+     "description": "Palau de la Música Catalana",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/6_ad5XR4V/117d5f8f7c3b163ceb97155b31571b17.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/6_ad5XR4V.jpg"
+    }
+   ],
+   "description": "Эта самостоятельная аудиоэкскурсия начинается в Музее Пикассо в Барселоне. Обширная коллекция этого музея познакомит вас с жизнью Пабло Пикассо - одного из величайших художников XX века. Вы сможете проследить эволюцию его творчества от первых серьезных работ в возрасте 15 лет до всемирно известных шедевров.\r\n\r\nВНИМАНИЕ! Экскурсия в Музее Пикассо охватывает только основную, но не временную экспозицию. На временной выставке не предусмотрено никакого рассказа или руководства.\r\nЭкскурсия не связана с Музеем Пикассо, а проводится независимым автором. Билет включен в стоимость для удобства клиента.\r\n\r\nПосле музея вы отправитесь в путешествие по самому очаровательному и художественному району Барселоны, известному как Эль Борн, где работал и проводил время Пабло Пикассо. Прогулка охватит обязательные для посещения достопримечательности и интересные места Эль Борна. Базилика Санта-Мария-дель-Мар перенесет вас в прошлое - от эпохи Римской империи до Гражданской войны в Испании. Затем вы пройдете по оживленному средневековому проспекту Пасео-дель-Борн, где можно отведать тапас с бокалом кавы. Центр культуры и памяти Эль-Борн расскажет о наследии старого города Барселоны благодаря своим археологическим раскопкам. После этого отдохните в тени парка Сьютаделья с его захватывающим дух Каскадным фонтаном.\r\n\r\nНаконец, вы рассмотрите детали культового здания в стиле модерн - концертного зала Palau de La Musica - и услышите историю его создания.",
+   "lastModified": "2026-08-27 00:07",
+   "highlights": [
+    "Познакомьтесь с музеем Пикассо и очаровательным кварталом Эль-Борн, руководствуясь собственным аудиоэкскурсом в приложении.",
+    "Посмотрите на некоторые шедевры Пикассо и погрузитесь в мир его безграничного творчества.",
+    "Откройте для себя ранние работы Пикассо и узнайте, как он стал художником",
+    "Прогуляйтесь по средневековым улицам с богатой историей и оживленной жизнью, бурлящей в тапас-барах и на рынках.",
+    "Почувствуйте дух гордого народа Каталонии через его новаторскую архитектуру и искусство"
+   ],
+   "advisory_information": "Download the app and the digital audio tour on your smartphone before the visit. You will find recommendations on how to get to the staring point in the first step of the tour. If you have any questions or need any assistance, please email us at support@wegotrip.com.",
+   "distance": "4 km",
+   "duration": "3 hours",
+   "locale": "ru",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "country": {
+    "id": 2510769,
+    "name": "Spain",
+    "slug": "spain"
+   },
+   "address": "Carrer de Montcada, 15-23",
+   "startLocation": "Музей Пикассо",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.1809472,
+     41.3852706
+    ]
+   },
+   "finishAddress": "Carrer del Palau de la Música, 4-6",
+   "finishLocation": "Дворец каталонской музыки",
+   "finishLocationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.1753128,
+     41.3875752
+    ]
+   },
+   "boundingCircle": {
+    "coords": {
+     "lng": 2.181519203685225,
+     "lat": 41.38658333034837
+    },
+    "radius": 575.9473259046364
+   },
+   "routePoints": [
+    [
+     2.1765102320300937,
+     41.385699458194054
+    ],
+    [
+     2.175530658766629,
+     41.38738286011593
+    ],
+    [
+     2.1867245435714726,
+     41.38915715154353
+    ],
+    [
+     2.181821465492249,
+     41.387084459483276
+    ],
+    [
+     2.1847504377365117,
+     41.386529047278856
+    ],
+    [
+     2.187507748603821,
+     41.38735411442233
+    ],
+    [
+     2.1823847293853764,
+     41.384009509153216
+    ],
+    [
+     2.183484435081482,
+     41.385679820894836
+    ],
+    [
+     2.185860872268677,
+     41.38569189528137
+    ],
+    [
+     2.183371782302857,
+     41.387668039658955
+    ],
+    [
+     2.181054340443485,
+     41.38497130226043
+    ],
+    [
+     2.1817785501480107,
+     41.384532743952455
+    ],
+    [
+     2.182642221450806,
+     41.38468971357125
+    ],
+    [
+     2.1788656711578374,
+     41.38612254693394
+    ]
+   ],
+   "price": 2405.84,
+   "exprice": 2405.84,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 25211,
+     "pricingCategoryId": "1",
+     "label": "Adult",
+     "description": "",
+     "price": 941.76
+    },
+    {
+     "id": 25212,
+     "pricingCategoryId": "3",
+     "label": "Senior",
+     "description": "",
+     "price": 523.31
+    },
+    {
+     "id": 25213,
+     "pricingCategoryId": "2",
+     "label": "Student",
+     "description": "",
+     "price": 523.31
+    },
+    {
+     "id": 25214,
+     "pricingCategoryId": "4",
+     "label": "Child",
+     "description": "",
+     "price": 523.31
+    }
+   ],
+   "types": {
+    "hit": true,
+    "audioguide": true,
+    "text": true
+   },
+   "inclusions": [
+    "Входной билет в Музей Пикассо",
+    "Рекомендации по дальнейшей деятельности и местам для посещения",
+    "Центр культуры и памяти Эль Борн (вход бесплатный)",
+    "Самостоятельный аудиотур для вашего смартфона в приложении WeGoTrip"
+   ],
+   "exclusions": [
+    "Наушники в комплект не входят - приносите свои",
+    "Вход в Санта-Мария-дель-Мар бесплатный, за исключением периода с 13:00 до 17:00, когда вход стоит 5 EUR.",
+    "Еда и напитки",
+    "Наушники и смартфон в стоимость не входят - приносите свои",
+    "Персональный гид"
+   ],
+   "importantInfo": [],
+   "rating": null,
+   "reviewsCount": 0,
+   "ratingsCount": 0,
+   "reviews": [],
+   "tour": {
+    "id": 18694,
+    "title": "Барселона: Билет в музей Пикассо и аудиотур с прогулкой по Эль Борну",
+    "mediaSize": 241589128,
+    "eventsCount": 37,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "Искусство и музеи",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Культура и история",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 24,
+     "title": "Музеи и выставки",
+     "slug": "museum-tickets-passes"
+    },
+    {
+     "id": 10,
+     "title": "Культурные",
+     "slug": "cultural-tours"
+    },
+    {
+     "id": 6,
+     "title": "Искусство и музеи",
+     "slug": "art-museums"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 4799,
+     "name": "Ciutadella Park",
+     "slug": "ciutadella-park",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/4799/parc-de-la-ciutadella-1562194_1920/b634256f83a9fb438c46a143f9e58aff.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 4795,
+     "name": "Museu Picasso de Barcelona",
+     "slug": "museu-picasso-de-barcelona",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/4795/tmpz7s8s0gu/d48d08b802ab48574335007b0fffc401.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 3717,
+     "name": "El Born Centro de Cultura y Memoria",
+     "slug": "el-born-centro-de-cultura-y-memoria",
+     "preview": "",
+     "itemsCount": 1
+    },
+    {
+     "id": 3719,
+     "name": "Mercat de Santa Caterina",
+     "slug": "mercat-de-santa-caterina-12158331",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/3719/g-3pn58x8/be5320445210e92b8a559f3e500ae91f.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 3721,
+     "name": "Санта-Мария-дель-Мар",
+     "slug": "basilica-of-santa-maria-del-mar-12158333",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/3721/g-zfmq4gbu/4a3e2cc1198b7a908cd0fdb2d9d8f04d.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 4801,
+     "name": "Palau de la Musica Catalana",
+     "slug": "palau-de-la-musica-catalana",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/4801/tmpqq054w9j/bcf7233dbbae36ff2a5095091d6fab94.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 4797,
+     "name": "Passeig del Born",
+     "slug": "passeig-del-born",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/4797/Depositphotos_96388714_L/22cae6bfc279222fd907d8f4236dc068.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 180,
+   "durationMax": 180,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/34785/id34785-avatar_MYZztGl.png",
+    "name": "Alexandra",
+    "bio": "Привет! Я гид, путешественник и креатор контента для путешественников 🌍 С помощью аудиоэкскурсий я делюсь своей страстью к моим любимым местам, городам и музеям! Путешествуй со мной по моим маршрутам и слушай удивительные истории!",
+    "nickname": "id34785",
+    "rating": 4.42,
+    "ratingsCount": 24147,
+    "year_since": "2022"
+   },
+   "lastUpdatedByAuthor": "2025-08-19 08:04",
+   "url": "https://wegotrip.ru/barcelona-d3128760/barselona-bilet-v-muzej-pikasso-i-audiotur-s-progulkoj-po-el-bornu-p25180/",
+   "provider": {
+    "user_id": 1,
+    "nickname": "wegotrip",
+    "first_name": "WeGoTrip"
+   }
+  },
+  "23111": {
+   "id": 23111,
+   "slug": "muzej-iskusstv-i-iskusstva-bilet-s-vhodom-bez-ocheredi",
+   "title": "Музей искусств и искусства: Билет с входом без очереди",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/46d518f49f5c4549b526d94503869716.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/46d518f49f5c4549b526d94503869716/580582455f52c878c35e4e87d6134229.jpg",
+   "images": [
+    {
+     "id": 117504,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/67494047573e4d468ffedac78ec66d32/16875ae67758b3bc02e796c26439c4de.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/67494047573e4d468ffedac78ec66d32.jpg"
+    },
+    {
+     "id": 117505,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/7c284b6a09344f23a0d64e037be83ee4/39a029c70411de0fc252fb47443de745.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/7c284b6a09344f23a0d64e037be83ee4.jpg"
+    },
+    {
+     "id": 117506,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/68819140aac9402580f3ff51b29d8d86/a205c1e901c5d9ae0b6f89a309d1e02f.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/68819140aac9402580f3ff51b29d8d86.jpg"
+    },
+    {
+     "id": 117507,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/e4a5f51e7ff64b3199793c703af79766/466c3d1e588984b1fb9fbeaf0a6db3db.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/e4a5f51e7ff64b3199793c703af79766.jpg"
+    },
+    {
+     "id": 117508,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/e776bd796b2e47d79de1ac29fbae2455/cc098da0e2b2dbeed7071019b7f9e58f.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/e776bd796b2e47d79de1ac29fbae2455.jpg"
+    }
+   ],
+   "description": "Начните с Monigoty 1897 года, первой работы, рассказанной полностью в графическом повествовании! Затем прогуляйтесь по галереям Музея комиксов и иллюстраций и понаблюдайте, как комиксы в XX веке превращаются в индустрию с оборотом в миллиарды долларов. Особое внимание было уделено переходу комиксов в индустрию взрослых в 1980-е годы, поэтому обратите внимание на инструментальные произведения, которые помогли изменить сцену.\r\n\r\nНаряду с впечатляющей постоянной коллекцией музея в течение года в нем проходит целый ряд временных выставок, поэтому, если у вас есть любимый рисовальщик или автор, не пропустите - у вас может быть возможность погрузиться в их каталоги работ.",
+   "lastModified": "2026-08-27 00:06",
+   "highlights": [],
+   "advisory_information": null,
+   "distance": null,
+   "duration": null,
+   "locale": "ru",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "country": {
+    "id": 2510769,
+    "name": "Spain",
+    "slug": "spain"
+   },
+   "address": "Plaça de Pep Ventura, 1",
+   "startLocation": "Plaça de Pep Ventura, 1",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.082137,
+     41.474375
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 1030.65,
+   "exprice": 1030.65,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [],
+   "types": {},
+   "inclusions": [],
+   "exclusions": [],
+   "importantInfo": [],
+   "rating": 4.8,
+   "reviewsCount": 48,
+   "ratingsCount": 61,
+   "reviews": [
+    {
+     "text": "Un abuso, piden datos personales innecesarios ",
+     "locale": null,
+     "date": "2026-05-18 00:00:00",
+     "name": "Ricard",
+     "avatar": "",
+     "rating": 2,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Molt bona experiència!\nEl treballador que ens va atendre, súper amable i acollidor!",
+     "locale": null,
+     "date": "2025-02-24 00:00:00",
+     "name": "Asen",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": null,
+   "accessCodes": [],
+   "category": "Билеты в музеи",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    }
+   ],
+   "subcategories": [],
+   "attractions": [
+    {
+     "id": 38206,
+     "name": "Museu del Còmic i la Il·lustració",
+     "slug": "museu-del-comic-i-la-il*lustracio",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/None/photokeyaizasyccsokeemfb2t5ldahhtceqv9a0nq2zxk-and-photoreferenceaxqcqnsbfqbijfgip9nlljvou-6x9uajcjcrcb6abmaj44dmkau8zbdtfjljvowbn3gziztzqxofjip4b7eoujpepf3q8_9oRjnXT/27634e6240613c28e0e9c314867bfb27.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "lastUpdatedByAuthor": "2025-05-30 09:59",
+   "url": "https://wegotrip.ru/barcelona-d3128760/muzej-iskusstv-i-iskusstva-bilet-s-vhodom-bez-ocheredi-p23111/",
+   "provider": null
+  },
+  "23389": {
+   "id": 23389,
+   "slug": "white-rabbit-barselonyi-vhodnoj-bilet",
+   "title": "White Rabbit барселоны: входной билет",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/7531d180579c4f8283223b6121a34312.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/7531d180579c4f8283223b6121a34312/697a4015f187914e425ac066443c31e4.jpeg",
+   "images": [
+    {
+     "id": 119666,
+     "description": "Погрузитесь в 360-градусный визуальный взрыв мозаики тренкади Гауди.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/212088481f1b429c98acb715db8680a1/4f3aacab1dcf0f65ea2138e11dc8fb1c.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/212088481f1b429c98acb715db8680a1.jpeg"
+    },
+    {
+     "id": 119667,
+     "description": "Наши традиционные ¨Capgrossos¨. Полюбуйтесь городом как местным жителем в творческой и оригинальной атмосфере.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/3deb1c1a6cd046b395a776c19f4cb567/03a9a2c017d7df1cacb2ad05dbf92291.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/3deb1c1a6cd046b395a776c19f4cb567.jpeg"
+    },
+    {
+     "id": 119668,
+     "description": "Граффити TVBOY и вход в музей.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/c2ffc86d62384c92813cefc5f7c77e3a/365e145d7ee8609963ded3ca0211f8ee.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/c2ffc86d62384c92813cefc5f7c77e3a.jpeg"
+    },
+    {
+     "id": 119669,
+     "description": "Инновационные достопримечательности: LA FURA DELS BAUS",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/1c0e166c428c4666ab1b1291e3587708/876a2942123c8108d5405c50b3290dcd.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/1c0e166c428c4666ab1b1291e3587708.jpeg"
+    },
+    {
+     "id": 119670,
+     "description": "Ознакомьтесь С нашим оффшором, в котором представлены эксклюзивные подарки, фирменный кофе и вкусное мороженое от лучших местных брендов.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/680833cc48b54a74ab68b096ffeacf9b/5b250732d25cbc8ea4a2903c382d9c23.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/680833cc48b54a74ab68b096ffeacf9b.jpeg"
+    },
+    {
+     "id": 119671,
+     "description": "Самая большая бесконечная комната в городе.",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/8ffcfcd43dc5404e822aa975a1fe38f4/8ddb453f27267ac0493e8d1e760582f2.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/8ffcfcd43dc5404e822aa975a1fe38f4.jpeg"
+    },
+    {
+     "id": 119672,
+     "description": "ПЛЯЖ FURA DELS BAUS",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/256b24aa514f4fc3aba8f1d7b0171731/fcb561f72c1036d9d7d5386aa047d7e6.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/256b24aa514f4fc3aba8f1d7b0171731.jpeg"
+    }
+   ],
+   "description": "Познакомьтесь с каталонской культурой в - захватывающей достопримечательностиWhite Rabbit, соединяющей вас с местными барселонскими традициями. Исследуйте сторону города, известную в основном жителям, идеально подходящую для тех, кто хочет больше, чем типичные туристические места. Местные художники демонстрируют традиции Барселоны в 10 отдельных залах.\n\nНачните с осмотра местных фестивалей и насладитесь 360-градусным видом на мозаики тренкади Гауди и фонтаны Монжуика, танцами в Razzmatazz и опытом виртуальной реальности, переосмысливающим каталонские мифы и легенды. В музее можно увидеть иммерсивное искусство и игривые инсталляции.\n\nНачните с и White Rabbit углубите свое понимание местной культуры и обогатите свое посещение города. Это идеальная первая остановка для тех, кто ищет аутентичный вкус Барселоны. На Passeig de Gràcia 55, всего в 2 минутах ходьбы от Casa Batlló, можно познакомиться с каталонской культурой с помощью искусства и интерактивных инсталляций.",
+   "lastModified": "2026-08-27 00:02",
+   "highlights": [],
+   "advisory_information": null,
+   "distance": null,
+   "duration": null,
+   "locale": "ru",
+   "city": {
+    "id": 3128760,
+    "name": "Барселона",
+    "slug": "barcelona"
+   },
+   "country": {
+    "id": 2510769,
+    "name": "Spain",
+    "slug": "spain"
+   },
+   "address": "55 Passeig de Gràcia",
+   "startLocation": "55 Passeig de Gràcia",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.1636699,
+     41.392376
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 2118.22,
+   "exprice": 2118.22,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [],
+   "types": {},
+   "inclusions": [],
+   "exclusions": [],
+   "importantInfo": [],
+   "rating": 4.7,
+   "reviewsCount": 45,
+   "ratingsCount": 85,
+   "reviews": [
+    {
+     "text": "As people who have lived in Catalonia for many years, we found the experience lack-lustre in comparison with other immersive experiences. ",
+     "locale": null,
+     "date": "2026-07-23 00:00:00",
+     "name": "Brandon",
+     "avatar": "",
+     "rating": 2,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Surprising. Very different. Fun. Entertaining. Absolutely a great place to visit\n",
+     "locale": null,
+     "date": "2026-07-12 00:00:00",
+     "name": "Bjorn",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": null,
+   "accessCodes": [],
+   "category": "Билеты в музеи",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    }
+   ],
+   "subcategories": [],
+   "attractions": [
+    {
+     "id": 38504,
+     "name": "White Rabbit of Barcelona",
+     "slug": "white-rabbit-of-barcelona",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/None/photokeyaizasyccsokeemfb2t5ldahhtceqv9a0nq2zxk-and-photoreferenceaxqcqnq9inrdanykkkcp3seve4gcdissob3w08notohj2zdpihaypy-x-tzh6vy9dbbpa17afzp0yvzshqcotijes6gt5_oWRZERK/368efef2a39a421cb70f6f0f66fb73b5.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "lastUpdatedByAuthor": "2025-06-01 00:26",
+   "url": "https://wegotrip.ru/barcelona-d3128760/white-rabbit-barselonyi-vhodnoj-bilet-p23389/",
+   "provider": null
+  },
+  "14426": {
+   "id": 14426,
+   "slug": "audiotur-v-prilozhenii-muzej-luvr-s-biletom-shedevryi-tsivilizatsii",
+   "title": "Париж: Билет в Лувр и аудиоэкскурсия по главным шедеврам",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/image-1vcqhonr_k1s5LQa.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/image-1vcqhonr_k1s5LQa/82f4e4c213f52f6bab8422baef80817e.jpg",
+   "images": [
+    {
+     "id": 143571,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/dat-vo-rlhf3hvsk4-unsplash_sjgH8Qr/8c105acc172b93be9a473581db5dd064.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/dat-vo-rlhf3hvsk4-unsplash_sjgH8Qr.jpg"
+    },
+    {
+     "id": 143567,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/atthelouvreinparisfrance/489b362e5b8f1a557686969f03e34bf1.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/atthelouvreinparisfrance.jpg"
+    },
+    {
+     "id": 143564,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/the-free-birds-iy16cl-vlmu-unsplash/f986e7045d34766ebab41d084252726a.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/the-free-birds-iy16cl-vlmu-unsplash.jpg"
+    },
+    {
+     "id": 143565,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/2560px-venusdemilolouvre17january2017/6c056c2f57004cc24769c0442ad609f0.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/2560px-venusdemilolouvre17january2017.jpg"
+    },
+    {
+     "id": 143568,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/1280px-eugnedelacroix-lalibertguidantlepeuplecropped/d71d5c3587566f1131d7b99f7d62d0a6.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/1280px-eugnedelacroix-lalibertguidantlepeuplecropped.jpg"
+    },
+    {
+     "id": 143569,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/winged-bulls/b8c9ea92fbb104388d7ff896b7703f33.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/winged-bulls.jpg"
+    },
+    {
+     "id": 143562,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos407560452l_JTl720S/a6a5bdcf93a6a1e273fb4f801643585a.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos407560452l_JTl720S.jpg"
+    },
+    {
+     "id": 143566,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/harrison-moore-a77yxykq6c-unsplash/49729d86d653741a24d9ae56c94e67bf.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/harrison-moore-a77yxykq6c-unsplash.jpg"
+    },
+    {
+     "id": 143570,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/venus-and-the-graces/a6c2b74a0f4a31f91eefee3bf7028f44.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/venus-and-the-graces.jpg"
+    }
+   ],
+   "description": "С помощью этого аудиотура в приложении, дополненного входным билетом, вы познакомитесь с основными достопримечательностями великолепного музея Лувр.\r\n\r\nВойдите в музей через вход Пирамиды или Карусели по адресу 99, rue de Rivoli - встаньте в приоритетную зеленую очередь для посетителей с билетами.\r\n\r\nОзнакомьтесь с необыкновенной коллекцией произведений искусства, охватывающей период от доисторических времен до античности, от Средневековья до эпохи Возрождения и вплоть до 1848 года.  Помимо знаменитой Моны Лизы, в музее представлены сокровища человеческой цивилизации: древнеегипетские древности, изящные греческие скульптуры, средневековое европейское искусство и шедевры эпохи Возрождения.\r\n\r\nВаше путешествие начнется на нижнем уровне, в остатках средневековой крепости. Вы увидите такие знаковые произведения, как Венера Милосская и крылатая Самофракийская Победа, также известная как Нике.\r\n\r\nВ самом сердце Лувра находится его самый знаменитый шедевр - загадочная Мона Лиза. Откройте для себя секреты, скрывающиеся за ее знаменитой улыбкой, и гений Леонардо да Винчи.\r\n\r\nЭкскурсия завершается в секции древностей Ближнего Востока, где замечательные артефакты рассказывают о происхождении письменности. \r\n\r\nОбратите внимание: этот тур не связан с Лувром. Она создана независимым автором. Входной билет в музей включен для вашего удобства.",
+   "lastModified": "2026-08-27 00:07",
+   "highlights": [
+    "Ознакомьтесь с Лувром, получив билет в порядке приоритетной очереди и аудиоэкскурсию по основным достопримечательностям",
+    "Посетите Мону Лизу и полюбуйтесь ее загадочной улыбкой.",
+    "Посмотрите на всемирно известную Венеру Милосскую и крылатую Нике из Самофракии.",
+    "Потряситесь галереей Аполлона и ее сказочной коллекцией драгоценностей короны."
+   ],
+   "advisory_information": "Download the app and the digital audio tour on your smartphone before the visit. You will find recommendations on how to get to the staring point in the first step of the tour. If you have any questions or need any assistance, please email us at support@wegotrip.com.",
+   "distance": "2 km",
+   "duration": "3 – 4 hours",
+   "locale": "ru",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "Рю де Риволи, 91A",
+   "startLocation": "91A Рю де Риволи",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.335556565667503,
+     48.86096582581605
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": [
+    [
+     2.3358622926771715,
+     48.86100209044476
+    ],
+    [
+     2.335542630580219,
+     48.86107595904697
+    ]
+   ],
+   "price": 5021.4,
+   "exprice": 5021.4,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 13485,
+     "pricingCategoryId": "100010",
+     "label": "Adult",
+     "description": "Age: 18+",
+     "price": 1673.8
+    },
+    {
+     "id": 19881,
+     "pricingCategoryId": "100011",
+     "label": "Child",
+     "description": "",
+     "price": 941.76
+    }
+   ],
+   "types": {
+    "audioguide": true,
+    "text": true,
+    "hit": true
+   },
+   "inclusions": [
+    "Билет в Лувр (приоритетная зеленая очередь для посетителей с билетами)",
+    "Самостоятельный аудиотур для вашего смартфона в приложении WeGoTrip",
+    "Подробный маршрут с пошаговой навигацией по залам музея",
+    "Идеи, чем заняться после посещения"
+   ],
+   "exclusions": [
+    "Наушники и смартфон в стоимость не входят - приносите свои",
+    "Возьмите с собой палку для селфи, чтобы делать снимки над толпой.",
+    "Эта экскурсия не охватывает временные и специальные экспозиции музея"
+   ],
+   "importantInfo": [],
+   "rating": 4.2,
+   "reviewsCount": 36,
+   "ratingsCount": 88,
+   "reviews": [
+    {
+     "text": "ガイドさん（名前忘れた）とても親切で説明も分かりやすく、とても良かったです。",
+     "locale": null,
+     "date": "2026-03-19 00:00:00",
+     "name": "HIROYUKI",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Muy recomendada, el guía muy profesional en su explicación y puntualidad.\nestoy muy satisfecha con todo lo q contraté con Tiqets en Madrid y París ",
+     "locale": null,
+     "date": "2026-03-19 00:00:00",
+     "name": "Consuelo",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 14203,
+    "title": "Париж: Билет в Лувр и аудиоэкскурсия по главным шедеврам",
+    "mediaSize": 195379761,
+    "eventsCount": 17,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "Достопримечательности",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Культура и история",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 23,
+     "title": "Достопримечательности",
+     "slug": "attraction-tickets"
+    },
+    {
+     "id": 24,
+     "title": "Музеи и выставки",
+     "slug": "museum-tickets-passes"
+    },
+    {
+     "id": 10,
+     "title": "Культурные",
+     "slug": "cultural-tours"
+    },
+    {
+     "id": 6,
+     "title": "Искусство и музеи",
+     "slug": "art-museums"
+    },
+    {
+     "id": 26,
+     "title": "Билеты без очереди",
+     "slug": "skip-line-tickets"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 2285,
+     "name": "Лувр",
+     "slug": "musee-du-louvre",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/2285/michael-fousert-9s5mwnvwdxq-unsplash/20da6d76e6d9acdb73b241fbcbb8c048.jpg",
+     "itemsCount": 1
+    },
+    {
+     "id": 3574,
+     "name": "Сад Тюильри",
+     "slug": "jardin-des-tuileries",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/3574/kirsten-drew-NIGy5J-pQJs-unsplash/8ccb0ce0b007305d38c3d54e430c6aca.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 180,
+   "durationMax": 240,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75",
+    "rating": 4.41,
+    "ratingsCount": 20347,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2025-02-17 12:11",
+   "url": "https://wegotrip.ru/paris-d2988507/audiotur-v-prilozhenii-muzej-luvr-s-biletom-shedevryi-tsivilizatsii-p14426/",
+   "provider": null
+  },
+  "22987": {
+   "id": 22987,
+   "slug": "villa-savojya-vhodnoj-bilet",
+   "title": "Вилла Савойя: Входной билет",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/c58e717be1254cd5a4357091600b251f.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/c58e717be1254cd5a4357091600b251f/b1aae2c971f03c689af285526803c5df.jpg",
+   "images": [
+    {
+     "id": 116559,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/d7cb0964c43943648888930b9fac7e42/93c925c16e713d4a6abe0077a8ad68b9.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/d7cb0964c43943648888930b9fac7e42.jpg"
+    },
+    {
+     "id": 116560,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/e6db8e123c424044890e5e2dacee8b75/f549557b61fc037bffb49fa87330704e.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/e6db8e123c424044890e5e2dacee8b75.jpg"
+    },
+    {
+     "id": 116561,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/5c0babe7474f447680df9cc913fac64f/928e5b1e1f6ff91d3fef1cc7c131151d.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/5c0babe7474f447680df9cc913fac64f.jpg"
+    },
+    {
+     "id": 116562,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/aa554ca49b3d415e8882224be77b6834/93bcadc85b1a8bc1c77ac832d1fabbb5.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/aa554ca49b3d415e8882224be77b6834.jpg"
+    },
+    {
+     "id": 116563,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/df508c84e71f4d9b916e4e619e86bc6c/24de1b19cc26ae1d4c4c65bf46c7c762.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/df508c84e71f4d9b916e4e619e86bc6c.jpg"
+    }
+   ],
+   "description": "Вилла Савойя широко известна как основа модернистской архитектуры. Он был настолько почитаем, что был включен в список исторических памятников, а архитектор Ле Корбюзье (Шарль-Эдуар Жаннер) был еще жив. Представьте это! \r\n\r\nЭто знаковое уединение, входящее в список Всемирного наследия ЮНЕСКО, ждет вашего визита. Построенная в пяти архитектурных стилях Ле Корбюзье, вилла включает в себя основные элементы дизайна: пилот, сад на крыше, открытую планировку, горизонтальные окна и свободный фасад.",
+   "lastModified": "2026-08-27 00:07",
+   "highlights": [],
+   "advisory_information": null,
+   "distance": null,
+   "duration": null,
+   "locale": "ru",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "82 Rue de Villiers",
+   "startLocation": "82 Rue de Villiers",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.02828,
+     48.924425
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 1030.65,
+   "exprice": 1030.65,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [],
+   "types": {},
+   "inclusions": [],
+   "exclusions": [],
+   "importantInfo": [],
+   "rating": 4.8,
+   "reviewsCount": 81,
+   "ratingsCount": 135,
+   "reviews": [
+    {
+     "text": "Bonne expérience, demeure iconique, mais la visite guidée est inintéressanteAllez y mais en autonomie sans visite guidée ! ",
+     "locale": null,
+     "date": "2026-07-04 00:00:00",
+     "name": "Unknown",
+     "avatar": "",
+     "rating": 3,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Nous avons pu profiter de la visite guidée offerte, c’était très chouette.\n",
+     "locale": null,
+     "date": "2026-06-15 00:00:00",
+     "name": "Unknown",
+     "avatar": "",
+     "rating": 4,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": null,
+   "accessCodes": [],
+   "category": "Билеты в музеи",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    }
+   ],
+   "subcategories": [],
+   "attractions": [
+    {
+     "id": 38016,
+     "name": "Villa Savoye",
+     "slug": "villa-savoye",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/None/photokeyaizasyccsokeemfb2t5ldahhtceqv9a0nq2zxk-and-photoreferenceaxqcqnrdn8sduhctfzfxiuuusoah3cme7c5dkxkrwaoqehmuw0wbergsudaqttvdw9yu8bp3kc6klfnf-awanpatgm6ht_BUbWErf/f447e7e6b0ffd609ad4d74e761e841fd.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "lastUpdatedByAuthor": "2025-05-26 10:21",
+   "url": "https://wegotrip.ru/paris-d2988507/villa-savojya-vhodnoj-bilet-p22987/",
+   "provider": null
+  },
+  "23059": {
+   "id": 23059,
+   "slug": "dvorets-shantiji-vhod-tolko-v-sadyi",
+   "title": "Дворец Шантийи: вход только в сады",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/42d7b09c57754f948c69b3bae9abf087.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/42d7b09c57754f948c69b3bae9abf087/919bed2b8ab508c46a725549db6fe2f6.jpg",
+   "images": [
+    {
+     "id": 117099,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/ffc4d87bb61c46ba9b967eae5d390dd7/6a790f652157a0d04a7bc5b64b597c6a.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/ffc4d87bb61c46ba9b967eae5d390dd7.jpg"
+    },
+    {
+     "id": 117100,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/7dd3282d2851494380d67f4f29443c91/408b853602b02d0fe82804608a92887c.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/7dd3282d2851494380d67f4f29443c91.jpg"
+    },
+    {
+     "id": 117101,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/c94b0c58b9e74cca8ebc987f2cb751e2/a6820f225977418cc18cdf864d60e276.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/c94b0c58b9e74cca8ebc987f2cb751e2.jpg"
+    },
+    {
+     "id": 117102,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/79c8de49f9d74c678bcd178236a0f572/38d45b143ec5cb4a61d6df9e90c1bec8.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/79c8de49f9d74c678bcd178236a0f572.jpg"
+    }
+   ],
+   "description": "Сады в Château de Chantilly - что-то по-настоящему впечатляющее. С билетом в сад вы можете посетить три уникальных места, в том числе англо-китайский сад, который послужил источником вдохновения для деревушки Марии-Антуанетты в Версале.\r\n\r\nПосле того, как вы прогулялись по загородным домам с растениями в китайском саду в симпатичном стиле, неторопливо прогуляйтесь до следующей остановки - Английского сада. Идеально подходящий для романтической прогулки, вы можете остановиться в храме Венеры, насладиться красотой природы у водопада Бове и погрузиться в мир, который подчеркивает дикую природу.\r\n\r\nПожалуй, самые потрясающие элементы замка - это цветочные клумбы во французском стиле. Дизайн Андре Ле Нотра, который также работал в садах Версаля, напомнил, что это было его величайшее достижение. Безукоризненно ухоженные газоны стоят рядом с грандиозным каналом, похожим на зеркало, а статуи и водные сооружения радуют глаз и показывают порядок среди дикой природы.",
+   "lastModified": "2026-08-27 00:03",
+   "highlights": [],
+   "advisory_information": null,
+   "distance": null,
+   "duration": null,
+   "locale": "ru",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "7 rue Connétable",
+   "startLocation": "7 rue Connétable",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.485203,
+     49.193847
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 1048.62,
+   "exprice": 1048.62,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [],
+   "types": {},
+   "inclusions": [],
+   "exclusions": [],
+   "importantInfo": [],
+   "rating": 4.6,
+   "reviewsCount": 60,
+   "ratingsCount": 102,
+   "reviews": [
+    {
+     "text": "Récupération des billets sans aucune difficulté.\nJe recommande sans hésitation ",
+     "locale": null,
+     "date": "2026-08-16 00:00:00",
+     "name": "Unknown",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Très belle endroit, grand espace où nous pouvons découvrir à la fois le paysage et l'étendu magnifique des jardins mais aussi l'histoire que celui-ci évoque. De beaux endroits pour pique-niquer et profiter en famille. ",
+     "locale": null,
+     "date": "2026-08-08 00:00:00",
+     "name": "Matthieu",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": null,
+   "accessCodes": [],
+   "category": "Билеты в музеи",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    }
+   ],
+   "subcategories": [],
+   "attractions": [
+    {
+     "id": 38164,
+     "name": "Château de Chantilly",
+     "slug": "chateau-de-chantilly-12192678",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/None/photokeyaizasyccsokeemfb2t5ldahhtceqv9a0nq2zxk-and-photoreferenceaxqcqnrctxyyxp0gfjnz4yz-qcb8latwwhtamahkrbtn7zp6jxduxmbof5o6ewg3oi8iguztkbo4iwxfnxdkicksuguir_RsUAMff/d76516023aeb4e983eb692370282bcbe.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "lastUpdatedByAuthor": "2025-05-30 08:48",
+   "url": "https://wegotrip.ru/paris-d2988507/dvorets-shantiji-vhod-tolko-v-sadyi-p23059/",
+   "provider": null
+  },
+  "22784": {
+   "id": 22784,
+   "slug": "krepost-arhitekturyi-i-naslediya-bilet-s-vhodom-bez-ocheredi",
+   "title": "Крепость архитектуры и наследия: Билет с входом без очереди",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/5f767a93610b49d39c68032828382a39.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/5f767a93610b49d39c68032828382a39/ec8e86824d86c70a207f171fbc5d8671.jpg",
+   "images": [
+    {
+     "id": 114820,
+     "description": "Кастинговая галерея",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/136130306d7d4aad9a7879bc3235b32e/0c80a3229c8c6c23c04496a3b5074484.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/136130306d7d4aad9a7879bc3235b32e.jpg"
+    },
+    {
+     "id": 114821,
+     "description": "Городская библиотека",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/6a4f0a9e19784e0da1b42b856e23b931/0048b7ff2b4fe0068d072808545f9f3c.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/6a4f0a9e19784e0da1b42b856e23b931.jpg"
+    },
+    {
+     "id": 114822,
+     "description": "Галерея настенной живописи",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/885cef78044e4b79a7b4efbf80b62465/e9faf6803643656410e3811c7c5e3851.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/885cef78044e4b79a7b4efbf80b62465.jpg"
+    },
+    {
+     "id": 114823,
+     "description": "Литейные галереи",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/421ef296feea4510987707c6351b47c0/953d97d07222bf32e70cfbc89bcd4a45.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/421ef296feea4510987707c6351b47c0.jpg"
+    },
+    {
+     "id": 114824,
+     "description": "Дворец Шайо",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/602b8d7a53294c73b5f4a2fab8a6dfc1/89eba6d6a48b0ae77db8c212a627dc18.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/602b8d7a53294c73b5f4a2fab8a6dfc1.jpg"
+    },
+    {
+     "id": 114825,
+     "description": "Кастинговая галерея",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/bad43d055a6b4a59a0e3293babdb3d4b/efe5b1f74f4d0fddcee103ab3cb5cd46.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/bad43d055a6b4a59a0e3293babdb3d4b.jpg"
+    },
+    {
+     "id": 114826,
+     "description": "Кастинговая галерея",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/4cd550add32f4a89b97c5053588c7e70/8905b0203ddbcb0c609ffea64a5fc749.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/4cd550add32f4a89b97c5053588c7e70.jpg"
+    },
+    {
+     "id": 114827,
+     "description": "Кастинговая галерея",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/51cad923c8594db987ccee59e3e9e844/3cf566d932dc857378b7760ba4fee5c8.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/51cad923c8594db987ccee59e3e9e844.jpeg"
+    },
+    {
+     "id": 114828,
+     "description": "Галерея настенной живописи",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/bf6e074dafb64b53a1a406e121cd6431/51c39f287bcb923ed999c5efc8ce032f.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/bf6e074dafb64b53a1a406e121cd6431.jpeg"
+    },
+    {
+     "id": 114829,
+     "description": "Галерея настенной живописи",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/67658752256a4c7eae739da5efdc568b/65a37e07b5513d214315aa9daa1dee28.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/67658752256a4c7eae739da5efdc568b.jpeg"
+    },
+    {
+     "id": 114830,
+     "description": "Вид на Эйфелеву башню",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/1d444dd18d934185bcef87e0bb3ef4a0/746caa780fd84cb25d1e5ce79afa1e26.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/1d444dd18d934185bcef87e0bb3ef4a0.jpeg"
+    },
+    {
+     "id": 114831,
+     "description": "Выставка Notre-Dame de Paris. От строителей до реставраторов",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/3a6662c5f6334781a4f1dfd3bcd7eb25/87c369da24f918e0304472e293982567.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/3a6662c5f6334781a4f1dfd3bcd7eb25.jpeg"
+    }
+   ],
+   "description": "Откройте для себя шедевры французской и международной архитектуры в парижском Городе архитектуры и наследия. В одном здании вы сможете полюбоваться памятниками французской архитектуры от средневековья до промышленной революции и в XXI век.\r\n\r\nВ основе коллекции лежат скульптуры и модели, отражающие красоту разрушенной в настоящее время Нотр-Дам, с особым вниманием к шпилю. Если вы выбрали этот вариант, вы также сможете посещать регулярно меняющиеся временные выставки.",
+   "lastModified": "2026-08-27 00:04",
+   "highlights": [],
+   "advisory_information": null,
+   "distance": null,
+   "duration": null,
+   "locale": "ru",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "1 Place du Trocadéro et du 11 Novembre",
+   "startLocation": "1 Place du Trocadéro et du 11 Novembre",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.288662,
+     48.862701
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 1488.05,
+   "exprice": 1488.05,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [],
+   "types": {},
+   "inclusions": [],
+   "exclusions": [],
+   "importantInfo": [],
+   "rating": 4.6,
+   "reviewsCount": 49,
+   "ratingsCount": 128,
+   "reviews": [
+    {
+     "text": "Trés belle exposition sur les patrimoines en résistance. Enrichissante et émouvante.",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Unknown",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Exposition d'une grande intelligence et sensibilité. A voir absolument !",
+     "locale": null,
+     "date": "2026-06-16 00:00:00",
+     "name": "Pascale",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": null,
+   "accessCodes": [],
+   "category": "Билеты в музеи",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    }
+   ],
+   "subcategories": [],
+   "attractions": [
+    {
+     "id": 37263,
+     "name": "Cité de l’architecture et du patrimoine",
+     "slug": "cite-de-larchitecture-et-du-patrimoine-12191777",
+     "preview": "",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "lastUpdatedByAuthor": "2025-05-24 23:05",
+   "url": "https://wegotrip.ru/paris-d2988507/krepost-arhitekturyi-i-naslediya-bilet-s-vhodom-bez-ocheredi-p22784/",
+   "provider": null
+  },
+  "16161": {
+   "id": 16161,
+   "slug": "panteon-v-parizhe-bilet-i-audioekskursiya-v-prilozhenii",
+   "title": "Пантеон в Париже: билет и аудиоэкскурсия в приложении",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos207178092l_Dyx1vtK.jpg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos207178092l_Dyx1vtK/431bc5136df2c498fbb87b22fc0acd16.jpg",
+   "images": [
+    {
+     "id": 95712,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos303893952l/c6bf69795645c9ddc4aedbc0d57d6e31.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos303893952l.jpg"
+    },
+    {
+     "id": 95716,
+     "description": "",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/antonio-sessa-mx3zu-3nn4-unsplash/ce18e61dfc757690c94086c79573446c.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/antonio-sessa-mx3zu-3nn4-unsplash.jpg"
+    },
+    {
+     "id": 95714,
+     "description": "View of the main hall",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/pantheon-foucault-visit-the-hidden-paris1/efdcb6f79aa3cf51c0e3788b0d1a8ea2.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/pantheon-foucault-visit-the-hidden-paris1.jpg"
+    },
+    {
+     "id": 95718,
+     "description": "Sculpted pediment",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/optimized-mat-zeurpxrhx68-unsplash/729cba170e03df9347d3e9a8e21f7567.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/optimized-mat-zeurpxrhx68-unsplash.jpg"
+    },
+    {
+     "id": 95713,
+     "description": "Inside the dome",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/optimized-pexels-blue-arauz-14464336/83499de8d2a88553bbd630ddb66f5a45.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/optimized-pexels-blue-arauz-14464336.jpg"
+    },
+    {
+     "id": 95715,
+     "description": "Tomb of Voltaire",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos243879662l/06b3fce0f566269c443934ad09c3250c.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos243879662l.jpg"
+    },
+    {
+     "id": 95717,
+     "description": "Foucault's Pendulum",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/depositphotos10610317l/a134dac71264d9f8104721b7fd75428e.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/depositphotos10610317l.jpg"
+    },
+    {
+     "id": 95719,
+     "description": "Paris Pantheon",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/frontal/6e108e492d3c05d65a73d305ddfa29e5.jpg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/frontal.jpg"
+    }
+   ],
+   "description": "То, что начиналось как место поклонения, стало последним пристанищем для выдающихся личностей Франции, которые внесли значительный вклад в развитие нации.\r\n\r\nС помощью аудиоэкскурсии в приложении, вы сможете исследовать Пантеон в своем темпе — величественный и прекрасный памятник, который имеет огромное значение для французского народа.\r\n\r\nВ этом монументальном сооружении можно увидеть произведения искусства, от скульптур до фресок, картин, гобеленов и многого другого, которые отражают глубокое уважение нации к своей Республике. От патриотических скульптур на фасаде до произведений искусства внутри здания, Пантеон чтит ценности Республики.\r\n\r\nПрогулка по крипте с её тёмными гробницами лишь усилит чувство величия, которое вы испытываете в этом священном месте. Также под куполом Пантеона вы увидите маятник Фуко. А на вершине купола вас ждет открытая панорамная площадка, откуда открывается потрясающий вид на город.\r\n\r\nВнимание! Этот тур не аффилирован с Пантеоном, а предоставлен независимым автором. Билеты включены для удобства клиента без дополнительной наценки.",
+   "lastModified": "2026-08-27 00:07",
+   "highlights": [
+    "Откройте для себя величие национального мавзолея с помощью собственного аудиотура в приложении с билетом",
+    "Узнайте о маятнике Фуко и открытии того, что Земля вращается вокруг своей оси.",
+    "Побродите по гробницам величайших умов Франции, таких как Вольтер, Кюри, Гюго и других.",
+    "Услышьте легенды и истории о самых почитаемых святых Франции, таких как Жанна д'Арк и Святая Женевьева.",
+    "Полюбуйтесь панорамными видами, открывающимися с высоты 35 метров, с колоссального Купола"
+   ],
+   "advisory_information": "Download the app and the digital audio tour on your smartphone before the visit. You will find recommendations on how to get to the staring point in the first step of the tour. If you have any questions or need any assistance, please email us at support@wegotrip.com.",
+   "distance": "2 km",
+   "duration": "1 – 1.5 hours",
+   "locale": "ru",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "Площадь Пантеона",
+   "startLocation": "Пантеон",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.3464138,
+     48.8462218
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": [
+    [
+     2.3454915,
+     48.8457836
+    ]
+   ],
+   "price": 2286.0,
+   "exprice": 2286.0,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [
+    {
+     "id": 15268,
+     "pricingCategoryId": "2817",
+     "label": "Entrance Ticket",
+     "description": "Age: 18+",
+     "price": 836.9
+    }
+   ],
+   "types": {
+    "audioguide": true
+   },
+   "inclusions": [
+    "Входной билет в Пантеон",
+    "Самостоятельный аудиотур для вашего смартфона в приложении WeGoTrip",
+    "Подробный маршрут с пошаговой навигацией по Пантеону",
+    "Функции автономного доступа, аудиоповествование, фотографии и письменные текстовые пояснения",
+    "Рекомендации по дальнейшей деятельности и местам для посещения"
+   ],
+   "exclusions": [
+    "Наушники и смартфон в стоимость не входят - приносите свои",
+    "Доступ на панорамную площадку купола (€3,50)",
+    "Продукты питания и напитки",
+    "Сувениры",
+    "Персональный гид"
+   ],
+   "importantInfo": [],
+   "rating": 4.6,
+   "reviewsCount": 192,
+   "ratingsCount": 538,
+   "reviews": [
+    {
+     "text": "Saaai niks aan!",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "raynish",
+     "avatar": "",
+     "rating": 1,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Magnifique endroit. Lieu de respect et à respecter surtout. \nNous avons pu traversé les salles sans problème car il n’y avait pas trop de monde. On circulait facilement.\n",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "Élisabeth",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": {
+    "id": 15940,
+    "title": "Пантеон в Париже: билет и аудиоэкскурсия в приложении",
+    "mediaSize": 119500616,
+    "eventsCount": 14,
+    "generated_by_ai": false
+   },
+   "accessCodes": [],
+   "category": "Достопримечательности",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    },
+    {
+     "id": 1,
+     "title": "Культура и история",
+     "slug": "culture-and-history"
+    }
+   ],
+   "subcategories": [
+    {
+     "id": 23,
+     "title": "Достопримечательности",
+     "slug": "attraction-tickets"
+    },
+    {
+     "id": 7,
+     "title": "История и достояние",
+     "slug": "history-heritage"
+    },
+    {
+     "id": 6,
+     "title": "Искусство и музеи",
+     "slug": "art-museums"
+    }
+   ],
+   "attractions": [
+    {
+     "id": 194,
+     "name": "Пантеон",
+     "slug": "pantheon-6269532",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/194/paris-2368437_1280/e8ec74a593efc7467e94fa6dfa9f25e6.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": 60,
+   "durationMax": 90,
+   "type": 3,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "author": {
+    "avatar": "https://wgt-prod-storage.s3.amazonaws.com/media/users/user/454/esl75-avatar.png",
+    "name": "Ellen",
+    "bio": "I am a friendly Franco-American tour guide with a passion for the history, art & architecture of Paris.  As Victor Hugo wrote, \"a breath of Paris preserves the soul\".  I share my passion with visitors from around the world through my guided walking tours.  I have adapted several into self-guided audio tours that will provide you with an in-depth visit - to museums, monuments, neighborhoods.",
+    "nickname": "esl75",
+    "rating": 4.41,
+    "ratingsCount": 20347,
+    "year_since": "2019"
+   },
+   "lastUpdatedByAuthor": "2025-03-03 12:09",
+   "url": "https://wegotrip.ru/paris-d2988507/panteon-v-parizhe-bilet-i-audioekskursiya-v-prilozhenii-p16161/",
+   "provider": null
+  },
+  "22825": {
+   "id": 22825,
+   "slug": "muse-national-de-la-marine-vhodnoj-bilet",
+   "title": "Musée National de la Marine: Входной билет",
+   "cover": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/cfa559e620d64b94a0f5cd0dca78d20f.jpeg",
+   "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/cfa559e620d64b94a0f5cd0dca78d20f/03756d58a4366679c8fa6238837f3b89.jpeg",
+   "images": [
+    {
+     "id": 115199,
+     "description": "Экскурсияпо Ла-Буссоле",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/a3ce0c484b9449a7aa1d1b8a05a973a1/80a68d9d2372c60bf7abce2c350329cd.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/a3ce0c484b9449a7aa1d1b8a05a973a1.jpeg"
+    },
+    {
+     "id": 115200,
+     "description": "Взгляд Vernet на французские порты",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/d3f572ab779e45fc8528bba764256473/d1d7248ecacd9572d70cb503589e9e9d.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/d3f572ab779e45fc8528bba764256473.jpeg"
+    },
+    {
+     "id": 115201,
+     "description": "Франция, комната военно-морской державы",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/7e0689bdc55442dabbeb4a5e95561237/88c13e354c8fd013d746e910f81de84b.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/7e0689bdc55442dabbeb4a5e95561237.jpeg"
+    },
+    {
+     "id": 115202,
+     "description": "Модель шлюпки",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/a6dc8d5aa84943fb9319002e7980ef96/67eadd12f80ce28b5e26d7e8543beb3a.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/a6dc8d5aa84943fb9319002e7980ef96.jpeg"
+    },
+    {
+     "id": 115203,
+     "description": "модель лодки",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/5bc268bcfa254005b15e56b610ac876d/e56b904bc3c6e78f7056e6fb6fee9def.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/5bc268bcfa254005b15e56b610ac876d.jpeg"
+    },
+    {
+     "id": 115204,
+     "description": "Пространство En passant par Le Havre",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/579deb9911d54cb8ac038f7ce0d820a9/a641b21fa6913df56f827593511eee06.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/579deb9911d54cb8ac038f7ce0d820a9.jpeg"
+    },
+    {
+     "id": 115205,
+     "description": "Parvis des Droits de l'Homme и Palais de Chaillot, вид на Эйфелеву башню",
+     "cover": false,
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/products/imagefile/None/a474d2f1502047949b171148554dbc6c/5d2eefdbdd2f06f30ff678c76d1ec46a.jpeg",
+     "full": "https://wgt-prod-storage.s3.amazonaws.com/media/products/imagefile/None/a474d2f1502047949b171148554dbc6c.jpeg"
+    }
+   ],
+   "description": "Этот отель, расположенный в самом сердце Парижа, идеально Musée National de la Marine подходит для прогулок. Великолепие Дворца Шайо с видом на пышные сады Трокадеро - идеальный фон для музея, в котором хранится одна из лучших в мире коллекций морских и военно-морских артефактов. \n\nС замысловато детализированными моделями, потрясающими картинами, интригующими предметами и драматическими скульптурами музей открывает свои сокровища впечатляющим, инновационным способом. Наслаждайтесь интересными цифровыми и интерактивными функциями на протяжении всего тура, которые понравятся как молодым, так и опытным искателям приключений.",
+   "lastModified": "2026-08-27 00:01",
+   "highlights": [],
+   "advisory_information": null,
+   "distance": null,
+   "duration": null,
+   "locale": "ru",
+   "city": {
+    "id": 2988507,
+    "name": "Париж",
+    "slug": "paris"
+   },
+   "country": {
+    "id": 3017382,
+    "name": "France",
+    "slug": "france"
+   },
+   "address": "17 Place du Trocadéro et du 11 Novembre",
+   "startLocation": "17 Place du Trocadéro et du 11 Novembre",
+   "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+     2.2875596,
+     48.8622808
+    ]
+   },
+   "finishAddress": null,
+   "finishLocation": null,
+   "finishLocationGeo": null,
+   "boundingCircle": null,
+   "routePoints": null,
+   "price": 1715.75,
+   "exprice": 1715.75,
+   "currency": "₽",
+   "currencyCode": "RUB",
+   "defaultCurrency": {
+    "id": 1,
+    "rate": 1.0,
+    "code": "EUR",
+    "symbol": "€",
+    "name": "Евро"
+   },
+   "discount": 0.0,
+   "priceLevels": [],
+   "types": {},
+   "inclusions": [],
+   "exclusions": [],
+   "importantInfo": [],
+   "rating": 4.5,
+   "reviewsCount": 90,
+   "ratingsCount": 227,
+   "reviews": [
+    {
+     "text": "Très bien ,très peu de monde ce jour pour l'ouverture ",
+     "locale": null,
+     "date": "2026-08-22 00:00:00",
+     "name": "frederic",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    },
+    {
+     "text": "Bonjour, excellent accueil, les tableaux, peinture et diverses représentations sont d'une réalité surprenante. Les maquettes des bateaux sont également magnifiques.\nQQes vidéos sont très bien représentées . Je remercie le personnel de gestion de ce musée! Une feuille de route à l'entrée aurait été la bienvenue pour faire un choix des salles à visiter. Je recherchais le \"torpilleur\" \"La Tramontane\" sur lequel mon père avait participer comme marin pdt la dernière guerre, celui était absent; il devait se trouver ds une salle d'archive. Peut être sera t il là prochainement ? Le restaurant , avec toile de fond la tour eiffel participait au grandiose du Musée de La Marine. Bien cordialement\nAlain Guillaume",
+     "locale": null,
+     "date": "2026-08-14 00:00:00",
+     "name": "Alain",
+     "avatar": "",
+     "rating": 5,
+     "content_rating": null,
+     "navigation_rating": null,
+     "audio_rating": null,
+     "recommendation_rating": null
+    }
+   ],
+   "tour": null,
+   "accessCodes": [],
+   "category": "Билеты в музеи",
+   "categories": [
+    {
+     "id": 6,
+     "title": "Билеты в музеи",
+     "slug": "sightseeing-tickets-passes"
+    }
+   ],
+   "subcategories": [],
+   "attractions": [
+    {
+     "id": 37860,
+     "name": "Musée National de la Marine",
+     "slug": "musee-national-de-la-marine-12192374",
+     "preview": "https://wgt-prod-storage.s3.amazonaws.com/media/CACHE/images/world/attraction/None/photokeyaizasyccsokeemfb2t5ldahhtceqv9a0nq2zxk-and-photoreferenceaxqcqnqjc4xjfro87sqmjclbqdh4yjfzg32yt9pkztaw15zevxipldydoci8yamv819mgjgwxd97r9fkcrcu13yuawxc9_DpeNE8v/ce9989660f26fc56cfb455749a13be9f.jpg",
+     "itemsCount": 1
+    }
+   ],
+   "durationMin": null,
+   "durationMax": null,
+   "type": 2,
+   "available": true,
+   "published": true,
+   "status": "approved",
+   "preorder": false,
+   "lastUpdatedByAuthor": "2025-05-25 00:30",
+   "url": "https://wegotrip.ru/paris-d2988507/muse-national-de-la-marine-vhodnoj-bilet-p22825/",
+   "provider": null
+  }
+ }
+}

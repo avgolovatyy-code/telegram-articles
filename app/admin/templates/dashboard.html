@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · WeGoTrip Content Engine{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+<p class="subtitle">Catalogue, pipeline and AI spend for {{ budget.spend_date }}.</p>
+
+<div class="grid grid-4">
+  <div class="card">
+    <h3>Today budget</h3>
+    <div class="metric">${{ '%.2f'|format(budget.budget_usd) }}</div>
+    <div class="bar {{ 'warn' if budget.spent_usd / budget.budget_usd > 0.8 }}">
+      <span style="width: {{ (100 * budget.spent_usd / budget.budget_usd)|round(1) }}%"></span>
+    </div>
+    <div class="small muted">
+      Spent ${{ '%.2f'|format(budget.spent_usd) }} ·
+      Reserved ${{ '%.2f'|format(budget.reserved_usd) }} ·
+      Remaining ${{ '%.2f'|format(budget.remaining_usd) }}
+    </div>
+  </div>
+  <div class="card">
+    <h3>Generated today</h3>
+    <div class="metric">
+      {{ budget.generated.en }} <small>EN</small> / {{ budget.generated.ru }} <small>RU</small>
+    </div>
+    <div class="small muted">Plan: EN {{ plan.en }} · RU {{ plan.ru }} more</div>
+  </div>
+  <div class="card">
+    <h3>Average article cost</h3>
+    <div class="metric">${{ '%.4f'|format(budget.average_article_cost_usd) }}</div>
+    <div class="small muted">Rolling 7-day actual spend</div>
+  </div>
+  <div class="card">
+    <h3>Material left</h3>
+    <div class="metric small">
+      {% for code, report in coverage.items() %}
+      <div>
+        {{ code|upper }}
+        <span class="badge {{ 'warn' if report.exhausted else 'ok' }}">
+          {{ report.usable_candidates }} topics
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="small muted">Daily counts are a ceiling, never a quota to fill</div>
+  </div>
+  <div class="card">
+    <h3>Auto-publish</h3>
+    <div class="metric small">
+      EN <span class="badge {{ 'ok' if auto_publish.en else '' }}">{{ 'on' if auto_publish.en else 'off' }}</span>
+      RU <span class="badge {{ 'ok' if auto_publish.ru else '' }}">{{ 'on' if auto_publish.ru else 'off' }}</span>
+    </div>
+    <div class="small muted">Review mode is the default</div>
+  </div>
+</div>
+
+{% for code, report in coverage.items() %}
+{% if report.exhausted %}
+<div class="flash flash-ok" style="margin-top:16px">
+  <strong>{{ code|upper }}: material exhausted.</strong> {{ report.reason }}
+  {% if report.last_new_product_at %}
+  Newest product seen {{ report.last_new_product_at.strftime('%Y-%m-%d') }};
+  {{ report.new_products_7d }} added in the last 7 days.
+  {% endif %}
+</div>
+{% endif %}
+{% endfor %}
+
+<h2>Markets</h2>
+<div class="grid grid-2">
+  {% for overview in overviews %}
+  <div class="card">
+    <h3><span class="badge {{ overview.market }}">{{ overview.market|upper }}</span> catalogue &amp; pipeline</h3>
+    <table>
+      <tr><td>Countries</td><td class="num">{{ overview.countries }}</td>
+          <td>Topic candidates</td><td class="num">{{ overview.topic_candidates }}</td></tr>
+      <tr><td>Cities</td><td class="num">{{ overview.cities }}</td>
+          <td>Drafts / review</td><td class="num">{{ overview.drafts }}</td></tr>
+      <tr><td>Attractions</td><td class="num">{{ overview.attractions }}</td>
+          <td>Scheduled</td><td class="num">{{ overview.scheduled }}</td></tr>
+      <tr><td>Collections</td><td class="num">{{ overview.collections }}</td>
+          <td>Published today</td><td class="num">{{ overview.published_today }}</td></tr>
+      <tr><td>Products</td><td class="num">{{ overview.products }}</td>
+          <td>Published total</td><td class="num">{{ overview.published_total }}</td></tr>
+      <tr><td>New products (7d)</td><td class="num">{{ overview.new_products_7d }}</td>
+          <td>Validation failures</td><td class="num">{{ overview.validation_failures }}</td></tr>
+    </table>
+  </div>
+  {% endfor %}
+</div>
+
+<h2>Recent articles</h2>
+{% if recent_articles %}
+<table>
+  <thead>
+    <tr><th>Market</th><th>Title</th><th>Intent</th><th>Status</th>
+        <th class="num">Quality</th><th class="num">Facts</th><th class="num">Cost</th><th>Created</th></tr>
+  </thead>
+  <tbody>
+  {% for article in recent_articles %}
+    <tr>
+      <td><span class="badge {{ article.market }}">{{ article.market|upper }}</span></td>
+      <td><a href="/admin/articles/{{ article.id }}">{{ article.title or article.primary_query }}</a></td>
+      <td class="muted small">{{ article.intent }}</td>
+      <td><span class="badge {{ status_class(article.status) }}">{{ article.status }}</span></td>
+      <td class="num">{{ '%.2f'|format(article.quality_score) if article.quality_score else '—' }}</td>
+      <td class="num">{{ '%.2f'|format(article.factuality_score) if article.factuality_score else '—' }}</td>
+      <td class="num">${{ '%.4f'|format(article.actual_cost_usd) }}</td>
+      <td class="muted small nowrap">{{ article.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty">No articles yet. Run <code>wgt cycle</code> or use the Ops page.</div>
+{% endif %}
+
+<h2>Top topic candidates</h2>
+{% if top_topics %}
+<table>
+  <thead><tr><th>Market</th><th>Entity</th><th>Primary query</th><th>Intent</th>
+             <th class="num">Depth</th><th class="num">Score</th></tr></thead>
+  <tbody>
+  {% for topic in top_topics %}
+    <tr>
+      <td><span class="badge {{ topic.market }}">{{ topic.market|upper }}</span></td>
+      <td>{{ topic.entity_name }} <span class="muted small">({{ topic.entity_type }})</span></td>
+      <td>{{ topic.primary_query }}</td>
+      <td class="muted small">{{ topic.intent }}</td>
+      <td class="num">{{ topic.inventory_depth }}</td>
+      <td class="num">{{ '%.3f'|format(topic.topic_score) }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty">No topic candidates yet.</div>
+{% endif %}
+{% endblock %}
