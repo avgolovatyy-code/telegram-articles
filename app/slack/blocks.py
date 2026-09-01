@@ -44,8 +44,13 @@ def _preview(article: Article, limit: int = 420) -> str:
     return intro or "_нет вступления_"
 
 
-def article_card(article: Article, *, admin_url: str, auto_publish: bool) -> list[dict[str, Any]]:
-    """Card shown when an article is written and waiting for its slot."""
+def article_card(article: Article, *, auto_publish: bool, admin_url: str | None = None) -> list[dict[str, Any]]:
+    """Card shown when an article is written and waiting for its slot.
+
+    Control is Slack-first: buttons act here. ``admin_url`` is accepted for
+    backward compatibility but no longer linked from the card.
+    """
+    del admin_url  # Slack is the control plane; admin is optional and unlinked.
     flag = MARKET_FLAG.get(article.market, article.market)
     quality = f"{article.quality_score:.2f}" if article.quality_score else "—"
     factuality = f"{article.factuality_score:.2f}" if article.factuality_score else "—"
@@ -68,8 +73,8 @@ def article_card(article: Article, *, admin_url: str, auto_publish: bool) -> lis
             "type": "context",
             "elements": [
                 _text(
-                    f"запрос: `{article.primary_query}` · {article.entity_type} "
-                    f"{article.entity_name} · {article.char_count} знаков"
+                    f"#{article.id} · запрос: `{article.primary_query}` · "
+                    f"{article.entity_type} {article.entity_name} · {article.char_count} знаков"
                 )
             ],
         },
@@ -88,8 +93,6 @@ def article_card(article: Article, *, admin_url: str, auto_publish: bool) -> lis
             "type": "actions",
             "block_id": f"article:{article.id}",
             "elements": [
-                _button("Открыть", "article_open", str(article.id))
-                | {"url": f"{admin_url}/admin/articles/{article.id}"},
                 _button("Опубликовать сейчас", ACTION_PUBLISH, str(article.id), "primary"),
                 _button("В тест-канал", ACTION_PUBLISH_TEST, str(article.id)),
                 _button("Перегенерировать", ACTION_REGENERATE, str(article.id)),
@@ -130,8 +133,9 @@ def digest_card(
     budget: Any,
     coverage: dict[str, CoverageReport],
     published_today: dict[str, int],
-    admin_url: str,
+    admin_url: str | None = None,
 ) -> list[dict[str, Any]]:
+    del admin_url
     spent_bar = min(1.0, budget.spent_usd / budget.budget_usd) if budget.budget_usd else 0.0
     filled = int(spent_bar * 20)
     bar = "█" * filled + "░" * (20 - filled)
@@ -153,7 +157,10 @@ def digest_card(
     return [
         _section("*Сводка за день*"),
         _section("\n".join(lines)),
-        {"type": "context", "elements": [_text(f"<{admin_url}/admin|Открыть админку>")]},
+        {
+            "type": "context",
+            "elements": [_text("Управление: `/wegotrip status` · `coverage` · `pending`")],
+        },
         {"type": "divider"},
     ]
 
@@ -165,15 +172,21 @@ def alert_card(title: str, detail: str) -> list[dict[str, Any]]:
     ]
 
 
-def connected_card(*, bot_name: str, team: str, admin_url: str) -> list[dict[str, Any]]:
+def connected_card(*, bot_name: str, team: str, admin_url: str | None = None) -> list[dict[str, Any]]:
     """Posted by ``wgt slack-check --post`` so the owner can see the bot is live."""
+    del admin_url
     return [
         _section(f"*WeGoTrip Content Engine подключён* · {bot_name} @ {team}"),
         _section(
             "Публикация идёт автоматически. Здесь будут карточки статей, сводка "
             "за день и алерты. Кнопки нужны только если захотите вмешаться."
         ),
-        {"type": "context", "elements": [_text(f"<{admin_url}/admin|Открыть админку>")]},
+        {
+            "type": "context",
+            "elements": [
+                _text("Управление через Slack: `/wegotrip status` · кнопки на карточках")
+            ],
+        },
     ]
 
 

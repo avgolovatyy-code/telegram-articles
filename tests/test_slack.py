@@ -272,27 +272,24 @@ def test_explicit_slack_enabled_does_not_need_the_signing_secret():
 
 
 def test_connected_card_is_a_plain_status_message():
-    card = sb.connected_card(
-        bot_name="wegotrip-engine", team="WeGoTrip", admin_url="https://engine.example"
-    )
+    card = sb.connected_card(bot_name="wegotrip-engine", team="WeGoTrip")
     rendered = json.dumps(card, ensure_ascii=False)
     assert "подключён" in rendered
     assert "wegotrip-engine" in rendered
     assert "автоматически" in rendered
+    assert "/admin" not in rendered
 
 
 def test_article_card_mentions_automatic_publishing(session, settings):
-    card = sb.article_card(
-        make_article(session), admin_url="https://engine.example", auto_publish=True
-    )
+    card = sb.article_card(make_article(session), auto_publish=True)
     rendered = json.dumps(card, ensure_ascii=False)
     assert "автоматически" in rendered
     assert sb.ACTION_REJECT in rendered
+    assert "/admin" not in rendered
+    assert "article_open" not in rendered
 
 
 @pytest.mark.parametrize("action", [sb.ACTION_PUBLISH, sb.ACTION_REJECT, sb.ACTION_REGENERATE])
 def test_every_button_has_an_action_id(session, settings, action):
-    card = sb.article_card(
-        make_article(session), admin_url="https://engine.example", auto_publish=True
-    )
+    card = sb.article_card(make_article(session), auto_publish=True)
     assert action in json.dumps(card)
