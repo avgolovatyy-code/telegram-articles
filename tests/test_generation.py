@@ -120,7 +120,7 @@ def test_selection_is_capped(session, settings):
     assert 0 < len(selected) <= MAX_PRODUCTS_PER_ARTICLE
 
 
-def test_first_selected_product_becomes_the_hero(session, settings):
+def test_selected_products_use_compact_placement(session, settings):
     topic = add_topic(session)
     products = [
         add_product(session, external_id=str(200 + i), title=f"Paris tour {i}", popularity_rank=i)
@@ -128,7 +128,8 @@ def test_first_selected_product_becomes_the_hero(session, settings):
     ]
     topic.relevant_product_ids = [p.external_id for p in products]
     selected = ProductSelector(settings).select(topic, {p.external_id: p for p in products})
-    assert selected[0].placement == "hero"
+    assert selected
+    assert all(item.placement == "compact" for item in selected)
 
 
 def test_attraction_topics_prefer_products_linked_to_that_attraction(session, settings):

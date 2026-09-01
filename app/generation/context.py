@@ -70,8 +70,15 @@ class WriterContext:
             "allowed_audio": self.audio,
             "brand_style": {
                 "voice": "friendly, plain, specific, lightly humorous",
+                "purpose": "help travellers plan a cultural programme",
                 "references": ["Aviasales", "T—J"],
-                "avoid": ["ad pathos", "AI boilerplate", "keyword stuffing"],
+                "avoid": [
+                    "ad pathos",
+                    "AI boilerplate",
+                    "keyword stuffing",
+                    "catalogue / shop-window tone",
+                    "recommending an audio guide for every stop",
+                ],
                 "humour_must_not": [
                     "mock people, nationalities, cities or the reader",
                     "use stereotypes or sensitive traits",
@@ -82,7 +89,9 @@ class WriterContext:
                 "min_chars": settings.article_target_min_chars,
                 "max_chars": settings.article_target_max_chars,
                 "hard_max_chars": settings.article_max_chars,
-                "max_products": len(self.products),
+                "preferred_products": 1,
+                "max_products": min(2, len(self.products)),
+                "products_are_optional": True,
                 "max_hashtags": settings.max_hashtags if settings.enable_hashtags else 0,
                 "sections_min": 3,
                 "sections_max": 8,

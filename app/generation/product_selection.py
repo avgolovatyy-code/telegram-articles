@@ -33,7 +33,7 @@ RANK_WEIGHTS: dict[str, float] = {
 #: A candidate below this relevance is dropped rather than padded into the article.
 MIN_RELEVANCE = 0.12
 
-MAX_PRODUCTS_PER_ARTICLE = 5
+MAX_PRODUCTS_PER_ARTICLE = 2
 
 
 @dataclass(slots=True)
@@ -83,11 +83,11 @@ def _availability(product: Product) -> float:
 
 
 def _commercial_fit(product: Product, *, entity_match: bool) -> float:
-    score = 0.4 if product.price is not None else 0.2
-    if product.types and product.types.get("audioguide"):
-        score += 0.3
+    # Do not boost audioguides just for being audioguides — relevance + entity match
+    # already decide whether a tour belongs in a cultural plan.
+    score = 0.45 if product.price is not None else 0.25
     if entity_match:
-        score += 0.3
+        score += 0.35
     return min(1.0, score)
 
 
@@ -138,10 +138,9 @@ class ProductSelector:
 
         ranked.sort(key=lambda item: item.score, reverse=True)
         selected = _diversify(ranked, limit)
-        for index, item in enumerate(selected):
-            item.placement = "hero" if index == 0 else "compact"
-        if len(selected) >= 3:
-            selected[-1].placement = "collection"
+        # Prefer quiet compact cards; hero shop-window layouts push a sales tone.
+        for item in selected:
+            item.placement = "compact"
         return selected
 
     def select(
