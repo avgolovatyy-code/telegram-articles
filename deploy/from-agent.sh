@@ -38,12 +38,33 @@ KEY_TEXT="${KEY_TEXT//$'\r'/}"
 if [[ "$KEY_TEXT" == *'\\n'* ]]; then
 	KEY_TEXT="${KEY_TEXT//\\n/$'\n'}"
 fi
+# Cursor Secrets often strip newlines. Rebuild OpenSSH PEM from a single line.
+if [[ "$KEY_TEXT" == *"BEGIN OPENSSH PRIVATE KEY"* && "$KEY_TEXT" != *$'\n'* ]]; then
+	KEY_TEXT="$(
+		KEY_TEXT="$KEY_TEXT" python3 - <<'PY'
+import os, re, textwrap
+raw = os.environ["KEY_TEXT"].strip()
+body = raw.replace("-----BEGIN OPENSSH PRIVATE KEY-----", "")
+body = body.replace("-----END OPENSSH PRIVATE KEY-----", "")
+body = re.sub(r"\s+", "", body)
+wrapped = "\n".join(textwrap.wrap(body, 70))
+print("-----BEGIN OPENSSH PRIVATE KEY-----")
+print(wrapped)
+print("-----END OPENSSH PRIVATE KEY-----")
+PY
+	)"
+fi
 
 KEYFILE="$(mktemp)"
 cleanup() { rm -f "$KEYFILE"; }
 trap cleanup EXIT
 printf '%s\n' "$KEY_TEXT" >"$KEYFILE"
 chmod 600 "$KEYFILE"
+if ! ssh-keygen -y -f "$KEYFILE" >/dev/null 2>&1; then
+	echo "DEPLOY_SSH_KEY is not a usable private key (ssh-keygen rejected it)."
+	echo "Paste the full OpenSSH private key, including BEGIN/END lines."
+	exit 2
+fi
 
 SSH=(ssh -i "$KEYFILE" -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new
 	-o BatchMode=yes -o ConnectTimeout=20 "${USER}@${HOST}")
