@@ -285,11 +285,14 @@ def test_article_card_mentions_automatic_publishing(session, settings):
     rendered = json.dumps(card, ensure_ascii=False)
     assert "автоматически" in rendered
     assert sb.ACTION_REJECT in rendered
+    assert sb.ACTION_REGENERATE in rendered
+    assert sb.ACTION_PUBLISH not in rendered
+    assert sb.ACTION_PUBLISH_TEST not in rendered
     assert "/admin" not in rendered
     assert "article_open" not in rendered
 
 
 @pytest.mark.parametrize("action", [sb.ACTION_PUBLISH, sb.ACTION_REJECT, sb.ACTION_REGENERATE])
-def test_every_button_has_an_action_id(session, settings, action):
-    card = sb.article_card(make_article(session), auto_publish=True)
+def test_manual_review_card_keeps_publish_buttons(session, settings, action):
+    card = sb.article_card(make_article(session), auto_publish=False)
     assert action in json.dumps(card)

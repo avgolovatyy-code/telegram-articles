@@ -92,12 +92,19 @@ def article_card(article: Article, *, auto_publish: bool, admin_url: str | None 
         {
             "type": "actions",
             "block_id": f"article:{article.id}",
-            "elements": [
-                _button("Опубликовать сейчас", ACTION_PUBLISH, str(article.id), "primary"),
-                _button("В тест-канал", ACTION_PUBLISH_TEST, str(article.id)),
-                _button("Перегенерировать", ACTION_REGENERATE, str(article.id)),
-                _button("Снять", ACTION_REJECT, str(article.id), "danger"),
-            ],
+            "elements": (
+                [
+                    _button("Перегенерировать", ACTION_REGENERATE, str(article.id)),
+                    _button("Снять", ACTION_REJECT, str(article.id), "danger"),
+                ]
+                if auto_publish
+                else [
+                    _button("Опубликовать сейчас", ACTION_PUBLISH, str(article.id), "primary"),
+                    _button("В тест-канал", ACTION_PUBLISH_TEST, str(article.id)),
+                    _button("Перегенерировать", ACTION_REGENERATE, str(article.id)),
+                    _button("Снять", ACTION_REJECT, str(article.id), "danger"),
+                ]
+            ),
         },
         {"type": "divider"},
     ]

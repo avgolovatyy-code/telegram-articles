@@ -83,12 +83,17 @@ class TelegramProductCardRenderer:
         *,
         pitch: str | None = None,
         url_override: str | None = None,
+        used_image_urls: set[str] | None = None,
     ) -> RenderedProductCard:
         url = url_override or self.product_url(product, market, context)
         blocks: list[dict[str, Any]] = [tb.divider()]
         image = product.cover or product.preview
-        if image:
-            blocks.append(tb.photo(image, caption=product.title))
+        already_shown = bool(image and used_image_urls and image in used_image_urls)
+        # Skip the hero photo when the same URL already appeared as cover/media —
+        # otherwise Telegram shows duplicate image+caption blocks.
+        if image and not already_shown:
+            # No caption on the photo: the 🎧 title line below is the label.
+            blocks.append(tb.photo(image))
         blocks.append(tb.paragraph([{"type": "bold", "text": f"🎧 {product.title}"}]))
         summary = pitch or self._auto_pitch(product, market)
         if summary:
