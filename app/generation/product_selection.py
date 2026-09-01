@@ -33,7 +33,7 @@ RANK_WEIGHTS: dict[str, float] = {
 #: A candidate below this relevance is dropped rather than padded into the article.
 MIN_RELEVANCE = 0.12
 
-MAX_PRODUCTS_PER_ARTICLE = 2
+MAX_PRODUCTS_PER_ARTICLE = 3
 
 
 @dataclass(slots=True)

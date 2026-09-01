@@ -34,6 +34,9 @@ BANNED_PHRASES = {
         "book now",
         "must-have audio guide",
         "perfect audio companion",
+        "getyourguide",
+        "viator",
+        "tiqets",
     ],
     "ru": [
         "погрузитесь в удивительный мир",
@@ -47,6 +50,9 @@ BANNED_PHRASES = {
         "не упустите возможность",
         "обязательный аудиогид",
         "идеальный аудиокомпаньон",
+        "getyourguide",
+        "viator",
+        "tiqets",
     ],
 }
 
@@ -163,10 +169,12 @@ class QualityGate:
             warnings.append(f"{len(document.sections)} sections is above the recommended maximum")
 
         product_ratio = len(document.product_placements) / max(len(document.sections), 1)
-        if len(document.product_placements) > 2:
-            errors.append("more than 2 product cards; keep recommendations sparse")
-        if product_ratio > 0.5:
-            errors.append("product cards are too dense relative to sections; reads as a shop window")
+        if len(document.product_placements) > 3:
+            errors.append("more than 3 product cards; keep recommendations measured")
+        if product_ratio > 0.6:
+            errors.append(
+                "product cards are too dense relative to sections; reads as a shop window"
+            )
 
         if not document.intro.strip():
             errors.append("empty intro")

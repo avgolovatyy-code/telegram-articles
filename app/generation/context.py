@@ -70,7 +70,7 @@ class WriterContext:
             "allowed_audio": self.audio,
             "brand_style": {
                 "voice": "friendly, plain, specific, lightly humorous",
-                "purpose": "help travellers plan a cultural programme",
+                "purpose": "interesting cultural planning for travellers",
                 "references": ["Aviasales", "T—J"],
                 "avoid": [
                     "ad pathos",
@@ -78,6 +78,7 @@ class WriterContext:
                     "keyword stuffing",
                     "catalogue / shop-window tone",
                     "recommending an audio guide for every stop",
+                    "naming competitor apps or ticket resellers",
                 ],
                 "humour_must_not": [
                     "mock people, nationalities, cities or the reader",
@@ -90,8 +91,9 @@ class WriterContext:
                 "max_chars": settings.article_target_max_chars,
                 "hard_max_chars": settings.article_max_chars,
                 "preferred_products": 1,
-                "max_products": min(2, len(self.products)),
+                "max_products": min(3, len(self.products)),
                 "products_are_optional": True,
+                "recommend_wegotrip_only": True,
                 "max_hashtags": settings.max_hashtags if settings.enable_hashtags else 0,
                 "sections_min": 3,
                 "sections_max": 8,
