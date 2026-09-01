@@ -253,6 +253,36 @@ def test_gate_rejects_banned_boilerplate(context, settings):
     assert any("boilerplate" in error for error in result.errors)
 
 
+def test_gate_rejects_watery_article_without_named_attractions(context, settings):
+    if len(context.catalog_attractions) < 3:
+        pytest.skip("fixture catalogue has too few attractions")
+    watery = (
+        "Choose one focus for the day and leave free time around it. "
+        "Do not turn the city into a checklist of obligations. "
+        "A calm rhythm beats collecting pins on a map."
+    )
+    document = base_document(watery)
+    result = QualityGate(settings).content(document, context)
+    assert not result.passed
+    assert any("too abstract" in error for error in result.errors)
+
+
+def test_gate_accepts_russian_aliases_for_latin_attraction_names():
+    from app.generation.place_names import attraction_mentioned
+    from app.topics.dedup import normalize_text
+
+    body = normalize_text(
+        "Начните с Саграды Фамилии, затем Парк Гуэль и музей Пикассо."
+    )
+    assert attraction_mentioned("Basílica de la Sagrada Família", body)
+    assert attraction_mentioned("Park Guell", body)
+    assert attraction_mentioned("Museu Picasso de Barcelona", body)
+    assert not attraction_mentioned(
+        "Музей современного искусства",
+        normalize_text("Билет в Музей Бенкси без очереди."),
+    )
+
+
 def test_gate_rejects_an_unknown_product(context, settings):
     from app.generation.schemas import ProductPlacement
 

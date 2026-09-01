@@ -14,6 +14,10 @@ from app.config import Market, Settings, get_settings
 from app.db.enums import ClaimStatus
 from app.generation.claims import split_sentences
 from app.generation.context import WriterContext
+from app.generation.place_names import (
+    GENERIC_ATTRACTION_TOKENS,
+    attraction_mentioned,
+)
 from app.generation.schemas import ArticleDocument, QualityReview
 from app.links.affiliate import AffiliateLinkBuilder
 from app.topics.dedup import normalize_text
@@ -177,20 +181,22 @@ class QualityGate:
             )
 
         # Require concrete catalogue places so the piece cannot be pure philosophy.
-        attraction_names = [
-            str(item.get("name") or "").strip()
-            for item in (context.catalog_attractions or [])
-            if item.get("name")
+        attraction_items = [
+            item for item in (context.catalog_attractions or []) if item.get("name")
         ]
-        if len(attraction_names) >= 4:
+        if len(attraction_items) >= 3:
             body_norm = normalize_text(text)
             mentioned = 0
-            for name in attraction_names:
-                tokens = [t for t in normalize_text(name).split() if len(t) > 3]
-                # Match on a distinctive token (Sagrada, Picasso, Montjuic, …).
-                if tokens and any(token in body_norm for token in tokens[:2]):
+            for item in attraction_items:
+                name = str(item.get("name") or "").strip()
+                aliases = [
+                    str(alias).strip()
+                    for alias in (item.get("mention_as") or [])
+                    if str(alias).strip()
+                ]
+                if attraction_mentioned(name, body_norm, aliases=aliases):
                     mentioned += 1
-            required = min(4, max(3, len(attraction_names) // 3))
+            required = min(4, max(3, len(attraction_items) // 3))
             if mentioned < required:
                 errors.append(
                     f"too few concrete catalogue attractions named "
@@ -295,6 +301,7 @@ def normalize_hashtags(tags: list[str], settings: Settings) -> list[str]:
 
 __all__ = [
     "BANNED_PHRASES",
+    "GENERIC_ATTRACTION_TOKENS",
     "MAX_KEYWORD_DENSITY",
     "GateResult",
     "QualityGate",

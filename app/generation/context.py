@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Market, Settings, get_settings
 from app.db.models import Attraction, City, Country, Product, TopicCandidate
+from app.generation.place_names import mention_forms_for
 from app.generation.product_selection import RankedProduct, product_facts, product_summary
 from app.media_assets import MediaCandidate
 
@@ -66,6 +67,11 @@ class WriterContext:
                 "inventory_depth": self.topic.inventory_depth,
             },
             "catalog_attractions": self.catalog_attractions,
+            "must_mention_attractions": [
+                item.get("name")
+                for item in self.catalog_attractions[:6]
+                if item.get("name")
+            ],
             "catalog_facts": self.catalog_facts,
             "verified_facts": self.verified_facts,
             # Full ranked set for naming places / durations / ratings; cards are capped.
@@ -103,6 +109,7 @@ class WriterContext:
                 "min_named_catalog_attractions": min(4, max(2, len(self.catalog_attractions))),
                 "products_are_optional": True,
                 "recommend_wegotrip_only": True,
+                "attractions_are_required_backbone": True,
                 "max_hashtags": settings.max_hashtags if settings.enable_hashtags else 0,
                 "sections_min": 3,
                 "sections_max": 8,
@@ -240,6 +247,7 @@ class ContextBuilder:
                 "slug": row.slug,
                 "product_count": row.product_count,
                 "popularity_rank": row.popularity_rank,
+                "mention_as": mention_forms_for(row.name, market=market),
             }
             for row in rows[:18]
         ]

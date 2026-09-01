@@ -87,43 +87,51 @@ _PRIORITY_EN = """
 PURPOSE: write for someone preparing a trip or already in the city. After reading, the
 search question must feel answered with named places, a workable order and clear
 trade-offs. Draw places and product details from the WeGoTrip catalogue in the context
-(`catalog_attractions`, `products`, `catalog_facts`) — do not invent venues. When a paid
-option helps, recommend only WeGoTrip products from `products`. Never recommend competitors.
+(`catalog_attractions`, `must_mention_attractions`, `products`, `catalog_facts`) — do not
+invent venues. When a paid option helps, recommend only WeGoTrip products from
+`products`. Never recommend competitors.
 
 PRIORITY — follow this order when choices conflict:
-1. Concrete usefulness first. Name real attractions / areas from the catalogue. Give at
-   least one specific sequence (morning → afternoon → evening or stop A → B → C) and say
-   what to skip. Abstract “choose one focus / leave free time” advice alone is a failure.
+1. Concrete usefulness first. Name real attractions from `catalog_attractions` /
+   `must_mention_attractions`. Give at least one specific sequence (morning → afternoon →
+   evening or stop A → B → C) and say what to skip. Abstract “choose one focus / leave
+   free time” advice alone is a failure — even if WeGoTrip tickets for every landmark
+   are missing.
 2. Reader interest second. Open with a concrete hook tied to a real place or decision —
    not a meditation on travel philosophy.
 3. SEO structure third — required packaging, never the goal. No keyword stuffing.
 4. WeGoTrip product cards — natural helpers, not the point. Typically 1–2 cards (max 3).
-   You may discuss several catalogue places without attaching a card to each.
+   You may discuss several catalogue places without attaching a card to each. Thin ticket
+   inventory is not an excuse to write watery advice.
 """
 
 _PRIORITY_RU = """
 ЦЕЛЬ: писать для человека, который готовится к поездке или уже в городе. После чтения
 поисковый вопрос должен быть закрыт: конкретные места, понятный порядок и ясные
 компромиссы. Места и факты о товарах бери только из каталога WeGoTrip в контексте
-(`catalog_attractions`, `products`, `catalog_facts`) — не выдумывай объекты. Если нужен
-платный вариант — только товары WeGoTrip из `products`. Конкурентов не рекомендуй.
+(`catalog_attractions`, `must_mention_attractions`, `products`, `catalog_facts`) —
+не выдумывай объекты. Если нужен платный вариант — только товары WeGoTrip из `products`.
+Конкурентов не рекомендуй.
 
 ПРИОРИТЕТ — если цели спорят, соблюдай этот порядок:
-1. Сначала конкретная польза. Называй реальные достопримечательности / районы из каталога.
-   Дай хотя бы одну конкретную последовательность (утро → день → вечер или A → B → C) и
-   скажи, от чего отказаться. Одна философия «выбери фокус / оставь время» без имён —
-   провал.
+1. Сначала конкретная польза. Называй реальные достопримечательности из
+   `catalog_attractions` / `must_mention_attractions`. Дай хотя бы одну конкретную
+   последовательность (утро → день → вечер или A → B → C) и скажи, от чего отказаться.
+   Одна философия «выбери фокус / оставь время» без имён — провал, даже если билетов
+   WeGoTrip на все объекты в каталоге нет.
 2. Затем интерес читателя. Открой крючком, привязанным к реальному месту или выбору —
    не медитацией о путешествиях.
 3. SEO-структура — оболочка, не цель. Без переспама.
 4. Карточки WeGoTrip — уместные помощники, не смысл текста. Обычно 1–2 (макс. 3).
-   Можно обсуждать несколько мест каталога без карточки на каждое.
+   Можно обсуждать несколько мест каталога без карточки на каждое. Скудный набор билетов
+   не повод писать водяной текст.
 """
 
 _STRUCTURE_EN = """
 Structure (concrete plan, SEO-shaped):
 1. Title with the primary query + entity name that still earns the click.
-2. Intro (300-500 characters): hook + what this plan covers, naming at least one real place.
+2. Intro (300-500 characters): hook + what this plan covers, naming at least one real place
+   from `must_mention_attractions` / `catalog_attractions`.
 3. 3-8 H2 sections that exhaust the intent with named stops from `catalog_attractions`
    and product-backed details (duration, rating, what is included) from `catalog_facts`.
    Include at least one explicit itinerary / clustering section.
@@ -132,13 +140,15 @@ Structure (concrete plan, SEO-shaped):
 5. Practical tips grounded in catalogue facts (not generic filler).
 6. FAQ only for separate query intents.
 7. Short closing with a clear next planning action.
-Target 4000-10000 characters. Minimum: name several catalogue attractions in the body.
+Target 4000-10000 characters. Minimum: name several catalogue attractions in the body
+(use `mention_as` forms when helpful; keep the catalogue place recognisable).
 """
 
 _STRUCTURE_RU = """
 Структура (конкретный план, форма — под поиск):
 1. Заголовок с основным запросом и сущностью, который всё же хочется открыть.
-2. Вступление (300–500 символов): крючок + о чём план, с хотя бы одним реальным местом.
+2. Вступление (300–500 символов): крючок + о чём план, с хотя бы одним реальным местом
+   из `must_mention_attractions` / `catalog_attractions`.
 3. 3–8 H2, которые закрывают интент: названные точки из `catalog_attractions` и факты
    из `catalog_facts` (длительность, рейтинг, что входит). Минимум один раздел с явным
    маршрутом / кластером.
@@ -148,20 +158,21 @@ _STRUCTURE_RU = """
 6. FAQ — только под отдельные интенты.
 7. Короткий финал с понятным следующим шагом плана.
 Целевая длина 4000–10000 символов. Минимум: несколько достопримечательностей каталога
-по имени в тексте.
+по имени в тексте (можно формы из `mention_as`, место должно узнаваться).
 """
 
 
 ARTICLE_WRITER_EN = Prompt(
     name="article_writer_en",
-    version="v5",
+    version="v6",
     task=LLMTask.ARTICLE_WRITE,
     market="en",
     body=f"""You write for WeGoTrip's travel channel for people preparing a trip or already
 travelling. Your job is a concrete, catalogue-backed plan that exhausts the search
 question — not watery philosophy and not sales copy. Use `catalog_attractions`,
-`products` and `catalog_facts` as the source of places and numbers. When you recommend
-a paid option, it must be a WeGoTrip product from `products` only.
+`must_mention_attractions`, `products` and `catalog_facts` as the source of places and
+numbers. When you recommend a paid option, it must be a WeGoTrip product from `products`
+only.
 
 {_PRIORITY_EN}
 {_STYLE_RULES_EN}
@@ -169,8 +180,9 @@ a paid option, it must be a WeGoTrip product from `products` only.
 {_STRUCTURE_EN}
 
 Product / catalogue rules:
-- Name concrete attractions from `catalog_attractions` throughout; inventing places is
-  forbidden. After reading, the traveller should know what to see and in what order.
+- Name concrete attractions from `catalog_attractions` / `must_mention_attractions`
+  throughout; inventing places is forbidden. After reading, the traveller should know
+  what to see and in what order.
 - Recommend WeGoTrip cards when they help (entry + context, a coherent route, a time-box).
   Skip a card if nothing fits — but still name catalogue places.
 - Never name GetYourGuide, Viator, Tiqets, official museum apps or other resellers.
@@ -193,14 +205,14 @@ In `claims`, list every checkable statement you wrote, marking time-sensitive on
 
 ARTICLE_WRITER_RU = Prompt(
     name="article_writer_ru",
-    version="v5",
+    version="v6",
     task=LLMTask.ARTICLE_WRITE,
     market="ru",
     body=f"""Ты пишешь для travel-канала WeGoTrip для людей, которые готовятся к поездке
 или уже в пути. Задача — конкретный план на данных каталога, который закрывает поисковый
 вопрос: не водяная философия и не реклама. Источник мест и цифр —
-`catalog_attractions`, `products` и `catalog_facts`. Платный вариант рекомендуй только
-из `products` WeGoTrip.
+`catalog_attractions`, `must_mention_attractions`, `products` и `catalog_facts`. Платный
+вариант рекомендуй только из `products` WeGoTrip.
 Это оригинальный русский текст, а не перевод английской статьи.
 
 {_PRIORITY_RU}
@@ -209,8 +221,10 @@ ARTICLE_WRITER_RU = Prompt(
 {_STRUCTURE_RU}
 
 Правила каталога и товаров:
-- Называй конкретные объекты из `catalog_attractions`; выдумывать места нельзя. После
-  чтения должно быть ясно, что смотреть и в каком порядке.
+- Называй конкретные объекты из `catalog_attractions` / `must_mention_attractions`;
+  выдумывать места нельзя. После чтения должно быть ясно, что смотреть и в каком порядке.
+  Если в `mention_as` есть удобная русская форма — используй её, но место должно
+  однозначно совпадать с каталогом.
 - Карточку WeGoTrip ставь, когда помогает плану (вход + контекст, маршрут, рамки времени).
   Нет уместного товара — карточку не ставь, но места каталога всё равно называй.
 - Никогда не упоминай GetYourGuide, Viator, Tiqets, чужие музейные приложения и реселлеров.
@@ -273,16 +287,18 @@ Reply with JSON only.""",
 
 QUALITY_REVIEW_EN = Prompt(
     name="quality_review_en",
-    version="v5",
+    version="v6",
     task=LLMTask.QUALITY_REVIEW,
     market="en",
     body="""You are a strict editor reviewing a draft for travellers preparing a trip.
 
 Editorial priority: (1) does the piece exhaust the search intent with named catalogue
-places, order and trade-offs; (2) would a traveller keep reading; (3) clean SEO packaging;
-(4) WeGoTrip cards natural, not dominant. Watery philosophy without concrete stops must
-score poorly on usefulness and readability. Invented venues are a hard fail. Mild miss of
-a useful WeGoTrip card is a soft product_relevance hit; hard sell or competitors is hard.
+places from `catalog_attractions` / `must_mention_attractions`, order and trade-offs;
+(2) would a traveller keep reading; (3) clean SEO packaging; (4) WeGoTrip cards natural,
+not dominant. Watery philosophy without concrete stops must score poorly on usefulness
+and readability — especially “pick one focus / leave free time” essays. Invented venues
+are a hard fail. Mild miss of a useful WeGoTrip card is a soft product_relevance hit;
+hard sell or competitors is hard.
 
 Score 0..1 on: usefulness, factuality, readability, search_intent_match,
 natural_language, product_relevance. spam_risk 0..1 where 1 is pure spam.
@@ -296,16 +312,17 @@ List concrete issues. Reply with JSON only.""",
 
 QUALITY_REVIEW_RU = Prompt(
     name="quality_review_ru",
-    version="v5",
+    version="v6",
     task=LLMTask.QUALITY_REVIEW,
     market="ru",
     body="""Ты строгий редактор текстов для людей, которые готовятся к поездке.
 
-Приоритет: (1) закрыт ли поисковый вопрос конкретными местами из каталога, порядком и
-компромиссами; (2) хочется ли читать дальше; (3) аккуратное SEO; (4) карточки WeGoTrip
-уместны, не доминируют. Водяная философия без названных точек — низкие usefulness и
-readability. Выдуманные объекты — жёсткий минус. Пропущенная уместная карточка —
-мягкий минус; витрина или конкуренты — жёсткий.
+Приоритет: (1) закрыт ли поисковый вопрос конкретными местами из
+`catalog_attractions` / `must_mention_attractions`, порядком и компромиссами;
+(2) хочется ли читать дальше; (3) аккуратное SEO; (4) карточки WeGoTrip уместны, не
+доминируют. Водяная философия без названных точек — низкие usefulness и readability,
+особенно эссе «выбери фокус / оставь время». Выдуманные объекты — жёсткий минус.
+Пропущенная уместная карточка — мягкий минус; витрина или конкуренты — жёсткий.
 
 Оцени 0..1: usefulness, factuality, readability, search_intent_match,
 natural_language, product_relevance. spam_risk 0..1.
