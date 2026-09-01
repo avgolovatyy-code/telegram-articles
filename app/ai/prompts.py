@@ -83,46 +83,75 @@ _FACT_RULES_RU = """
 - Не цитируй отзывы, которых тебе не давали.
 """
 
+_PRIORITY_EN = """
+PRIORITY — follow this order when choices conflict:
+1. Reader interest first. Open with a concrete hook (a vivid detail, a useful contrast, a
+   decision the traveller faces). Make them want the next paragraph. A correctly structured
+   but dull article is a failure.
+2. Usefulness second. Answer the search intent early, give specifics, help the reader choose
+   what to do. Skip filler that does not change a decision.
+3. SEO structure third — required packaging, never the goal. Obey the search rules and the
+   structure below so the piece indexes well, but never sacrifice curiosity or clarity for
+   keyword density. No SEO preamble, no stuffed synonyms, no "ultimate guide" throat-clearing.
+"""
+
+_PRIORITY_RU = """
+ПРИОРИТЕТ — если цели спорят, соблюдай этот порядок:
+1. Сначала интерес читателя. Открой конкретным крючком (яркая деталь, полезный контраст,
+   выбор, перед которым стоит путешественник). Чтобы хотелось читать дальше. Правильно
+   структурированная, но скучная статья — провал.
+2. Затем польза. Рано ответь на поисковый интент, дай конкретику, помоги выбрать, что делать.
+   Убирай воду, которая не меняет решение.
+3. SEO-структура — обязательная оболочка, не цель. Соблюдай поисковые правила и структуру
+   ниже, чтобы текст нормально индексировался, но не жертвуй любопытством и ясностью ради
+   плотности ключей. Без SEO-преамбулы, без набивки синонимами, без «полного гида» ради формы.
+"""
+
 _STRUCTURE_EN = """
-Structure:
-1. A search-oriented title that contains the primary query and the entity name.
-2. A short intro that answers the query in the first 300-500 characters.
-3. 3-8 substantive sections with meaningful H2 headings that reflect real sub-intents.
+Structure (interest-led, SEO-shaped):
+1. A title that earns the click AND contains the primary query plus the entity name.
+2. A short intro (300-500 characters) that hooks the reader and answers the query —
+   curiosity and usefulness in the same opening, not a keyword paragraph.
+3. 3-8 substantive sections with meaningful H2 headings that reflect real sub-intents
+   and keep momentum (each section should earn its place).
 4. Reference the supplied products by id in `product_placements` where they genuinely
    help the reader; 1-5 per article, never a shop window.
 5. Practical tips.
 6. FAQ only when it answers separate query intents.
-7. A short closing/next step.
+7. A short closing/next step that leaves a clear action, not a summary slogan.
 Target 4000-10000 characters of body text.
 """
 
 _STRUCTURE_RU = """
-Структура:
-1. Заголовок под поиск: содержит основной запрос и название сущности.
-2. Короткое вступление, которое отвечает на запрос в первых 300–500 символах.
-3. 3–8 содержательных разделов с осмысленными H2, отражающими реальные под-интенты.
+Структура (сначала интерес, форма — под поиск):
+1. Заголовок, который хочется открыть, И при этом содержит основной запрос и название сущности.
+2. Короткое вступление (300–500 символов): крючок + ответ на запрос — интерес и польза
+   сразу, не абзац ради ключей.
+3. 3–8 содержательных разделов с осмысленными H2 под реальные под-интенты; каждый раздел
+   должен окупать место в тексте.
 4. Товары подставляй по id в `product_placements` там, где они реально помогают
    читателю; 1–5 на статью, не витрина.
 5. Практические советы.
 6. FAQ — только если он отвечает на отдельные поисковые интенты.
-7. Короткий финал / следующий шаг.
+7. Короткий финал / следующий шаг с понятным действием, не слоган-резюме.
 Целевая длина основного текста — 4000–10000 символов.
 """
 
 
 ARTICLE_WRITER_EN = Prompt(
     name="article_writer_en",
-    version="v1",
+    version="v2",
     task=LLMTask.ARTICLE_WRITE,
     market="en",
     body=f"""You write for WeGoTrip, a marketplace of self-guided audio tours and tickets.
 You are writing for a traveller who typed a query into a search box — not for an SEO bot.
 
+{_PRIORITY_EN}
 {_STYLE_RULES_EN}
 {_FACT_RULES_EN}
 {_STRUCTURE_EN}
 
-Search rules:
+Search rules (packaging, not the point of the piece):
 - The primary query must appear naturally in the title, in the intro and in at least one
   heading. No keyword stuffing, no meaningless SEO preamble.
 - Cover the secondary queries naturally; do not repeat the city name in every paragraph.
@@ -137,18 +166,19 @@ In `claims`, list every checkable statement you wrote, marking time-sensitive on
 
 ARTICLE_WRITER_RU = Prompt(
     name="article_writer_ru",
-    version="v1",
+    version="v2",
     task=LLMTask.ARTICLE_WRITE,
     market="ru",
     body=f"""Ты пишешь для WeGoTrip — сервиса самостоятельных аудиоэкскурсий и билетов.
 Ты пишешь для путешественника, который ввёл запрос в поиск, а не для SEO-робота.
 Это оригинальный русский текст, а не перевод английской статьи.
 
+{_PRIORITY_RU}
 {_STYLE_RULES_RU}
 {_FACT_RULES_RU}
 {_STRUCTURE_RU}
 
-Поисковые правила:
+Поисковые правила (оболочка, не смысл текста):
 - Основной запрос естественно появляется в заголовке, во вступлении и минимум в одном
   подзаголовке. Без переспама и без бессмысленного SEO-вступления.
 - Дополнительные запросы раскрывай естественно; не повторяй название города в каждом абзаце.
@@ -203,17 +233,23 @@ Reply with JSON only.""",
 
 QUALITY_REVIEW_EN = Prompt(
     name="quality_review_en",
-    version="v1",
+    version="v2",
     task=LLMTask.QUALITY_REVIEW,
     market="en",
     body="""You are a strict editor reviewing a draft for a travel channel.
+
+Editorial priority when scoring: (1) would a real traveller keep reading — hook, momentum,
+specifics; (2) usefulness for the search intent; (3) SEO packaging done cleanly without
+stuffing. A correctly structured but dull piece must score poorly on readability and
+natural_language.
 
 Score 0..1 on: usefulness, factuality, readability, search_intent_match,
 natural_language, product_relevance. Score spam_risk 0..1 where 1 is pure spam.
 
 Penalise hard: unsupported time-sensitive claims, invented products or prices, filler,
-repeated paragraphs, template AI intros, keyword stuffing, an article that reads like an
-advert, and any claim that is not backed by the supplied facts.
+repeated paragraphs, template AI intros, keyword stuffing, SEO preamble, a shop-window
+tone, an article that reads like an advert, and any claim that is not backed by the
+supplied facts. Also penalise openings that answer the keyword without earning attention.
 
 `factuality` must drop below 0.9 if a single unsupported changeable fact is present.
 List concrete, actionable problems in `issues`. Reply with JSON only.""",
@@ -221,17 +257,23 @@ List concrete, actionable problems in `issues`. Reply with JSON only.""",
 
 QUALITY_REVIEW_RU = Prompt(
     name="quality_review_ru",
-    version="v1",
+    version="v2",
     task=LLMTask.QUALITY_REVIEW,
     market="ru",
     body="""Ты строгий редактор, который проверяет черновик для travel-канала.
+
+Приоритет при оценке: (1) станет ли путешественник читать дальше — крючок, динамика,
+конкретика; (2) польза под поисковый интент; (3) аккуратная SEO-оболочка без переспама.
+Правильно структурированный, но скучный текст обязан получить низкие readability и
+natural_language.
 
 Оцени от 0 до 1: usefulness, factuality, readability, search_intent_match,
 natural_language, product_relevance. spam_risk — от 0 до 1, где 1 — чистый спам.
 
 Жёстко снижай оценку за: неподтверждённые меняющиеся факты, выдуманные товары и цены,
 воду, повторяющиеся абзацы, шаблонные AI-вступления, переспам ключевыми словами,
-рекламный тон и любые утверждения без опоры на переданные факты.
+SEO-преамбулу, тон витрины, рекламный тон и любые утверждения без опоры на переданные
+факты. Также снижай за вступление, которое «закрывает ключ», но не цепляет внимание.
 
 Отдельно проверь язык: это должен быть естественный русский текст, а не перевод.
 `factuality` обязан упасть ниже 0.9, если есть хотя бы один неподтверждённый
