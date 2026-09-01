@@ -176,6 +176,27 @@ class QualityGate:
                 "product cards are too dense relative to sections; reads as a shop window"
             )
 
+        # Require concrete catalogue places so the piece cannot be pure philosophy.
+        attraction_names = [
+            str(item.get("name") or "").strip()
+            for item in (context.catalog_attractions or [])
+            if item.get("name")
+        ]
+        if len(attraction_names) >= 4:
+            body_norm = normalize_text(text)
+            mentioned = 0
+            for name in attraction_names:
+                tokens = [t for t in normalize_text(name).split() if len(t) > 3]
+                # Match on a distinctive token (Sagrada, Picasso, Montjuic, …).
+                if tokens and any(token in body_norm for token in tokens[:2]):
+                    mentioned += 1
+            required = min(4, max(3, len(attraction_names) // 3))
+            if mentioned < required:
+                errors.append(
+                    f"too few concrete catalogue attractions named "
+                    f"({mentioned} < {required}); article is too abstract"
+                )
+
         if not document.intro.strip():
             errors.append("empty intro")
 

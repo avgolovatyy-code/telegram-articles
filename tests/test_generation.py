@@ -192,8 +192,10 @@ def test_context_contains_everything_the_writer_needs(synced_session, settings):
     assert payload["primary_query"] == "things to do in Paris"
     assert payload["entity"]["name"] == "Paris"
     assert payload["catalog_facts"]
+    assert payload["catalog_attractions"], "city topics must expose catalogue attractions"
     assert payload["forbidden_claims"]
     assert payload["article_constraints"]["max_chars"] == settings.article_target_max_chars
+    assert payload["article_constraints"]["min_named_catalog_attractions"] >= 2
     assert "brand_style" in payload
     for product in payload["products"]:
         assert "url" not in product  # the writer must never see a link

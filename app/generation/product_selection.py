@@ -35,6 +35,10 @@ MIN_RELEVANCE = 0.12
 
 MAX_PRODUCTS_PER_ARTICLE = 3
 
+#: How many ranked products the writer may *see* for naming places and facts.
+#: Placement cards stay capped by ``MAX_PRODUCTS_PER_ARTICLE``.
+CONTEXT_PRODUCTS_PER_ARTICLE = 8
+
 
 @dataclass(slots=True)
 class RankedProduct:
@@ -251,6 +255,7 @@ def product_summary(product: Product) -> dict[str, Any]:
 
 
 __all__ = [
+    "CONTEXT_PRODUCTS_PER_ARTICLE",
     "MAX_PRODUCTS_PER_ARTICLE",
     "MIN_RELEVANCE",
     "RANK_WEIGHTS",

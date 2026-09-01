@@ -43,7 +43,11 @@ from app.errors import BudgetExceeded, LLMError
 from app.generation.claims import DetectedClaim, scan_document, strip_unverified
 from app.generation.context import ContextBuilder, WriterContext
 from app.generation.covers import GeneratedCoverService
-from app.generation.product_selection import ProductSelector, RankedProduct
+from app.generation.product_selection import (
+    CONTEXT_PRODUCTS_PER_ARTICLE,
+    ProductSelector,
+    RankedProduct,
+)
 from app.generation.quality import GateResult, QualityGate
 from app.generation.research import FactResearchService, VerificationResult
 from app.generation.schemas import ArticleDocument, QualityReview
@@ -447,7 +451,7 @@ class GenerationPipeline:
             select(Product).where(Product.market == market, Product.available.is_(True))
         ).all()
         catalog = {row.external_id: row for row in rows}
-        return self.selector.select(topic, catalog)
+        return self.selector.select(topic, catalog, limit=CONTEXT_PRODUCTS_PER_ARTICLE)
 
     def _create_article(self, topic: TopicCandidate, market: Market, estimate: float) -> Article:
         article = Article(
