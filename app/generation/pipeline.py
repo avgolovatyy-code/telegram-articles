@@ -208,30 +208,55 @@ class GenerationPipeline:
             article.status = ArticleStatus.GENERATING
             article.status_reason = f"rewriting (was {previous_status})"
             topic.status = TopicStatus.GENERATING
+            # Snapshot live content so a failed rewrite does not leave a published
+            # article with unpublished body / unedited Telegram posts out of sync.
+            snapshot = {
+                "title": article.title,
+                "body": article.body,
+                "rendered_message": article.rendered_message,
+                "char_count": article.char_count,
+                "quality_scores": article.quality_scores,
+                "quality_score": article.quality_score,
+                "factuality_score": article.factuality_score,
+                "validation_issues": list(article.validation_issues or []),
+                "status_reason": article.status_reason,
+            }
             self.session.flush()
+
+            def _restore_published_snapshot() -> None:
+                article.title = snapshot["title"]
+                article.body = snapshot["body"]
+                article.rendered_message = snapshot["rendered_message"]
+                article.char_count = snapshot["char_count"]
+                article.quality_scores = snapshot["quality_scores"]
+                article.quality_score = snapshot["quality_score"]
+                article.factuality_score = snapshot["factuality_score"]
+                article.validation_issues = snapshot["validation_issues"]
+                article.status = ArticleStatus.PUBLISHED
+                topic.status = TopicStatus.USED
 
             try:
                 outcome = self._run(article, topic, context, market, job_id)
             except BudgetExceeded as exc:
                 self.budget.release(reservation)
-                article.status = previous_status
-                article.status_reason = str(exc)
-                topic.status = (
-                    TopicStatus.USED
-                    if previous_status == ArticleStatus.PUBLISHED
-                    else TopicStatus.CANDIDATE
-                )
+                if previous_status == ArticleStatus.PUBLISHED:
+                    _restore_published_snapshot()
+                    article.status_reason = str(exc)
+                else:
+                    article.status = previous_status
+                    article.status_reason = str(exc)
+                    topic.status = TopicStatus.CANDIDATE
                 self.session.flush()
                 return GenerationOutcome(article, "budget_blocked", str(exc))
             except LLMError as exc:
                 self.budget.settle(reservation)
-                article.status = previous_status
-                article.status_reason = f"LLM failure during rewrite: {exc}"
-                topic.status = (
-                    TopicStatus.USED
-                    if previous_status == ArticleStatus.PUBLISHED
-                    else TopicStatus.CANDIDATE
-                )
+                if previous_status == ArticleStatus.PUBLISHED:
+                    _restore_published_snapshot()
+                    article.status_reason = f"LLM failure during rewrite: {exc}"
+                else:
+                    article.status = previous_status
+                    article.status_reason = f"LLM failure during rewrite: {exc}"
+                    topic.status = TopicStatus.CANDIDATE
                 self.session.flush()
                 return GenerationOutcome(article, "failed", str(exc))
 
@@ -247,6 +272,24 @@ class GenerationPipeline:
                     article,
                     ArticleStatus.PUBLISHED,
                     outcome.reason,
+                    outcome.cost_usd,
+                    outcome.issues,
+                )
+            elif (
+                not outcome.ok
+                and previous_status == ArticleStatus.PUBLISHED
+                and snapshot["body"] is not None
+            ):
+                _restore_published_snapshot()
+                article.status_reason = (
+                    f"rewrite rejected ({outcome.status}): {outcome.reason or 'quality gate'}; "
+                    "kept previous published version"
+                )
+                self.session.flush()
+                outcome = GenerationOutcome(
+                    article,
+                    "rewrite_rejected",
+                    article.status_reason,
                     outcome.cost_usd,
                     outcome.issues,
                 )
