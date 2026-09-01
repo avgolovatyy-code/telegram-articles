@@ -73,6 +73,7 @@ class GenerationOutcome:
             ArticleStatus.NEEDS_REVIEW,
             ArticleStatus.APPROVED,
             ArticleStatus.SCHEDULED,
+            ArticleStatus.PUBLISHED,
         }
 
 
@@ -159,6 +160,97 @@ class GenerationPipeline:
                 return GenerationOutcome(article, "failed", str(exc))
 
             self.budget.settle(reservation)
+            ctx["cost_usd"] = round(article.actual_cost_usd, 6)
+            ctx["article_id"] = article.id
+            ctx["status"] = outcome.status
+            return outcome
+
+    def rewrite(self, article: Article) -> GenerationOutcome:
+        """Re-run the writer against an existing article (keeps id + Telegram pubs)."""
+        topic = article.topic
+        if topic is None:
+            return GenerationOutcome(None, "failed", "article has no topic to rewrite from")
+
+        market: Market = topic.market  # type: ignore[assignment]
+        job_id = new_job_id("rew")
+        previous_status = article.status
+
+        with job_context(
+            "article.rewrite",
+            job_id=job_id,
+            market=market,
+            topic_id=topic.id,
+            article_id=article.id,
+            entity_type=topic.entity_type,
+            entity_id=topic.entity_external_id,
+        ) as ctx:
+            products = self._select_products(topic, market)
+            if not products:
+                ctx["status"] = "skipped"
+                return GenerationOutcome(article, "skipped", "no relevant available products")
+
+            context = self.context_builder.build(topic, products)
+            estimate = self.budget.estimate_article_cost(
+                writer_model=self.settings.openai_writer_model,
+                review_model=self.settings.review_model,
+                context_chars=len(str(context.as_payload(self.settings))),
+                expected_output_chars=self.settings.article_target_max_chars,
+                web_search_calls=3 if topic.requires_volatile_facts else 1,
+            )
+            try:
+                reservation = self.budget.reserve(
+                    market, estimate, article_id=article.id, job_id=job_id
+                )
+            except BudgetExceeded as exc:
+                ctx["status"] = "budget_blocked"
+                return GenerationOutcome(article, "budget_blocked", str(exc))
+
+            article.status = ArticleStatus.GENERATING
+            article.status_reason = f"rewriting (was {previous_status})"
+            topic.status = TopicStatus.GENERATING
+            self.session.flush()
+
+            try:
+                outcome = self._run(article, topic, context, market, job_id)
+            except BudgetExceeded as exc:
+                self.budget.release(reservation)
+                article.status = previous_status
+                article.status_reason = str(exc)
+                topic.status = (
+                    TopicStatus.USED
+                    if previous_status == ArticleStatus.PUBLISHED
+                    else TopicStatus.CANDIDATE
+                )
+                self.session.flush()
+                return GenerationOutcome(article, "budget_blocked", str(exc))
+            except LLMError as exc:
+                self.budget.settle(reservation)
+                article.status = previous_status
+                article.status_reason = f"LLM failure during rewrite: {exc}"
+                topic.status = (
+                    TopicStatus.USED
+                    if previous_status == ArticleStatus.PUBLISHED
+                    else TopicStatus.CANDIDATE
+                )
+                self.session.flush()
+                return GenerationOutcome(article, "failed", str(exc))
+
+            self.budget.settle(reservation)
+
+            if outcome.ok and previous_status == ArticleStatus.PUBLISHED:
+                # Keep the live post identity; content was refreshed in place.
+                article.status = ArticleStatus.PUBLISHED
+                article.status_reason = "rewritten under current editorial rules"
+                topic.status = TopicStatus.USED
+                self.session.flush()
+                outcome = GenerationOutcome(
+                    article,
+                    ArticleStatus.PUBLISHED,
+                    outcome.reason,
+                    outcome.cost_usd,
+                    outcome.issues,
+                )
+
             ctx["cost_usd"] = round(article.actual_cost_usd, 6)
             ctx["article_id"] = article.id
             ctx["status"] = outcome.status
