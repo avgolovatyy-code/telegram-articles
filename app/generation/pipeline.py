@@ -236,7 +236,9 @@ class GenerationPipeline:
                 topic.status = TopicStatus.USED
 
             try:
-                outcome = self._run(article, topic, context, market, job_id)
+                outcome = self._run(
+                    article, topic, context, market, job_id, count_topic_failure=False
+                )
             except BudgetExceeded as exc:
                 self.budget.release(reservation)
                 if previous_status == ArticleStatus.PUBLISHED:
