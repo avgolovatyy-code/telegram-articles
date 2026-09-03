@@ -213,6 +213,30 @@ def generate_daily_articles(
             )
             continue
 
+        # Do not generate more than public channels can still absorb today.
+        publish_room = remaining_same_day_publish_slots(session, market, settings)
+        awaiting_schedule = int(
+            session.scalar(
+                select(func.count(Article.id)).where(
+                    Article.market == market,
+                    Article.status.in_(
+                        [ArticleStatus.APPROVED, ArticleStatus.NEEDS_REVIEW]
+                    ),
+                    Article.scheduled_for.is_(None),
+                )
+            )
+            or 0
+        )
+        publish_room = max(0, publish_room - awaiting_schedule)
+        if publish_room <= 0:
+            report.details[f"{market}_generated"] = 0
+            report.details[f"{market}_publish_capped"] = (
+                "no same-day production slots left; skip generation to avoid backlog"
+            )
+            continue
+        wanted = min(wanted, publish_room)
+        report.details[f"{market}_publish_room"] = publish_room
+
         for topic in candidates:
             if produced >= wanted:
                 break
@@ -292,7 +316,7 @@ def schedule_publications(
             if ceiling is None:
                 wanted = len(pending)
             else:
-                wanted = min(len(pending), ceiling - _planned_today(session, market))
+                wanted = min(len(pending), ceiling - _planned_today(session, market, settings))
             if wanted <= 0:
                 report.details[f"{market}_scheduled"] = 0
                 report.details[f"{market}_note"] = "daily publication quota already planned"
@@ -325,10 +349,14 @@ def schedule_publications(
     return report
 
 
-def _planned_today(session: Session, market: Market) -> int:
-    """Articles already published or scheduled for publication today."""
-    start = dt.datetime.combine(utcnow().date(), dt.time.min, tzinfo=dt.UTC)
-    end = start + dt.timedelta(days=1)
+def _planned_today(session: Session, market: Market, settings: Settings | None = None) -> int:
+    """Articles already published or scheduled for publication on the local publish day."""
+    settings = settings or get_settings()
+    local_now = utcnow().astimezone(settings.publish_tz)
+    local_start = local_now.replace(hour=0, minute=0, second=0, microsecond=0)
+    local_end = local_start + dt.timedelta(days=1)
+    start = local_start.astimezone(dt.UTC)
+    end = local_end.astimezone(dt.UTC)
     return int(
         session.scalar(
             select(func.count(Article.id)).where(
@@ -348,52 +376,120 @@ def _publication_slots(
 ) -> list[dt.datetime]:
     """Spread ``count`` publications across the publishing window.
 
-    Posts are distributed over the whole remaining window rather than fired back to
-    back at the minimum interval, so a batch generated at 04:00 still trickles out
-    through the day. Whatever does not fit today rolls into tomorrow's window.
+    Posts are distributed over the remaining window rather than fired back to back.
+    Slots never jump ahead of a far-future backlog: only schedules inside the day
+    currently being filled affect spacing. Overflow packs densely from the next
+    morning — it does not append after a multi-day queue tail.
     """
     if count <= 0:
         return []
 
     now = utcnow()
     min_interval = dt.timedelta(minutes=settings.min_post_interval_minutes)
-
-    last = session.scalar(
-        select(Article.scheduled_for)
-        .where(
-            Article.market == market,
-            Article.scheduled_for.is_not(None),
-            Article.scheduled_for >= now - min_interval,
-        )
-        .order_by(Article.scheduled_for.desc())
-        .limit(1)
-    )
-    cursor = _next_in_window(
-        max(now + dt.timedelta(minutes=5), (last + min_interval) if last else now), settings
-    )
+    cursor = _next_in_window(now + dt.timedelta(minutes=5), settings)
 
     slots: list[dt.datetime] = []
     remaining = count
     while remaining > 0:
         window_end = _window_end(cursor, settings)
-        available = window_end - cursor
-        if available < dt.timedelta(0):
+        day_start = _window_start(cursor, settings)
+        last_in_day = session.scalar(
+            select(Article.scheduled_for)
+            .where(
+                Article.market == market,
+                Article.scheduled_for.is_not(None),
+                Article.scheduled_for >= day_start,
+                Article.scheduled_for <= window_end,
+            )
+            .order_by(Article.scheduled_for.desc())
+            .limit(1)
+        )
+        # Also respect a post that just went out / is imminent before day_start.
+        last_recent = session.scalar(
+            select(Article.scheduled_for)
+            .where(
+                Article.market == market,
+                Article.scheduled_for.is_not(None),
+                Article.scheduled_for >= now - min_interval,
+                Article.scheduled_for < day_start,
+            )
+            .order_by(Article.scheduled_for.desc())
+            .limit(1)
+        )
+        earliest = cursor
+        for prior in (last_in_day, last_recent):
+            if prior is not None:
+                earliest = max(earliest, prior + min_interval)
+        cursor = _next_in_window(earliest, settings)
+        if cursor > window_end:
             cursor = _next_in_window(window_end + dt.timedelta(minutes=1), settings)
             continue
 
+        available = window_end - cursor
         fits_today = min(remaining, int(available / min_interval) + 1)
+        if fits_today <= 0:
+            cursor = _next_in_window(window_end + dt.timedelta(minutes=1), settings)
+            continue
         if fits_today <= 1:
             spacing = min_interval
         else:
-            # Stretch to the window edge, never tighter than the configured minimum.
+            # Stretch across the remaining window; never tighter than the minimum.
             spacing = max(min_interval, available / (fits_today - 1))
 
-        for index in range(fits_today):
-            slots.append(cursor + spacing * index)
+        day_slots = [cursor + spacing * index for index in range(fits_today)]
+        slots.extend(day_slots)
         remaining -= fits_today
         cursor = _next_in_window(window_end + dt.timedelta(minutes=1), settings)
 
     return slots
+
+
+def remaining_same_day_publish_slots(
+    session: Session, market: Market, settings: Settings
+) -> int:
+    """How many more production posts can still go out today (Moscow window).
+
+    Used to stop generating more articles than the public channels can absorb the
+    same calendar day — so the test channel does not run ahead of production.
+    """
+    now = utcnow()
+    local = now.astimezone(settings.publish_tz)
+    if local.hour >= settings.publish_window_end_hour:
+        return 0
+
+    min_interval = dt.timedelta(minutes=settings.min_post_interval_minutes)
+    cursor = _next_in_window(now + dt.timedelta(minutes=5), settings)
+    window_end = _window_end(cursor, settings)
+    # If we were snapped into tomorrow (should not happen before end hour), no same-day room.
+    if cursor.astimezone(settings.publish_tz).date() != local.date():
+        return 0
+
+    day_start = _window_start(cursor, settings)
+    last_in_day = session.scalar(
+        select(Article.scheduled_for)
+        .where(
+            Article.market == market,
+            Article.scheduled_for.is_not(None),
+            Article.scheduled_for >= day_start,
+            Article.scheduled_for <= window_end,
+        )
+        .order_by(Article.scheduled_for.desc())
+        .limit(1)
+    )
+    if last_in_day is not None:
+        cursor = _next_in_window(max(cursor, last_in_day + min_interval), settings)
+    if cursor > window_end:
+        return 0
+    available = window_end - cursor
+    return int(available / min_interval) + 1
+
+
+def _window_start(moment: dt.datetime, settings: Settings) -> dt.datetime:
+    """Start of the publishing window for the local day ``moment`` falls in."""
+    local = moment.astimezone(settings.publish_tz)
+    start = settings.publish_window_start_hour
+    local_start = local.replace(hour=start, minute=0, second=0, microsecond=0)
+    return local_start.astimezone(dt.UTC)
 
 
 def _window_end(moment: dt.datetime, settings: Settings) -> dt.datetime:
@@ -594,6 +690,7 @@ __all__ = [
     "generate_daily_articles",
     "process_publication_queue",
     "refresh_article_products",
+    "remaining_same_day_publish_slots",
     "run_daily_cycle",
     "schedule_publications",
     "seed_reference_data",

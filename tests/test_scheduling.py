@@ -84,6 +84,42 @@ def test_publications_are_spaced_out(session, settings):
     assert all(gap >= settings.min_post_interval_minutes for gap in gaps)
 
 
+def test_new_slots_ignore_far_future_backlog(session, settings):
+    """A multi-day queue must not push new posts even further out."""
+    future = utcnow() + dt.timedelta(days=5)
+    stuck = make_article(session, "en", ArticleStatus.SCHEDULED, 100)
+    stuck.scheduled_for = future
+    session.flush()
+
+    for index in range(3):
+        make_article(session, "en", ArticleStatus.APPROVED, index)
+
+    jobs.schedule_publications(session, markets=("en",), settings=settings)
+
+    new_slots = sorted(
+        article.scheduled_for
+        for article in session.scalars(
+            select(Article).where(
+                Article.scheduled_for.is_not(None),
+                Article.id != stuck.id,
+            )
+        )
+    )
+    assert len(new_slots) == 3
+    assert all(slot < future for slot in new_slots)
+    # New batch starts within the next couple of publishing days, not after the backlog.
+    horizon = utcnow() + dt.timedelta(days=2)
+    assert new_slots[0] <= horizon
+
+
+def test_remaining_same_day_slots_are_zero_after_window(session, settings, monkeypatch):
+    """After 21:00 Moscow there is no same-day production capacity left."""
+    # 19:30 UTC = 22:30 MSK on a fixed date.
+    after_hours = dt.datetime(2026, 9, 3, 19, 30, tzinfo=dt.UTC)
+    monkeypatch.setattr(jobs, "utcnow", lambda: after_hours)
+    assert jobs.remaining_same_day_publish_slots(session, "en", settings) == 0
+
+
 def test_slots_stay_inside_the_moscow_publishing_window(session, settings):
     """Window hours are local to PUBLISH_TIMEZONE, not UTC."""
     assert settings.publish_timezone == "Europe/Moscow"
@@ -127,6 +163,10 @@ def test_everything_ready_is_scheduled_when_no_ceiling_is_set(session, settings)
 
 def test_an_explicit_quota_is_not_multiplied_by_repeated_runs(session, settings, monkeypatch):
     monkeypatch.setattr(settings, "en_publish_per_day", 10)
+    # Morning Moscow so the whole quota fits in today's window.
+    monkeypatch.setattr(
+        jobs, "utcnow", lambda: dt.datetime(2026, 9, 3, 7, 0, tzinfo=dt.UTC)
+    )
     for index in range(15):
         make_article(session, "en", ArticleStatus.APPROVED, index)
 
