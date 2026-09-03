@@ -1,0 +1,42 @@
+# Install as root on tools-server (or any host whose nginx already owns :80/:443):
+#
+#   sudo cp deploy/nginx-content-engine.conf.example \
+#     /etc/nginx/sites-available/content.wegotrip.dev
+#   # edit server_name + ssl paths, then:
+#   sudo ln -sf /etc/nginx/sites-available/content.wegotrip.dev \
+#     /etc/nginx/sites-enabled/content.wegotrip.dev
+#   sudo certbot --nginx -d content.wegotrip.dev   # if cert missing
+#   sudo nginx -t && sudo systemctl reload nginx
+#
+# Upstream matches deploy/docker-compose.proxy.yml (API_PORT=18765).
+
+upstream wegotrip_content_engine {
+    server 127.0.0.1:18765;
+    keepalive 16;
+}
+
+server {
+    listen 80;
+    server_name content.wegotrip.dev;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name content.wegotrip.dev;
+
+    ssl_certificate     /etc/letsencrypt/live/content.wegotrip.dev/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/content.wegotrip.dev/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Slack + click tracking. Admin UI may exist but is not required.
+    location / {
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://wegotrip_content_engine;
+    }
+}

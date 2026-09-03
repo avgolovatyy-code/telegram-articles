@@ -102,7 +102,7 @@ class Settings(BaseSettings):
     min_post_interval_minutes: int = 20
     #: Publishing window, in `publish_timezone` local hours.
     publish_timezone: str = "Europe/Moscow"
-    publish_window_start_hour: int = 10
+    publish_window_start_hour: int = 9
     publish_window_end_hour: int = 21
     stale_article_refresh_hours: int = 24
 

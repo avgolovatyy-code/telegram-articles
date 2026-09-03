@@ -235,7 +235,7 @@ def _article(context: dict[str, Any]) -> dict[str, Any]:
         placements.append(
             {
                 "product_id": str(product.get("id")),
-                "placement": "hero" if index == 0 else "compact",
+                "placement": "compact",
                 "after_section": min(index, len(sections) - 1),
                 "pitch": product.get("title", "")[:120],
             }

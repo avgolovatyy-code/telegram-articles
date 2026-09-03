@@ -43,7 +43,11 @@ from app.errors import BudgetExceeded, LLMError
 from app.generation.claims import DetectedClaim, scan_document, strip_unverified
 from app.generation.context import ContextBuilder, WriterContext
 from app.generation.covers import GeneratedCoverService
-from app.generation.product_selection import ProductSelector, RankedProduct
+from app.generation.product_selection import (
+    CONTEXT_PRODUCTS_PER_ARTICLE,
+    ProductSelector,
+    RankedProduct,
+)
 from app.generation.quality import GateResult, QualityGate
 from app.generation.research import FactResearchService, VerificationResult
 from app.generation.schemas import ArticleDocument, QualityReview
@@ -73,6 +77,7 @@ class GenerationOutcome:
             ArticleStatus.NEEDS_REVIEW,
             ArticleStatus.APPROVED,
             ArticleStatus.SCHEDULED,
+            ArticleStatus.PUBLISHED,
         }
 
 
@@ -164,6 +169,142 @@ class GenerationPipeline:
             ctx["status"] = outcome.status
             return outcome
 
+    def rewrite(self, article: Article) -> GenerationOutcome:
+        """Re-run the writer against an existing article (keeps id + Telegram pubs)."""
+        topic = article.topic
+        if topic is None:
+            return GenerationOutcome(None, "failed", "article has no topic to rewrite from")
+
+        market: Market = topic.market  # type: ignore[assignment]
+        job_id = new_job_id("rew")
+        previous_status = article.status
+
+        with job_context(
+            "article.rewrite",
+            job_id=job_id,
+            market=market,
+            topic_id=topic.id,
+            article_id=article.id,
+            entity_type=topic.entity_type,
+            entity_id=topic.entity_external_id,
+        ) as ctx:
+            products = self._select_products(topic, market)
+            if not products:
+                ctx["status"] = "skipped"
+                return GenerationOutcome(article, "skipped", "no relevant available products")
+
+            context = self.context_builder.build(topic, products)
+            estimate = self.budget.estimate_article_cost(
+                writer_model=self.settings.openai_writer_model,
+                review_model=self.settings.review_model,
+                context_chars=len(str(context.as_payload(self.settings))),
+                expected_output_chars=self.settings.article_target_max_chars,
+                web_search_calls=3 if topic.requires_volatile_facts else 1,
+            )
+            try:
+                reservation = self.budget.reserve(
+                    market, estimate, article_id=article.id, job_id=job_id
+                )
+            except BudgetExceeded as exc:
+                ctx["status"] = "budget_blocked"
+                return GenerationOutcome(article, "budget_blocked", str(exc))
+
+            article.status = ArticleStatus.GENERATING
+            article.status_reason = f"rewriting (was {previous_status})"
+            topic.status = TopicStatus.GENERATING
+            # Snapshot live content so a failed rewrite does not leave a published
+            # article with unpublished body / unedited Telegram posts out of sync.
+            snapshot = {
+                "title": article.title,
+                "body": article.body,
+                "rendered_message": article.rendered_message,
+                "char_count": article.char_count,
+                "quality_scores": article.quality_scores,
+                "quality_score": article.quality_score,
+                "factuality_score": article.factuality_score,
+                "validation_issues": list(article.validation_issues or []),
+                "status_reason": article.status_reason,
+            }
+            self.session.flush()
+
+            def _restore_published_snapshot() -> None:
+                article.title = snapshot["title"]
+                article.body = snapshot["body"]
+                article.rendered_message = snapshot["rendered_message"]
+                article.char_count = snapshot["char_count"]
+                article.quality_scores = snapshot["quality_scores"]
+                article.quality_score = snapshot["quality_score"]
+                article.factuality_score = snapshot["factuality_score"]
+                article.validation_issues = snapshot["validation_issues"]
+                article.status = ArticleStatus.PUBLISHED
+                topic.status = TopicStatus.USED
+
+            try:
+                outcome = self._run(
+                    article, topic, context, market, job_id, count_topic_failure=False
+                )
+            except BudgetExceeded as exc:
+                self.budget.release(reservation)
+                if previous_status == ArticleStatus.PUBLISHED:
+                    _restore_published_snapshot()
+                    article.status_reason = str(exc)
+                else:
+                    article.status = previous_status
+                    article.status_reason = str(exc)
+                    topic.status = TopicStatus.CANDIDATE
+                self.session.flush()
+                return GenerationOutcome(article, "budget_blocked", str(exc))
+            except LLMError as exc:
+                self.budget.settle(reservation)
+                if previous_status == ArticleStatus.PUBLISHED:
+                    _restore_published_snapshot()
+                    article.status_reason = f"LLM failure during rewrite: {exc}"
+                else:
+                    article.status = previous_status
+                    article.status_reason = f"LLM failure during rewrite: {exc}"
+                    topic.status = TopicStatus.CANDIDATE
+                self.session.flush()
+                return GenerationOutcome(article, "failed", str(exc))
+
+            self.budget.settle(reservation)
+
+            if outcome.ok and previous_status == ArticleStatus.PUBLISHED:
+                # Keep the live post identity; content was refreshed in place.
+                article.status = ArticleStatus.PUBLISHED
+                article.status_reason = "rewritten under current editorial rules"
+                topic.status = TopicStatus.USED
+                self.session.flush()
+                outcome = GenerationOutcome(
+                    article,
+                    ArticleStatus.PUBLISHED,
+                    outcome.reason,
+                    outcome.cost_usd,
+                    outcome.issues,
+                )
+            elif (
+                not outcome.ok
+                and previous_status == ArticleStatus.PUBLISHED
+                and snapshot["body"] is not None
+            ):
+                _restore_published_snapshot()
+                article.status_reason = (
+                    f"rewrite rejected ({outcome.status}): {outcome.reason or 'quality gate'}; "
+                    "kept previous published version"
+                )
+                self.session.flush()
+                outcome = GenerationOutcome(
+                    article,
+                    "rewrite_rejected",
+                    article.status_reason,
+                    outcome.cost_usd,
+                    outcome.issues,
+                )
+
+            ctx["cost_usd"] = round(article.actual_cost_usd, 6)
+            ctx["article_id"] = article.id
+            ctx["status"] = outcome.status
+            return outcome
+
     # -------------------------------------------------------------- internals
     def _run(
         self,
@@ -172,6 +313,8 @@ class GenerationPipeline:
         context: WriterContext,
         market: Market,
         job_id: str,
+        *,
+        count_topic_failure: bool = True,
     ) -> GenerationOutcome:
         cost = 0.0
         feedback: list[str] = []
@@ -272,23 +415,24 @@ class GenerationPipeline:
         if not gate.passed:
             article.status = ArticleStatus.VALIDATION_FAILED
             article.status_reason = "; ".join(gate.errors[:5])
-            topic.generation_failures += 1
-            if topic.generation_failures >= self.settings.max_topic_generation_failures:
-                # Retire the topic rather than paying for the same failure every run.
-                topic.status = TopicStatus.REJECTED
-                topic.status_reason = (
-                    f"retired after {topic.generation_failures} failed generations: "
-                    f"{article.status_reason}"
-                )
-                log.info(
-                    "topics.retired",
-                    topic_id=topic.id,
-                    market=topic.market,
-                    failures=topic.generation_failures,
-                    reason=article.status_reason,
-                )
-            else:
-                topic.status = TopicStatus.CANDIDATE
+            if count_topic_failure:
+                topic.generation_failures += 1
+                if topic.generation_failures >= self.settings.max_topic_generation_failures:
+                    # Retire the topic rather than paying for the same failure every run.
+                    topic.status = TopicStatus.REJECTED
+                    topic.status_reason = (
+                        f"retired after {topic.generation_failures} failed generations: "
+                        f"{article.status_reason}"
+                    )
+                    log.info(
+                        "topics.retired",
+                        topic_id=topic.id,
+                        market=topic.market,
+                        failures=topic.generation_failures,
+                        reason=article.status_reason,
+                    )
+                else:
+                    topic.status = TopicStatus.CANDIDATE
             self.session.flush()
             return GenerationOutcome(
                 article, ArticleStatus.VALIDATION_FAILED, article.status_reason, cost, gate.errors
@@ -307,7 +451,7 @@ class GenerationPipeline:
             select(Product).where(Product.market == market, Product.available.is_(True))
         ).all()
         catalog = {row.external_id: row for row in rows}
-        return self.selector.select(topic, catalog)
+        return self.selector.select(topic, catalog, limit=CONTEXT_PRODUCTS_PER_ARTICLE)
 
     def _create_article(self, topic: TopicCandidate, market: Market, estimate: float) -> Article:
         article = Article(

@@ -69,9 +69,6 @@ class InteractionHandler:
         value = str(action.get("value", ""))
         user = (payload.get("user") or {}).get("username") or "slack"
 
-        if action_id == "article_open":
-            return InteractionResult("Ссылка открыта")
-
         article = self.session.get(Article, int(value)) if value.isdigit() else None
         if article is None:
             return InteractionResult(f"Статья {value} не найдена", ok=False)
