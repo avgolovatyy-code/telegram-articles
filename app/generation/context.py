@@ -68,9 +68,7 @@ class WriterContext:
             },
             "catalog_attractions": self.catalog_attractions,
             "must_mention_attractions": [
-                item.get("name")
-                for item in self.catalog_attractions[:6]
-                if item.get("name")
+                item.get("name") for item in self.catalog_attractions[:6] if item.get("name")
             ],
             "catalog_facts": self.catalog_facts,
             "verified_facts": self.verified_facts,
@@ -267,9 +265,7 @@ class ContextBuilder:
                 facts.append(f"{name} is listed as a WeGoTrip catalogue attraction (WeGoTrip API)")
         return facts
 
-    def _resolve_city_id(
-        self, topic: TopicCandidate, products: list[RankedProduct]
-    ) -> str | None:
+    def _resolve_city_id(self, topic: TopicCandidate, products: list[RankedProduct]) -> str | None:
         entity_id = topic.entity_external_id.split("@", 1)[0]
         if topic.entity_type == "city":
             return entity_id

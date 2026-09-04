@@ -101,9 +101,7 @@ def render_max_payload(article: Article) -> dict[str, Any]:
 
     payload: dict[str, Any] = {"text": text, "format": "markdown"}
     if buttons:
-        payload["attachments"] = [
-            {"type": "inline_keyboard", "payload": {"buttons": buttons}}
-        ]
+        payload["attachments"] = [{"type": "inline_keyboard", "payload": {"buttons": buttons}}]
     return payload
 
 

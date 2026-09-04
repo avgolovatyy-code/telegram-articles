@@ -191,11 +191,7 @@ class ArticleWorkflow:
         url = result.publication.message_url or "(no public URL)"
         if not result.created:
             return WorkflowResult(True, f"already published: {url}", article)
-        if (
-            target == PublicationTarget.PRODUCTION
-            and article.market == "ru"
-            and result.created
-        ):
+        if target == PublicationTarget.PRODUCTION and article.market == "ru" and result.created:
             max_result = maybe_publish_ru_to_max(article, settings=self.settings)
             if max_result.error:
                 return WorkflowResult(

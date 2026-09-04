@@ -271,9 +271,7 @@ def test_gate_accepts_russian_aliases_for_latin_attraction_names():
     from app.generation.place_names import attraction_mentioned
     from app.topics.dedup import normalize_text
 
-    body = normalize_text(
-        "Начните с Саграды Фамилии, затем Парк Гуэль и музей Пикассо."
-    )
+    body = normalize_text("Начните с Саграды Фамилии, затем Парк Гуэль и музей Пикассо.")
     assert attraction_mentioned("Basílica de la Sagrada Família", body)
     assert attraction_mentioned("Park Guell", body)
     assert attraction_mentioned("Museu Picasso de Barcelona", body)

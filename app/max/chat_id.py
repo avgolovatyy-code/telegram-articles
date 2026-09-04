@@ -61,9 +61,7 @@ def resolve_chat_id_from_slug(slug: str, *, timeout: float = 20.0) -> int:
     except httpx.HTTPError as exc:
         raise MaxError(f"failed to resolve Max channel slug via {url}: {exc}") from exc
     if response.status_code >= 400:
-        raise MaxError(
-            f"failed to resolve Max channel slug via {url}: HTTP {response.status_code}"
-        )
+        raise MaxError(f"failed to resolve Max channel slug via {url}: HTTP {response.status_code}")
     return chat_id_from_public_html(response.text)
 
 

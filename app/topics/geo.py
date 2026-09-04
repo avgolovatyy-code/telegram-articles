@@ -55,8 +55,7 @@ class GeoResolver:
             for c in session.scalars(select(Country).where(Country.market == market))
         }
         self._cities = {
-            c.external_id: c
-            for c in session.scalars(select(City).where(City.market == market))
+            c.external_id: c for c in session.scalars(select(City).where(City.market == market))
         }
         self._attractions = {
             a.external_id: a

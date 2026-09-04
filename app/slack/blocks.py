@@ -194,9 +194,7 @@ def connected_card(
         ),
         {
             "type": "context",
-            "elements": [
-                _text("Управление через Slack: `/wegotrip status` · кнопки на карточках")
-            ],
+            "elements": [_text("Управление через Slack: `/wegotrip status` · кнопки на карточках")],
         },
     ]
 

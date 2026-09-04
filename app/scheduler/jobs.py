@@ -221,9 +221,7 @@ def generate_daily_articles(
             session.scalar(
                 select(func.count(Article.id)).where(
                     Article.market == market,
-                    Article.status.in_(
-                        [ArticleStatus.APPROVED, ArticleStatus.NEEDS_REVIEW]
-                    ),
+                    Article.status.in_([ArticleStatus.APPROVED, ArticleStatus.NEEDS_REVIEW]),
                     Article.scheduled_for.is_(None),
                 )
             )
@@ -312,9 +310,7 @@ def schedule_publications(
                 report.details[f"{market}_scheduled"] = 0
                 continue
 
-            pending = order_articles_for_schedule(
-                pending, session, market, settings=settings
-            )
+            pending = order_articles_for_schedule(pending, session, market, settings=settings)
 
             # The daily figure, when set, is a ceiling for the whole day rather than per
             # scheduler run: this job runs several times a day and must not multiply it.
@@ -450,9 +446,7 @@ def _publication_slots(
     return slots
 
 
-def remaining_same_day_publish_slots(
-    session: Session, market: Market, settings: Settings
-) -> int:
+def remaining_same_day_publish_slots(session: Session, market: Market, settings: Settings) -> int:
     """How many more production posts can still go out today (Moscow window).
 
     Used to stop generating more articles than the public channels can absorb the
@@ -585,9 +579,7 @@ def process_publication_queue(
                                 channel=result.publication.channel_username,
                             )
                             if article.market == "ru":
-                                max_result = maybe_publish_ru_to_max(
-                                    article, settings=settings
-                                )
+                                max_result = maybe_publish_ru_to_max(article, settings=settings)
                                 ctx["max"] = (
                                     "skipped"
                                     if max_result.skipped

@@ -154,9 +154,7 @@ class CatalogSyncService:
             # under-sample on a global popular list — pull Russia explicitly.
             russia_id = self._russia_country_id(market)
             if russia_id:
-                cities.extend(
-                    self.provider.get_cities(market, country_id=russia_id, popular=False)
-                )
+                cities.extend(self.provider.get_cities(market, country_id=russia_id, popular=False))
         for city in cities:
             if city.external_id in seen:
                 row = self._find(City, market, city.external_id)
@@ -167,9 +165,7 @@ class CatalogSyncService:
                     country_id = city.country_external_id or self._resolve_country_id(
                         market, city.country_name
                     )
-                    row.country_external_id = (
-                        country_id or row.country_external_id
-                    )
+                    row.country_external_id = country_id or row.country_external_id
                     row.country_name = city.country_name or row.country_name
                 continue
             seen.add(city.external_id)
@@ -272,9 +268,7 @@ class CatalogSyncService:
                 # out of the global popular cap.
                 domestic_cap = options.max_products or 400
                 products.extend(
-                    self.provider.get_products(
-                        market, country_id=russia_id, max_items=domestic_cap
-                    )
+                    self.provider.get_products(market, country_id=russia_id, max_items=domestic_cap)
                 )
         seen: list[str] = []
         seen_set: set[str] = set()

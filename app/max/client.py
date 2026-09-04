@@ -82,9 +82,7 @@ class MaxBotClient:
         raw = self.settings.max_ru_channel_id
         if not raw:
             raise ConfigurationError("MAX_RU_CHANNEL_ID is not set")
-        self._resolved_chat_id = resolve_max_chat_id(
-            raw, timeout=self.settings.max_timeout_seconds
-        )
+        self._resolved_chat_id = resolve_max_chat_id(raw, timeout=self.settings.max_timeout_seconds)
         return self._resolved_chat_id
 
     def call(

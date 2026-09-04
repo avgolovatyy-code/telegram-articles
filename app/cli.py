@@ -452,6 +452,7 @@ def style_max(
         typer.secho(f"Max branding failed: {exc}", fg=typer.colors.RED)
         raise typer.Exit(code=1) from exc
 
+
 secrets_app = typer.Typer(help="Encrypted credential storage", no_args_is_help=True)
 app.add_typer(secrets_app, name="secrets")
 

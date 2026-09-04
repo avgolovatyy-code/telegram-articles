@@ -117,9 +117,7 @@ def test_ru_selection_prefers_domestic_when_available(session, settings, monkeyp
             slug="russia",
         )
     )
-    session.add(
-        Country(market="ru", external_id="es", code="ES", name="Испания", slug="spain")
-    )
+    session.add(Country(market="ru", external_id="es", code="ES", name="Испания", slug="spain"))
     session.add(
         City(
             market="ru",

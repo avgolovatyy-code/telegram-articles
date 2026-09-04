@@ -164,9 +164,7 @@ def test_everything_ready_is_scheduled_when_no_ceiling_is_set(session, settings)
 def test_an_explicit_quota_is_not_multiplied_by_repeated_runs(session, settings, monkeypatch):
     monkeypatch.setattr(settings, "en_publish_per_day", 10)
     # Morning Moscow so the whole quota fits in today's window.
-    monkeypatch.setattr(
-        jobs, "utcnow", lambda: dt.datetime(2026, 9, 3, 7, 0, tzinfo=dt.UTC)
-    )
+    monkeypatch.setattr(jobs, "utcnow", lambda: dt.datetime(2026, 9, 3, 7, 0, tzinfo=dt.UTC))
     for index in range(15):
         make_article(session, "en", ArticleStatus.APPROVED, index)
 
