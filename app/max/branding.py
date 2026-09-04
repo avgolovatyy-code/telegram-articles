@@ -124,7 +124,8 @@ def _ensure_intro_pin(client: MaxBotClient, chat_id: int) -> bool:
             "PUT",
             f"/chats/{chat_id}/pin",
             json_body={"message_id": mid, "notify": False},
-        )        return True
+        )
+        return True
     except Exception as exc:  # noqa: BLE001
         log.warning("max.branding_pin_failed", error=str(exc))
         return False
