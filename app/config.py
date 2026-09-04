@@ -38,7 +38,11 @@ class Settings(BaseSettings):
     database_echo: bool = False
 
     # -------------------------------------------------------------- WeGoTrip
+    #: EN / default Affiliate API host. Russia inventory is absent here.
     wegotrip_api_base_url: str = "https://app.wegotrip.com/api"
+    #: RU market Affiliate API host. Domestic (Russia) cities/products are only
+    #: returned from the wegotrip.ru storefront API — not from app.wegotrip.com.
+    wegotrip_api_base_url_ru: str = "https://wegotrip.ru/api"
     # The public documentation mentions both v2 and v3. Probing the live API shows
     # that v2 serves currencies/countries/cities/products/search while v3 only serves
     # attractions (and its `city` filter is ignored), so each endpoint pins its version.
@@ -202,6 +206,16 @@ class Settings(BaseSettings):
 
     def store_domain(self, market: Market) -> str:
         return self.wegotrip_store_domain_ru if market == "ru" else self.wegotrip_store_domain_en
+
+    def api_base_url(self, market: Market) -> str:
+        """Affiliate API host for a market.
+
+        RU must use ``wegotrip.ru`` — the ``.com`` API returns Russia as an empty
+        country (0 cities / 0 products). EN keeps the ``.com`` host.
+        """
+        if market == "ru":
+            return (self.wegotrip_api_base_url_ru or self.wegotrip_api_base_url).rstrip("/")
+        return self.wegotrip_api_base_url.rstrip("/")
 
     def currency(self, market: Market) -> str:
         return self.wegotrip_currency_ru if market == "ru" else self.wegotrip_currency_en
