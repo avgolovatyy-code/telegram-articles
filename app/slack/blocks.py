@@ -44,7 +44,9 @@ def _preview(article: Article, limit: int = 420) -> str:
     return intro or "_нет вступления_"
 
 
-def article_card(article: Article, *, auto_publish: bool, admin_url: str | None = None) -> list[dict[str, Any]]:
+def article_card(
+    article: Article, *, auto_publish: bool, admin_url: str | None = None
+) -> list[dict[str, Any]]:
     """Card shown when an article is written and waiting for its slot.
 
     Control is Slack-first: buttons act here. ``admin_url`` is accepted for
@@ -179,7 +181,9 @@ def alert_card(title: str, detail: str) -> list[dict[str, Any]]:
     ]
 
 
-def connected_card(*, bot_name: str, team: str, admin_url: str | None = None) -> list[dict[str, Any]]:
+def connected_card(
+    *, bot_name: str, team: str, admin_url: str | None = None
+) -> list[dict[str, Any]]:
     """Posted by ``wgt slack-check --post`` so the owner can see the bot is live."""
     del admin_url
     return [

@@ -225,7 +225,9 @@ class CatalogSyncService:
         if not ids:
             return ids
         rows = list(
-            self.session.scalars(select(City).where(City.market == market, City.external_id.in_(ids)))
+            self.session.scalars(
+                select(City).where(City.market == market, City.external_id.in_(ids))
+            )
         )
         by_id = {row.external_id: row for row in rows}
         russia_id = self._russia_country_id(market) if market == "ru" else None

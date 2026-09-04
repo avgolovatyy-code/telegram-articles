@@ -69,7 +69,7 @@ class MaxPublisher:
                 attachments=payload.get("attachments"),
                 format=payload.get("format") or "markdown",
             )
-        except Exception as exc:  # noqa: BLE001 — secondary surface must not break Telegram
+        except Exception as exc:
             log.error(
                 "max.publish_failed",
                 article_id=article.id,

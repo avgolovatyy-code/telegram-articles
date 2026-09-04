@@ -28,6 +28,7 @@ from app.db.types import utcnow
 from app.errors import EngineError, TelegramRateLimited
 from app.generation.pipeline import GenerationPipeline
 from app.logging_setup import get_logger, job_context, new_job_id
+from app.max.publisher import maybe_publish_ru_to_max
 from app.slack.notifications import SlackNotifier
 from app.telegram.api import build_telegram_client
 from app.telegram.publisher import TelegramPublisher
@@ -35,7 +36,6 @@ from app.topics.clusters import KeywordClusterRegistry
 from app.topics.coverage import CoverageReport, assess_coverage
 from app.topics.discovery import TopicDiscoveryService, select_topics_for_generation
 from app.topics.diversity import order_articles_for_schedule
-from app.max.publisher import maybe_publish_ru_to_max
 
 log = get_logger("scheduler.jobs")
 

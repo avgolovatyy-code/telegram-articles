@@ -77,7 +77,10 @@ class DiversityTracker:
             self.attraction_counts[geo.attraction_id] += 1
 
     def allows(self, geo: TopicGeo) -> bool:
-        if geo.attraction_id and self.attraction_counts[geo.attraction_id] >= self.max_same_attraction:
+        if (
+            geo.attraction_id
+            and self.attraction_counts[geo.attraction_id] >= self.max_same_attraction
+        ):
             return False
         if geo.city_id and self.city_counts[geo.city_id] >= self.max_same_city:
             return False

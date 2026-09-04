@@ -108,7 +108,12 @@ def test_max_publisher_skips_when_unconfigured(session, settings):
 def test_max_publisher_skips_en_market(session, settings, monkeypatch):
     monkeypatch.setattr(settings, "max_bot_token", "token")
     monkeypatch.setattr(settings, "max_ru_channel_id", "-1")
-    article = make_article(session, market="en", title="x", body={"title": "x", "intro": "y", "sections": []})
+    article = make_article(
+        session,
+        market="en",
+        title="x",
+        body={"title": "x", "intro": "y", "sections": []},
+    )
     result = MaxPublisher(settings=settings).publish_ru(article)
     assert result.skipped is True
 

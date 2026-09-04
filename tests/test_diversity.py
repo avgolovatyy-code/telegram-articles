@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-from app.db.enums import ArticleStatus, EntityType, TopicStatus
-from app.db.models import Article, Attraction, City, Country, TopicCandidate
-from app.db.types import utcnow
+from app.db.enums import EntityType, TopicStatus
+from app.db.models import City, Country, TopicCandidate
 from app.topics.diversity import select_diverse_topics
 from app.topics.geo import GeoResolver, is_russia_country
 
@@ -71,9 +70,33 @@ def test_select_diverse_topics_caps_same_city(session, settings, monkeypatch):
         )
     )
     session.flush()
-    _topic(session, market="en", entity_type="city", entity_id="1", name="Paris", score=0.99, index=1)
-    _topic(session, market="en", entity_type="city", entity_id="1", name="Paris", score=0.98, index=2)
-    _topic(session, market="en", entity_type="city", entity_id="2", name="Rome", score=0.90, index=3)
+    _topic(
+        session,
+        market="en",
+        entity_type="city",
+        entity_id="1",
+        name="Paris",
+        score=0.99,
+        index=1,
+    )
+    _topic(
+        session,
+        market="en",
+        entity_type="city",
+        entity_id="1",
+        name="Paris",
+        score=0.98,
+        index=2,
+    )
+    _topic(
+        session,
+        market="en",
+        entity_type="city",
+        entity_id="2",
+        name="Rome",
+        score=0.90,
+        index=3,
+    )
 
     selected = select_diverse_topics(session, "en", 3, settings=settings)
     cities = [t.entity_external_id for t in selected]
@@ -85,8 +108,18 @@ def test_ru_selection_prefers_domestic_when_available(session, settings, monkeyp
     monkeypatch.setattr(settings, "ru_prefer_domestic", True)
     monkeypatch.setattr(settings, "ru_domestic_share", 0.7)
     monkeypatch.setattr(settings, "max_same_city_per_day", 1)
-    session.add(Country(market="ru", external_id="2017370", code="RU", name="Россия", slug="russia"))
-    session.add(Country(market="ru", external_id="es", code="ES", name="Испания", slug="spain"))
+    session.add(
+        Country(
+            market="ru",
+            external_id="2017370",
+            code="RU",
+            name="Россия",
+            slug="russia",
+        )
+    )
+    session.add(
+        Country(market="ru", external_id="es", code="ES", name="Испания", slug="spain")
+    )
     session.add(
         City(
             market="ru",
@@ -111,8 +144,24 @@ def test_ru_selection_prefers_domestic_when_available(session, settings, monkeyp
     )
     session.flush()
     # Higher score for Barcelona, but Moscow should still be preferred under quota.
-    _topic(session, market="ru", entity_type="city", entity_id="bcn", name="Барселона", score=0.99, index=1)
-    _topic(session, market="ru", entity_type="city", entity_id="msk", name="Москва", score=0.80, index=2)
+    _topic(
+        session,
+        market="ru",
+        entity_type="city",
+        entity_id="bcn",
+        name="Барселона",
+        score=0.99,
+        index=1,
+    )
+    _topic(
+        session,
+        market="ru",
+        entity_type="city",
+        entity_id="msk",
+        name="Москва",
+        score=0.80,
+        index=2,
+    )
     _topic(
         session,
         market="ru",
@@ -140,7 +189,15 @@ def test_geo_resolver_reads_category_city(session, settings):
             country_name="Россия",
         )
     )
-    session.add(Country(market="ru", external_id="2017370", code="RU", name="Россия", slug="russia"))
+    session.add(
+        Country(
+            market="ru",
+            external_id="2017370",
+            code="RU",
+            name="Россия",
+            slug="russia",
+        )
+    )
     session.flush()
     resolver = GeoResolver(session, "ru")
     geo = resolver.resolve(entity_type=EntityType.CATEGORY, entity_external_id="3@524901")

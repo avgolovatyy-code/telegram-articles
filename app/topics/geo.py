@@ -33,9 +33,7 @@ class TopicGeo:
 def is_russia_country(*, code: str | None = None, name: str | None = None) -> bool:
     if code and code.upper() in RUSSIA_COUNTRY_CODES:
         return True
-    if name and name.casefold() in RUSSIA_COUNTRY_NAMES:
-        return True
-    return False
+    return bool(name and name.casefold() in RUSSIA_COUNTRY_NAMES)
 
 
 def _city_id_from_compound(external_id: str) -> str | None:

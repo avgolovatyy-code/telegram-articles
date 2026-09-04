@@ -71,7 +71,7 @@ def apply_max_branding(
             )
         try:
             client.call("PATCH", "/me/commands", json_body={"commands": BOT_COMMANDS})
-        except Exception as exc:  # noqa: BLE001 — commands are optional chrome
+        except Exception as exc:
             log.warning("max.branding_commands_failed", error=str(exc))
 
         chat_id = client.ru_chat_id()
@@ -126,7 +126,7 @@ def _ensure_intro_pin(client: MaxBotClient, chat_id: int) -> bool:
             json_body={"message_id": mid, "notify": False},
         )
         return True
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         log.warning("max.branding_pin_failed", error=str(exc))
         return False
 
