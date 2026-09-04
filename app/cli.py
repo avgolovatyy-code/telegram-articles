@@ -381,6 +381,44 @@ def check_telegram() -> None:
             close()
 
 
+@app.command("check-max")
+def check_max(
+    post: Annotated[
+        bool, typer.Option("--post", help="Also send a short smoke post to the RU Max channel")
+    ] = False,
+) -> None:
+    """Verify Max bot token and RU channel access (secondary publish surface)."""
+    _bootstrap()
+    from app.max.client import MaxBotClient
+    from app.max.publisher import max_smoke_details
+
+    settings = get_settings()
+    if not settings.max_ru_active:
+        typer.secho(
+            "Max RU not configured (set MAX_BOT_TOKEN + MAX_RU_CHANNEL_ID)",
+            fg=typer.colors.YELLOW,
+        )
+        raise typer.Exit(code=0)
+    try:
+        details = max_smoke_details(settings)
+        typer.echo(json.dumps(details, ensure_ascii=False, indent=2))
+        if post:
+            client = MaxBotClient(settings)
+            try:
+                sent = client.send_message(
+                    text="WeGoTrip Max smoke test — можно удалить.",
+                    format=None,
+                )
+                typer.secho(
+                    f"smoke post ok: chat_id={sent.chat_id} mid={sent.message_id}",
+                    fg=typer.colors.GREEN,
+                )
+            finally:
+                client.close()
+    except Exception as exc:
+        typer.secho(f"Max check failed: {exc}", fg=typer.colors.RED)
+        raise typer.Exit(code=1) from exc
+
 secrets_app = typer.Typer(help="Encrypted credential storage", no_args_is_help=True)
 app.add_typer(secrets_app, name="secrets")
 
@@ -619,6 +657,17 @@ def doctor() -> None:
             "telegram_test_channel",
             bool(settings.telegram_test_channel),
             settings.telegram_test_channel or "MISSING",
+        )
+    )
+    checks.append(
+        (
+            "max_ru",
+            True,
+            (
+                "enabled"
+                if settings.max_ru_active
+                else "off (set MAX_BOT_TOKEN + MAX_RU_CHANNEL_ID)"
+            ),
         )
     )
     checks.append(

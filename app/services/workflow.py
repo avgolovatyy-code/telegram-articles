@@ -21,6 +21,7 @@ from app.db.types import utcnow
 from app.errors import ConfigurationError, EngineError, ValidationFailed
 from app.generation.pipeline import GenerationOutcome, GenerationPipeline
 from app.logging_setup import get_logger
+from app.max.publisher import maybe_publish_ru_to_max
 from app.services.rendering import render_stored_article
 from app.telegram.api import build_telegram_client
 from app.telegram.publisher import TelegramPublisher
@@ -190,6 +191,24 @@ class ArticleWorkflow:
         url = result.publication.message_url or "(no public URL)"
         if not result.created:
             return WorkflowResult(True, f"already published: {url}", article)
+        if (
+            target == PublicationTarget.PRODUCTION
+            and article.market == "ru"
+            and result.created
+        ):
+            max_result = maybe_publish_ru_to_max(article, settings=self.settings)
+            if max_result.error:
+                return WorkflowResult(
+                    True,
+                    f"published to {target}: {url} (Max fan-out failed: {max_result.error})",
+                    article,
+                )
+            if max_result.sent is not None:
+                return WorkflowResult(
+                    True,
+                    f"published to {target}: {url}; Max chat_id={max_result.sent.chat_id}",
+                    article,
+                )
         return WorkflowResult(True, f"published to {target}: {url}", article)
 
     def _has_test_publication(self, article: Article) -> bool:

@@ -229,6 +229,8 @@ Cloud Agents → Secrets или на сервере через `wgt secrets set 
 | `OPENAI_API_KEY` | да | шаг 4 | генерация статей |
 | `TELEGRAM_BOT_TOKEN` | да | шаг 1 | публикация в каналы |
 | `TELEGRAM_TEST_CHANNEL` | да | шаг 2 | обязательная проверка вёрстки до продакшена |
+| `MAX_BOT_TOKEN` | нет | платформа Max / «MAX для бизнеса» | зеркало RU-постов в Max |
+| `MAX_RU_CHANNEL_ID` | нет | API `chat_id` (напр. `-7351…`) или публичный slug канала | куда слать RU в Max |
 | `ADMIN_PASSWORD` | да | генерируется скриптом | вход в админку |
 | `DEPLOY_DOMAIN` | нет | шаг 5 | свой домен вместо бесплатного `*.sslip.io` |
 | `ACME_EMAIL` | нет | ваша почта | уведомления Let's Encrypt |
@@ -317,6 +319,7 @@ C="docker compose -f deploy/docker-compose.prod.yml --env-file .env"
 
 $C exec api wgt doctor            # конфигурация и подключение к БД
 $C exec api wgt check-telegram    # токен бота и доступ к трём каналам
+$C exec api wgt check-max --post  # Max: бот + RU-канал (если настроен)
 $C exec api wgt slack-check --post  # Slack: auth.test и тестовое сообщение
 $C exec api wgt seed              # рынки, кластеры интентов, версии промптов
 $C exec api wgt sync-catalog      # первая синхронизация, 5–15 минут

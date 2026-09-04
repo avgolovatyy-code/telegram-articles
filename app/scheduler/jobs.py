@@ -28,6 +28,7 @@ from app.db.types import utcnow
 from app.errors import EngineError, TelegramRateLimited
 from app.generation.pipeline import GenerationPipeline
 from app.logging_setup import get_logger, job_context, new_job_id
+from app.max.publisher import maybe_publish_ru_to_max
 from app.slack.notifications import SlackNotifier
 from app.telegram.api import build_telegram_client
 from app.telegram.publisher import TelegramPublisher
@@ -578,6 +579,19 @@ def process_publication_queue(
                                 message_url=result.publication.message_url,
                                 channel=result.publication.channel_username,
                             )
+                            if article.market == "ru":
+                                max_result = maybe_publish_ru_to_max(
+                                    article, settings=settings
+                                )
+                                ctx["max"] = (
+                                    "skipped"
+                                    if max_result.skipped
+                                    else ("ok" if max_result.ok else max_result.error)
+                                )
+                                if max_result.error:
+                                    report.details.setdefault("max_errors", []).append(
+                                        f"article {article.id}: {max_result.error}"
+                                    )
                     ctx["status"] = "published" if result.created else "already_published"
                 except TelegramRateLimited as exc:
                     item.scheduled_for = utcnow() + dt.timedelta(seconds=exc.retry_after)

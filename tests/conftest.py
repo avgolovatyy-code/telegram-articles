@@ -40,6 +40,9 @@ os.environ["SLACK_ENABLED"] = "false"
 os.environ["SLACK_BOT_TOKEN"] = ""
 os.environ["SLACK_SIGNING_SECRET"] = ""
 os.environ["SLACK_CHANNEL"] = ""
+os.environ["MAX_BOT_TOKEN"] = ""
+os.environ["MAX_RU_CHANNEL_ID"] = ""
+os.environ["MAX_PUBLISH_RU"] = "true"
 
 from app.config import Settings, reload_settings
 from app.db import models  # noqa: F401

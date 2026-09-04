@@ -63,6 +63,22 @@ class Settings(BaseSettings):
     telegram_max_retries: int = 4
     telegram_dry_run: bool = False
 
+    # -------------------------------------------------------------------- Max
+    #: Secondary RU publish surface (Telegram stays primary). When token + channel
+    #: id are set, production RU Telegram publishes also fan out to Max best-effort.
+    max_bot_token: str | None = None
+    #: Numeric API chat_id (e.g. ``-71234567890123``) or public slug / URL
+    #: (``NNNNNNNN_biz``, ``https://max.ru/idNNNNNNNN_biz``).
+    max_ru_channel_id: str | None = None
+    max_api_base_url: str = "https://platform-api2.max.ru"
+    max_timeout_seconds: float = 30.0
+    max_max_retries: int = 3
+    max_ssl_verify: bool = True
+    #: Optional path to the Russian trusted root (Минцифры). Empty → bundled PEM.
+    max_ssl_ca_file: str | None = None
+    #: Explicit kill-switch; credentials alone are enough to enable Max fan-out.
+    max_publish_ru: bool = True
+
     # ---------------------------------------------------------------- OpenAI
     openai_api_key: str | None = None
     openai_base_url: str = "https://api.openai.com/v1"
@@ -233,6 +249,13 @@ class Settings(BaseSettings):
         if self.slack_enabled:
             return True
         return bool(self.slack_bot_token and self.slack_signing_secret)
+
+    @property
+    def max_ru_active(self) -> bool:
+        """Whether RU production posts should also be mirrored to Max."""
+        if not self.max_publish_ru:
+            return False
+        return bool((self.max_bot_token or "").strip() and (self.max_ru_channel_id or "").strip())
 
 
 @lru_cache(maxsize=1)
