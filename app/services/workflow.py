@@ -15,12 +15,13 @@ from sqlalchemy.orm import Session
 
 from app.ai.router import LLMGateway
 from app.config import Settings, get_settings
-from app.db.enums import ArticleStatus, PublicationTarget, TopicStatus
+from app.db.enums import ArticleStatus, PublicationTarget
 from app.db.models import Article, TelegramPublication
 from app.db.types import utcnow
 from app.errors import ConfigurationError, EngineError, ValidationFailed
 from app.generation.pipeline import GenerationOutcome, GenerationPipeline
 from app.logging_setup import get_logger
+from app.max.publisher import maybe_publish_ru_to_max
 from app.services.rendering import render_stored_article
 from app.telegram.api import build_telegram_client
 from app.telegram.publisher import TelegramPublisher
@@ -75,16 +76,51 @@ class ArticleWorkflow:
         return WorkflowResult(True, "archived", article)
 
     def regenerate(self, article: Article) -> GenerationOutcome:
+        """Rewrite the article in place under current prompts; edit live Telegram posts."""
         if article.topic is None:
             raise ValidationFailed("article has no topic to regenerate from")
         gateway = LLMGateway(self.session, settings=self.settings)
         pipeline = GenerationPipeline(self.session, gateway, settings=self.settings)
-        article.status = ArticleStatus.ARCHIVED
-        article.status_reason = "superseded by a regeneration"
-        topic = article.topic
-        topic.status = TopicStatus.CANDIDATE
-        self.session.flush()
-        return pipeline.generate(topic)
+        had_publications = bool(article.publications)
+        outcome = pipeline.rewrite(article)
+        if (
+            outcome.ok
+            and had_publications
+            and article.rendered_message
+            and article.status == ArticleStatus.PUBLISHED
+        ):
+            edit = self._edit_all_publications(
+                article, reason="rewritten under current editorial rules"
+            )
+            if not edit.ok:
+                log.warning(
+                    "workflow.rewrite_telegram_edit_failed",
+                    article_id=article.id,
+                    reason=edit.message,
+                )
+        return outcome
+
+    def _edit_all_publications(self, article: Article, *, reason: str) -> WorkflowResult:
+        if not article.rendered_message:
+            return WorkflowResult(False, "article has no rendered message to push")
+        client = build_telegram_client(self.settings)
+        publisher = TelegramPublisher(self.session, client, settings=self.settings)
+        errors: list[str] = []
+        try:
+            for publication in list(article.publications):
+                if not publication.message_id:
+                    continue
+                try:
+                    publisher.edit(publication, article.rendered_message, reason=reason)
+                except EngineError as exc:
+                    errors.append(f"{publication.target}:{publication.message_id}: {exc}")
+        finally:
+            close = getattr(client, "close", None)
+            if callable(close):
+                close()
+        if errors:
+            return WorkflowResult(False, "; ".join(errors), article)
+        return WorkflowResult(True, "telegram messages updated", article)
 
     # ------------------------------------------------------------ scheduling
     def schedule(self, article: Article, when: dt.datetime) -> WorkflowResult:
@@ -155,6 +191,20 @@ class ArticleWorkflow:
         url = result.publication.message_url or "(no public URL)"
         if not result.created:
             return WorkflowResult(True, f"already published: {url}", article)
+        if target == PublicationTarget.PRODUCTION and article.market == "ru" and result.created:
+            max_result = maybe_publish_ru_to_max(article, settings=self.settings)
+            if max_result.error:
+                return WorkflowResult(
+                    True,
+                    f"published to {target}: {url} (Max fan-out failed: {max_result.error})",
+                    article,
+                )
+            if max_result.sent is not None:
+                return WorkflowResult(
+                    True,
+                    f"published to {target}: {url}; Max chat_id={max_result.sent.chat_id}",
+                    article,
+                )
         return WorkflowResult(True, f"published to {target}: {url}", article)
 
     def _has_test_publication(self, article: Article) -> bool:

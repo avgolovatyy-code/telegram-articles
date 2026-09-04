@@ -12,6 +12,7 @@ SECRET_NAMES: frozenset[str] = frozenset(
     {
         "OPENAI_API_KEY",
         "TELEGRAM_BOT_TOKEN",
+        "MAX_BOT_TOKEN",
         "WEGOTRIP_API_KEY",
         "SLACK_BOT_TOKEN",
         "SLACK_SIGNING_SECRET",

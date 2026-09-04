@@ -95,10 +95,8 @@ class CommandHandler:
                 else "время не назначено"
             )
             flag = sb.MARKET_FLAG.get(article.market, article.market)
-            lines.append(
-                f"{flag} <{self.settings.admin_base_url}/admin/articles/{article.id}|"
-                f"{article.title or article.primary_query}> — {when}"
-            )
+            title = article.title or article.primary_query
+            lines.append(f"{flag} #{article.id} *{title}* — {when}")
         return "\n".join(lines)
 
     @staticmethod

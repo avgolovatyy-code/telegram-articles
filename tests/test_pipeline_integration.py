@@ -231,3 +231,26 @@ def test_kpis_are_computable_on_an_empty_database(session, settings):
     kpis = AnalyticsService(session, settings).kpis()
     assert kpis["articles_generated"] == 0
     assert kpis["ai_cost_per_order"] is None
+
+
+def test_rewrite_keeps_article_id_and_published_status(synced_session, settings):
+    pipeline = build_pipeline(synced_session, settings)
+    topic = first_topic(synced_session, "en")
+    outcome = pipeline.generate(topic)
+    assert outcome.ok and outcome.article is not None
+    article = outcome.article
+    workflow = ArticleWorkflow(synced_session, settings)
+    assert workflow.publish_test(article).ok
+    assert workflow.approve(article).ok
+    assert workflow.publish_now(article).ok
+    assert article.status == ArticleStatus.PUBLISHED
+    article_id = article.id
+    pub_count = len(article.publications)
+
+    rewritten = pipeline.rewrite(article)
+    assert rewritten.ok
+    assert rewritten.article is not None
+    assert rewritten.article.id == article_id
+    assert rewritten.article.status == ArticleStatus.PUBLISHED
+    assert len(rewritten.article.publications) == pub_count
+    assert rewritten.article.current_version >= 2

@@ -151,6 +151,56 @@ def test_hero_card_shows_only_api_backed_facts(product, settings):
     assert "from 18.52 €" in text
     assert card.url.startswith("https://wegotrip.com/paris-d2988507/")
     assert "coupon=435" in card.url
+    photos = [b for b in card.blocks if b.get("type") == "photo"]
+    assert len(photos) == 1
+    assert "caption" not in photos[0].get("photo", {})
+
+
+def test_hero_skips_photo_when_url_already_used(product, settings):
+    renderer = TelegramProductCardRenderer(settings=settings)
+    card = renderer.hero(
+        product,
+        "en",
+        LinkContext(market="en", article_id="a1", topic_slug="t"),
+        used_image_urls={product.cover},
+    )
+    assert not any(b.get("type") == "photo" for b in card.blocks)
+    assert "🎧" in str(card.blocks)
+
+
+def test_renderer_does_not_duplicate_product_cover_photo(product, settings):
+    """Same product cover must not appear as media_placement and again in the hero card."""
+    media = {
+        "prod-cover": MediaCandidate(
+            id="prod-cover",
+            url=product.cover,
+            kind="photo",
+            source_entity_type="product",
+            role="gallery",
+            caption=product.title,
+            product_external_id=product.external_id,
+        )
+    }
+    document = sample_document()
+    document.media_placements = [
+        MediaPlacement(media_id="prod-cover", after_section=0, caption="Маршрут по Лувру")
+    ]
+    document.product_placements = [
+        ProductPlacement(product_id="4900", placement="hero", after_section=0, pitch="Why")
+    ]
+    rendered = RichMessageRenderer(settings=settings).render(
+        document,
+        market="en",
+        products={"4900": product},
+        media=media,
+        link_context=LinkContext(market="en", article_id="a1", topic_slug="t"),
+        entity_name="Paris",
+    )
+    photos = [b for b in rendered.message["blocks"] if b.get("type") == "photo"]
+    urls = [b["photo"]["media"] for b in photos]
+    assert urls.count(product.cover) == 1
+    assert sum(1 for u in urls if u == product.cover) == 1
+    assert "🎧" in str(rendered.message)
 
 
 def test_card_omits_facts_the_api_did_not_return(bare_product, settings):

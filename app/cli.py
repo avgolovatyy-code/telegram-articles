@@ -128,6 +128,92 @@ def publish_test(article_id: int) -> None:
         typer.secho(result.message, fg=typer.colors.GREEN if result.ok else typer.colors.RED)
 
 
+@app.command("rewrite")
+def rewrite(
+    article_id: Annotated[
+        int | None, typer.Option("--article-id", help="rewrite one article")
+    ] = None,
+    all_articles: Annotated[
+        bool, typer.Option("--all", help="rewrite every published / failed draft")
+    ] = False,
+) -> None:
+    """Rewrite existing articles under current editorial prompts (edits live Telegram posts)."""
+    _bootstrap()
+    from sqlalchemy import select
+
+    from app.db.enums import ArticleStatus
+    from app.db.models import Article
+    from app.services.workflow import ArticleWorkflow
+
+    if not article_id and not all_articles:
+        raise typer.BadParameter("pass --article-id N or --all")
+
+    with session_scope() as session:
+        if article_id is not None:
+            articles = [session.get(Article, article_id)]
+            if articles[0] is None:
+                raise typer.BadParameter(f"article {article_id} not found")
+        else:
+            articles = list(
+                session.scalars(
+                    select(Article)
+                    .where(
+                        Article.status.in_(
+                            [
+                                ArticleStatus.PUBLISHED,
+                                ArticleStatus.VALIDATION_FAILED,
+                                ArticleStatus.NEEDS_REVIEW,
+                                ArticleStatus.APPROVED,
+                                ArticleStatus.SCHEDULED,
+                                ArticleStatus.FAILED,
+                            ]
+                        )
+                    )
+                    .order_by(Article.id)
+                ).all()
+            )
+
+        workflow = ArticleWorkflow(session)
+        results: list[dict[str, object]] = []
+        for article in articles:
+            assert article is not None
+            label = article.title or article.primary_query
+            typer.echo(f"Rewriting #{article.id} ({article.market}) {label}…")
+            try:
+                outcome = workflow.regenerate(article)
+            except Exception as exc:
+                session.rollback()
+                typer.secho(f"  failed: {exc}", fg=typer.colors.RED)
+                results.append({"id": article.id, "ok": False, "error": str(exc)})
+                continue
+            ok = outcome.ok
+            typer.secho(
+                f"  → status={outcome.status} cost=${outcome.cost_usd:.3f} "
+                f"{outcome.reason or ''}".strip(),
+                fg=typer.colors.GREEN if ok else typer.colors.YELLOW,
+            )
+            if outcome.issues:
+                for issue in outcome.issues[:5]:
+                    typer.echo(f"    issue: {issue}")
+            results.append(
+                {
+                    "id": article.id,
+                    "ok": ok,
+                    "status": outcome.status,
+                    "cost_usd": outcome.cost_usd,
+                    "reason": outcome.reason,
+                    "title": article.title,
+                }
+            )
+            session.commit()
+        report = jobs.JobReport(
+            "rewrite",
+            ok=all(bool(r.get("ok")) for r in results) if results else False,
+            details={"articles": results},
+        )
+        _print(report)
+
+
 @app.command()
 def cycle() -> None:
     """Run sync → discover → generate → schedule."""
@@ -293,6 +379,78 @@ def check_telegram() -> None:
         close = getattr(client, "close", None)
         if callable(close):
             close()
+
+
+@app.command("check-max")
+def check_max(
+    post: Annotated[
+        bool, typer.Option("--post", help="Also send a short smoke post to the RU Max channel")
+    ] = False,
+) -> None:
+    """Verify Max bot token and RU channel access (secondary publish surface)."""
+    _bootstrap()
+    from app.max.client import MaxBotClient
+    from app.max.publisher import max_smoke_details
+
+    settings = get_settings()
+    if not settings.max_ru_active:
+        typer.secho(
+            "Max RU not configured (set MAX_BOT_TOKEN + MAX_RU_CHANNEL_ID)",
+            fg=typer.colors.YELLOW,
+        )
+        raise typer.Exit(code=0)
+    try:
+        details = max_smoke_details(settings)
+        typer.echo(json.dumps(details, ensure_ascii=False, indent=2))
+        if post:
+            client = MaxBotClient(settings)
+            try:
+                sent = client.send_message(
+                    text="WeGoTrip Max smoke test — можно удалить.",
+                    format=None,
+                )
+                typer.secho(
+                    f"smoke post ok: chat_id={sent.chat_id} mid={sent.message_id}",
+                    fg=typer.colors.GREEN,
+                )
+            finally:
+                client.close()
+    except Exception as exc:
+        typer.secho(f"Max check failed: {exc}", fg=typer.colors.RED)
+        raise typer.Exit(code=1) from exc
+
+
+@app.command("style-max")
+def style_max(
+    pin: Annotated[
+        bool, typer.Option("--pin/--no-pin", help="Pin an intro post in the RU Max channel")
+    ] = True,
+) -> None:
+    """Align Max bot + RU channel title/description with Telegram @wegotrip_ru."""
+    _bootstrap()
+    from app.max.branding import apply_max_branding
+
+    settings = get_settings()
+    if not settings.max_ru_active:
+        typer.secho("Max RU not configured", fg=typer.colors.YELLOW)
+        raise typer.Exit(code=1)
+    try:
+        result = apply_max_branding(settings, pin_intro=pin)
+        typer.echo(
+            json.dumps(
+                {
+                    "bot": result.bot,
+                    "chat_title": (result.chat or {}).get("title"),
+                    "chat_description": (result.chat or {}).get("description"),
+                    "pinned": result.pinned,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+    except Exception as exc:
+        typer.secho(f"Max branding failed: {exc}", fg=typer.colors.RED)
+        raise typer.Exit(code=1) from exc
 
 
 secrets_app = typer.Typer(help="Encrypted credential storage", no_args_is_help=True)
@@ -533,6 +691,17 @@ def doctor() -> None:
             "telegram_test_channel",
             bool(settings.telegram_test_channel),
             settings.telegram_test_channel or "MISSING",
+        )
+    )
+    checks.append(
+        (
+            "max_ru",
+            True,
+            (
+                "enabled"
+                if settings.max_ru_active
+                else "off (set MAX_BOT_TOKEN + MAX_RU_CHANNEL_ID)"
+            ),
         )
     )
     checks.append(

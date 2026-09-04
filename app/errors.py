@@ -64,6 +64,22 @@ class TelegramValidationError(TelegramError):
     retryable = False
 
 
+class MaxError(UpstreamError):
+    """Max Bot API failure."""
+
+
+class MaxRateLimited(MaxError):
+    def __init__(self, message: str, retry_after: int = 1):
+        super().__init__(message, status_code=429)
+        self.retry_after = retry_after
+
+
+class MaxValidationError(MaxError):
+    """Max rejected the payload; retrying the same payload will not help."""
+
+    retryable = False
+
+
 class BudgetExceeded(EngineError):
     """The projected cost of an operation would break the daily hard cap."""
 
@@ -98,6 +114,9 @@ __all__ = [
     "EngineError",
     "LLMError",
     "LLMOutputError",
+    "MaxError",
+    "MaxRateLimited",
+    "MaxValidationError",
     "MediaValidationError",
     "TelegramError",
     "TelegramRateLimited",

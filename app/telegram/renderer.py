@@ -71,6 +71,7 @@ class RichMessageRenderer:
         out: list[dict[str, Any]] = []
         cards: list[RenderedProductCard] = []
         used_media: list[str] = []
+        used_image_urls: set[str] = set()
 
         def resolve(product: Product, placement: str) -> str:
             if url_resolver is not None:
@@ -81,6 +82,7 @@ class RichMessageRenderer:
         if cover is not None:
             out.append(tb.photo(cover.url, caption=cover.caption))
             used_media.append(cover.id)
+            used_image_urls.add(cover.url)
 
         out.append(tb.heading(document.title, size=1))
         if document.intro.strip():
@@ -111,10 +113,12 @@ class RichMessageRenderer:
                     candidate is None
                     or candidate.id in used_media
                     or candidate.id in blocked_media_ids
+                    or candidate.url in used_image_urls
                 ):
                     continue
                 out.append(tb.photo(candidate.url, caption=placement.caption or candidate.caption))
                 used_media.append(candidate.id)
+                used_image_urls.add(candidate.url)
 
             for placement in audio_by_section.get(index, []):
                 url = audio_urls.get(placement.product_id)
@@ -144,6 +148,7 @@ class RichMessageRenderer:
                         link_context,
                         pitch=placement.pitch,
                         url_override=resolve(product, "hero"),
+                        used_image_urls=used_image_urls,
                     )
                     if placement.placement == "hero"
                     else self.cards.compact(
@@ -156,6 +161,9 @@ class RichMessageRenderer:
                 )
                 out.extend(card.blocks)
                 cards.append(card)
+                image = product.cover or product.preview
+                if image:
+                    used_image_urls.add(image)
 
         if document.faq:
             out.append(tb.divider())
