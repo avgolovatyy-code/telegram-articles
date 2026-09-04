@@ -178,7 +178,7 @@ def test_renderer_does_not_duplicate_product_cover_photo(product, settings):
             source_entity_type="product",
             role="gallery",
             caption=product.title,
-            product_id=product.external_id,
+            product_external_id=product.external_id,
         )
     }
     document = sample_document()

@@ -214,28 +214,27 @@ class GenerationPipeline:
             topic.status = TopicStatus.GENERATING
             # Snapshot live content so a failed rewrite does not leave a published
             # article with unpublished body / unedited Telegram posts out of sync.
-            snapshot = {
-                "title": article.title,
-                "body": article.body,
-                "rendered_message": article.rendered_message,
-                "char_count": article.char_count,
-                "quality_scores": article.quality_scores,
-                "quality_score": article.quality_score,
-                "factuality_score": article.factuality_score,
-                "validation_issues": list(article.validation_issues or []),
-                "status_reason": article.status_reason,
-            }
+            snapshot_title = article.title
+            snapshot_body = article.body
+            snapshot_rendered = article.rendered_message
+            snapshot_char_count = article.char_count
+            snapshot_quality_scores = dict(article.quality_scores or {})
+            snapshot_quality_score = article.quality_score
+            snapshot_factuality_score = article.factuality_score
+            snapshot_validation_issues = list(article.validation_issues or [])
+            snapshot_status_reason = article.status_reason
             self.session.flush()
 
             def _restore_published_snapshot() -> None:
-                article.title = snapshot["title"]
-                article.body = snapshot["body"]
-                article.rendered_message = snapshot["rendered_message"]
-                article.char_count = snapshot["char_count"]
-                article.quality_scores = snapshot["quality_scores"]
-                article.quality_score = snapshot["quality_score"]
-                article.factuality_score = snapshot["factuality_score"]
-                article.validation_issues = snapshot["validation_issues"]
+                article.title = snapshot_title
+                article.body = snapshot_body
+                article.rendered_message = snapshot_rendered
+                article.char_count = snapshot_char_count
+                article.quality_scores = snapshot_quality_scores
+                article.quality_score = snapshot_quality_score
+                article.factuality_score = snapshot_factuality_score
+                article.validation_issues = snapshot_validation_issues
+                article.status_reason = snapshot_status_reason
                 article.status = ArticleStatus.PUBLISHED
                 topic.status = TopicStatus.USED
 
@@ -284,7 +283,7 @@ class GenerationPipeline:
             elif (
                 not outcome.ok
                 and previous_status == ArticleStatus.PUBLISHED
-                and snapshot["body"] is not None
+                and snapshot_body is not None
             ):
                 _restore_published_snapshot()
                 article.status_reason = (
