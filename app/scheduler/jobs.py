@@ -28,13 +28,14 @@ from app.db.types import utcnow
 from app.errors import EngineError, TelegramRateLimited
 from app.generation.pipeline import GenerationPipeline
 from app.logging_setup import get_logger, job_context, new_job_id
-from app.max.publisher import maybe_publish_ru_to_max
 from app.slack.notifications import SlackNotifier
 from app.telegram.api import build_telegram_client
 from app.telegram.publisher import TelegramPublisher
 from app.topics.clusters import KeywordClusterRegistry
 from app.topics.coverage import CoverageReport, assess_coverage
 from app.topics.discovery import TopicDiscoveryService, select_topics_for_generation
+from app.topics.diversity import order_articles_for_schedule
+from app.max.publisher import maybe_publish_ru_to_max
 
 log = get_logger("scheduler.jobs")
 
@@ -310,6 +311,10 @@ def schedule_publications(
             if not pending:
                 report.details[f"{market}_scheduled"] = 0
                 continue
+
+            pending = order_articles_for_schedule(
+                pending, session, market, settings=settings
+            )
 
             # The daily figure, when set, is a ceiling for the whole day rather than per
             # scheduler run: this job runs several times a day and must not multiply it.

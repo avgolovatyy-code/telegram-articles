@@ -1,4 +1,9 @@
-"""Best-effort Max fan-out after a successful Telegram RU production publish."""
+"""Best-effort Max fan-out after a successful Telegram RU production publish.
+
+Forward-only: Max never backfills historical Telegram posts. When Max was
+connected later than Telegram, it simply starts mirroring new RU production
+publishes from that point on.
+"""
 
 from __future__ import annotations
 

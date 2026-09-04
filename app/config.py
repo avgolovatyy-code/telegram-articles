@@ -125,6 +125,15 @@ class Settings(BaseSettings):
     publish_window_start_hour: int = 9
     publish_window_end_hour: int = 21
     stale_article_refresh_hours: int = 24
+    #: Max articles about the same city (or city-scoped category) per publish day.
+    max_same_city_per_day: int = 1
+    #: Max articles about the same attraction per publish day.
+    max_same_attraction_per_day: int = 1
+    #: For RU market: prefer Russia destinations before other countries.
+    ru_prefer_domestic: bool = True
+    #: Target share of the daily RU generation batch that should be Russia-geo
+    #: when domestic candidates exist (0–1).
+    ru_domestic_share: float = 0.7
 
     # ---------------------------------------------------------------- quality
     min_quality_score: float = 0.88

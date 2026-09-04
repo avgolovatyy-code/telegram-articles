@@ -43,6 +43,10 @@ os.environ["SLACK_CHANNEL"] = ""
 os.environ["MAX_BOT_TOKEN"] = ""
 os.environ["MAX_RU_CHANNEL_ID"] = ""
 os.environ["MAX_PUBLISH_RU"] = "true"
+os.environ["MAX_SAME_CITY_PER_DAY"] = "1"
+os.environ["MAX_SAME_ATTRACTION_PER_DAY"] = "1"
+os.environ["RU_PREFER_DOMESTIC"] = "true"
+os.environ["RU_DOMESTIC_SHARE"] = "0.7"
 
 from app.config import Settings, reload_settings
 from app.db import models  # noqa: F401

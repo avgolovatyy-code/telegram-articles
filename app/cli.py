@@ -419,6 +419,39 @@ def check_max(
         typer.secho(f"Max check failed: {exc}", fg=typer.colors.RED)
         raise typer.Exit(code=1) from exc
 
+
+@app.command("style-max")
+def style_max(
+    pin: Annotated[
+        bool, typer.Option("--pin/--no-pin", help="Pin an intro post in the RU Max channel")
+    ] = True,
+) -> None:
+    """Align Max bot + RU channel title/description with Telegram @wegotrip_ru."""
+    _bootstrap()
+    from app.max.branding import apply_max_branding
+
+    settings = get_settings()
+    if not settings.max_ru_active:
+        typer.secho("Max RU not configured", fg=typer.colors.YELLOW)
+        raise typer.Exit(code=1)
+    try:
+        result = apply_max_branding(settings, pin_intro=pin)
+        typer.echo(
+            json.dumps(
+                {
+                    "bot": result.bot,
+                    "chat_title": (result.chat or {}).get("title"),
+                    "chat_description": (result.chat or {}).get("description"),
+                    "pinned": result.pinned,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+    except Exception as exc:
+        typer.secho(f"Max branding failed: {exc}", fg=typer.colors.RED)
+        raise typer.Exit(code=1) from exc
+
 secrets_app = typer.Typer(help="Encrypted credential storage", no_args_is_help=True)
 app.add_typer(secrets_app, name="secrets")
 
