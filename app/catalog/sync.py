@@ -160,17 +160,26 @@ class CatalogSyncService:
         for city in cities:
             if city.external_id in seen:
                 row = self._find(City, market, city.external_id)
-                if row is not None and (city.product_count or 0) > (row.product_count or 0):
-                    row.product_count = city.product_count
-                    row.country_external_id = city.country_external_id or row.country_external_id
+                if row is not None:
+                    if (city.product_count or 0) > (row.product_count or 0):
+                        row.product_count = city.product_count
+                        row.raw = city.raw or row.raw
+                    country_id = city.country_external_id or self._resolve_country_id(
+                        market, city.country_name
+                    )
+                    row.country_external_id = (
+                        country_id or row.country_external_id
+                    )
                     row.country_name = city.country_name or row.country_name
-                    row.raw = city.raw or row.raw
                 continue
             seen.add(city.external_id)
             row = self._get_or_create(City, market, city.external_id)
             row.slug = city.slug
             row.name = city.name
-            row.country_external_id = city.country_external_id or row.country_external_id
+            country_id = city.country_external_id or self._resolve_country_id(
+                market, city.country_name
+            )
+            row.country_external_id = country_id or row.country_external_id
             row.country_name = city.country_name or row.country_name
             row.popular = city.popular
             row.media = [asset.model_dump() for asset in city.media]
@@ -196,6 +205,20 @@ class CatalogSyncService:
             )
         )
         return row.external_id if row is not None else None
+
+    def _resolve_country_id(self, market: Market, country_name: str | None) -> str | None:
+        """Map a bare country name (common on wegotrip.ru city payloads) to an id."""
+        if not country_name:
+            return None
+        if not hasattr(self, "_country_name_index"):
+            self._country_name_index: dict[tuple[str, str], str] = {}
+            self._country_name_markets: set[str] = set()
+        if market not in self._country_name_markets:
+            for row in self.session.scalars(select(Country).where(Country.market == market)):
+                if row.name:
+                    self._country_name_index[(market, row.name.casefold())] = row.external_id
+            self._country_name_markets.add(market)
+        return self._country_name_index.get((market, country_name.casefold()))
 
     def _prioritized_city_ids(self, market: Market, ids: list[str]) -> list[str]:
         """Prefer Russia (for RU market), then deeper inventory, for attraction sync."""
