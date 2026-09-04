@@ -37,9 +37,21 @@ def _ssl_verify(settings: Settings) -> bool | str:
     """
     if not settings.max_ssl_verify:
         return False
-    for candidate in (settings.max_ssl_ca_file, str(DEFAULT_CA_PATH)):
+    candidates = [
+        settings.max_ssl_ca_file,
+        str(DEFAULT_CA_PATH),
+        # Source-tree path when the console script loads a site-packages install
+        # that was built without package data (older images).
+        "/app/app/max/certs/russian_trusted_root_ca.crt",
+    ]
+    for candidate in candidates:
         if candidate and Path(candidate).is_file():
             return candidate
+    log.warning(
+        "max.ssl_ca_missing",
+        default=str(DEFAULT_CA_PATH),
+        hint="package data *.crt missing from install; falling back to system CAs",
+    )
     return True
 
 
