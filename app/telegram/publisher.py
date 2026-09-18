@@ -8,6 +8,9 @@ publication first and claims the queue row with a lock before contacting Telegra
 A timeout is treated as *unknown*, not as failure: the row stays claimed and a
 reconciliation pass decides, so the engine never re-posts a message that may have
 already gone out.
+
+Telegram always uses ``sendRichMessage`` with a blocks-mode ``InputRichMessage``.
+Max has a separate renderer and must never supply the payload here.
 """
 
 from __future__ import annotations
