@@ -3,6 +3,11 @@
 Forward-only: Max never backfills historical Telegram posts. When Max was
 connected later than Telegram, it simply starts mirroring new RU production
 publishes from that point on.
+
+Format separation (same article, two surfaces):
+- Telegram keeps block-based ``InputRichMessage`` via ``sendRichMessage``.
+- Max re-renders ``article.body`` into Max markdown/html + buttons.
+  It never reads or overwrites ``article.rendered_message``.
 """
 
 from __future__ import annotations

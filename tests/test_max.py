@@ -11,7 +11,7 @@ from app.max.chat_id import (
     resolve_max_chat_id,
 )
 from app.max.publisher import MaxPublisher
-from app.max.renderer import MAX_TEXT_CHARS, render_max_payload
+from app.max.renderer import MAX_FORMAT, MAX_TEXT_CHARS, render_max_payload
 
 
 def make_article(session, *, market: str = "ru", **overrides) -> Article:
@@ -93,9 +93,24 @@ def test_render_max_payload_fits_limit_and_adds_product_buttons(session, setting
     payload = render_max_payload(article)
     assert len(payload["text"]) <= MAX_TEXT_CHARS
     assert "Барселона" in payload["text"]
-    assert payload["format"] == "markdown"
+    assert payload["format"] == MAX_FORMAT
+    if MAX_FORMAT == "html":
+        assert "<h1>" in payload["text"]
+        assert "<h2>" in payload["text"] or "<p>" in payload["text"]
+        assert "**" not in payload["text"]  # not markdown markers
     assert payload["attachments"][0]["type"] == "inline_keyboard"
     assert payload["attachments"][0]["payload"]["buttons"][0][0]["url"].startswith("https://")
+
+
+def test_max_payload_is_not_a_telegram_rich_message(session, settings):
+    """Guards the dual-format contract: Max shape must fail Telegram validation."""
+    from app.telegram.blocks import validate_rich_message
+
+    article = make_article(session)
+    payload = render_max_payload(article)
+    errors = validate_rich_message(payload)
+    assert errors
+    assert any("Max" in e or "blocks" in e for e in errors)
 
 
 def test_max_publisher_skips_when_unconfigured(session, settings):

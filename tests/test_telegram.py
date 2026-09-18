@@ -117,6 +117,13 @@ def test_validation_rejects_an_empty_message():
     assert tb.validate_rich_message({"blocks": []})
 
 
+def test_validation_rejects_max_and_markdown_shapes():
+    assert tb.validate_rich_message({"text": "hello", "format": "markdown"})
+    assert tb.validate_rich_message({"markdown": "# Hello"})
+    assert tb.validate_rich_message({"html": "<b>Hi</b>"})
+    assert tb.validate_rich_message({"text": "plain only"})
+
+
 def test_validation_enforces_the_character_limit():
     message = tb.rich_message([tb.paragraph("x" * (tb.CHAR_LIMIT + 1))])
     assert any("characters" in error for error in tb.validate_rich_message(message))
