@@ -14,7 +14,7 @@ from typing import Any
 import httpx
 
 from app.ai.provider import Citation, LLMRequest, LLMResponse, Usage
-from app.catalog.http import request_with_retries
+from app.catalog.http import RateLimiter, request_with_retries
 from app.config import Settings, get_settings
 from app.errors import ConfigurationError, LLMError, LLMOutputError
 from app.logging_setup import get_logger
@@ -40,6 +40,8 @@ class OpenAIProvider:
                 "Content-Type": "application/json",
             },
         )
+        #: Stay under org TPM/RPM when the worker runs several jobs close together.
+        self._limiter = RateLimiter(self._settings.openai_rate_limit_rps)
 
     def close(self) -> None:
         if self._owns_client:
@@ -80,6 +82,7 @@ class OpenAIProvider:
             "/responses",
             json=payload,
             max_retries=self._settings.openai_max_retries,
+            limiter=self._limiter,
             error_cls=LLMError,
         )
         duration_ms = int((time.monotonic() - started) * 1000)

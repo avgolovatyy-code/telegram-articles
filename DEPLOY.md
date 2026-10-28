@@ -230,7 +230,12 @@ Cloud Agents → Secrets или на сервере через `wgt secrets set 
 | `TELEGRAM_BOT_TOKEN` | да | шаг 1 | публикация в каналы |
 | `TELEGRAM_TEST_CHANNEL` | да | шаг 2 | обязательная проверка вёрстки до продакшена |
 | `MAX_BOT_TOKEN` | нет | платформа Max / «MAX для бизнеса» | зеркало RU-постов в Max |
-| `MAX_RU_CHANNEL_ID` | нет | API `chat_id` (напр. `-7351…`) или публичный slug канала | куда слать RU в Max |
+| `MAX_RU_CHANNEL_ID` | нет | **numeric** API `chat_id` (предпочтительно; не менять при смене публичного URL) | куда слать RU в Max |
+| `MAXAPP_CHANNEL_PUBLIC_URL` | нет | `https://max.ru/channel_wegotrip` (CTA/docs only) | канонический адрес существующего канала |
+| `MAXAPP_AUDIENCE_COUNTRY` | нет | `RU` | Max только для аудитории в России |
+| `MAXAPP_RU_DOMESTIC_SHARE_TARGET` | нет | `0.75` | soft-доля локальных/российских тем |
+| `MAXAPP_RU_OUTBOUND_SHARE_TARGET` | нет | `0.25` | soft-доля зарубежных поездок из РФ |
+| `MAXAPP_UTM_SOURCE` | нет | `max` | UTM для Max product links |
 | `ADMIN_PASSWORD` | да | генерируется скриптом | вход в админку |
 | `DEPLOY_DOMAIN` | нет | шаг 5 | свой домен вместо бесплатного `*.sslip.io` |
 | `ACME_EMAIL` | нет | ваша почта | уведомления Let's Encrypt |

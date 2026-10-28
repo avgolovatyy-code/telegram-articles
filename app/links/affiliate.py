@@ -26,12 +26,16 @@ class LinkContext:
     market: Market
     article_id: str | None = None
     topic_slug: str | None = None
+    #: Override platform UTM source (e.g. ``max`` for Max messenger posts).
+    utm_source: str | None = None
+    utm_medium: str | None = None
+    utm_campaign: str | None = None
 
     def utm_params(self, settings: Settings) -> dict[str, str]:
         params = {
-            "utm_source": settings.utm_source,
-            "utm_medium": settings.utm_medium,
-            "utm_campaign": settings.utm_campaign(self.market),
+            "utm_source": self.utm_source or settings.utm_source,
+            "utm_medium": self.utm_medium or settings.utm_medium,
+            "utm_campaign": self.utm_campaign or settings.utm_campaign(self.market),
         }
         if self.article_id:
             params["utm_content"] = str(self.article_id)

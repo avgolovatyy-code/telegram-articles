@@ -25,6 +25,7 @@ from app.db.enums import ArticleStatus, PublicationStatus, PublicationTarget
 from app.db.models import Article, ArticleProduct, Product, PublicationQueueItem
 from app.db.models import Market as MarketRow
 from app.db.types import utcnow
+from app.editorial.eligibility import article_meets_editorial_spec, publication_allowed
 from app.errors import EngineError, TelegramRateLimited
 from app.generation.pipeline import GenerationPipeline
 from app.logging_setup import get_logger, job_context, new_job_id
@@ -287,6 +288,8 @@ def schedule_publications(
     """Spread approved articles evenly across the publishing window (spec §35)."""
     settings = settings or get_settings()
     report = JobReport("schedule_publications")
+    if not settings.old_article_auto_scheduler_enabled:
+        report.details["legacy_scheduler"] = "disabled"
     client = build_telegram_client(settings)
     publisher = TelegramPublisher(session, client, settings=settings)
 
@@ -306,6 +309,7 @@ def schedule_publications(
                     .order_by(Article.created_at)
                 ).all()
             )
+            pending = [row for row in pending if article_meets_editorial_spec(row, settings)]
             if not pending:
                 report.details[f"{market}_scheduled"] = 0
                 continue
@@ -555,6 +559,11 @@ def process_publication_queue(
                 item.status = PublicationStatus.FAILED
                 item.last_error = "article or rendered payload missing"
                 continue
+            allowed, block_reason = publication_allowed(article, settings, item.target)
+            if not allowed:
+                item.status = PublicationStatus.CANCELLED
+                item.last_error = block_reason
+                continue
             with job_context(
                 "publication.publish",
                 job_id=worker_id,
@@ -579,7 +588,9 @@ def process_publication_queue(
                                 channel=result.publication.channel_username,
                             )
                             if article.market == "ru":
-                                max_result = maybe_publish_ru_to_max(article, settings=settings)
+                                max_result = maybe_publish_ru_to_max(
+                                    article, settings=settings, session=session
+                                )
                                 ctx["max"] = (
                                     "skipped"
                                     if max_result.skipped
@@ -683,6 +694,35 @@ def cleanup_expired(session: Session, *, settings: Settings | None = None) -> Jo
     return report
 
 
+def archive_legacy_backlog(session: Session, *, settings: Settings | None = None) -> JobReport:
+    """Archive unpublished articles created before ``EDITORIAL_SPEC_CUTOFF_DATE``."""
+    from app.editorial.eligibility import editorial_spec_cutoff_utc
+
+    settings = settings or get_settings()
+    report = JobReport("archive_legacy_backlog")
+    cutoff = editorial_spec_cutoff_utc(settings)
+    if cutoff is None:
+        report.details["archived"] = 0
+        report.details["note"] = "EDITORIAL_SPEC_CUTOFF_DATE is not set"
+        return report
+
+    keep = {ArticleStatus.PUBLISHED, ArticleStatus.ARCHIVED}
+    rows = list(
+        session.scalars(
+            select(Article).where(
+                Article.created_at < cutoff,
+                Article.status.not_in(keep),
+            )
+        ).all()
+    )
+    for article in rows:
+        article.status = ArticleStatus.ARCHIVED
+        article.status_reason = "legacy backlog archived for editorial spec v2.2"
+    session.flush()
+    report.details["archived"] = len(rows)
+    return report
+
+
 def run_daily_cycle(settings: Settings | None = None) -> list[JobReport]:
     """Sync → discover → generate → schedule, in one transaction per step."""
     settings = settings or get_settings()
@@ -695,6 +735,7 @@ def run_daily_cycle(settings: Settings | None = None) -> list[JobReport]:
 
 __all__ = [
     "JobReport",
+    "archive_legacy_backlog",
     "cleanup_expired",
     "coverage_report",
     "discover_topics",

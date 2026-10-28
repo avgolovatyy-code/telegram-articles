@@ -18,11 +18,14 @@ log = get_logger("max.branding")
 #: Mirror of the live Telegram RU channel (@wegotrip_ru) title/description,
 #: adapted for Max (bot deep-link instead of wegotrip.com-only footer).
 CHANNEL_TITLE = "WeGoTrip — Куда сходить и что посмотреть"
+#: Draft for Max Russia-only audience (addendum v1.1 §2). Apply only after owner approval.
 CHANNEL_DESCRIPTION = (
-    "Живые гиды по городам и практичные подборки — интересно читать, полезно перед поездкой.\n"
-    "Аудиогиды и билеты в музеи по всему миру — с приоритетом городов России.\n"
-    "https://wegotrip.ru/"
+    "Куда сходить в выходные и куда отправиться в поездку? Музеи, выставки, необычные места, "
+    "маршруты и полезные новости — для местных жителей и путешественников. "
+    "Пишем живо, по делу и иногда с улыбкой. https://wegotrip.ru"
 )
+#: Canonical public URL — do not invent a new channel or change numeric chat_id.
+CHANNEL_PUBLIC_URL = "https://max.ru/channel_wegotrip"
 
 #: Align with Telegram bot display name (wegotripbot → "WeGoTrip Tours & Tickets").
 BOT_NAME = "WeGoTrip Tours & Tickets"

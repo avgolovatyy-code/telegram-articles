@@ -6,6 +6,7 @@ budgets, channels or affiliate identifiers.
 
 from __future__ import annotations
 
+import datetime as dt
 import os
 from functools import lru_cache
 from typing import Literal
@@ -70,9 +71,13 @@ class Settings(BaseSettings):
     # -------------------------------------------------------------------- Max
     #: Secondary RU publish surface (Telegram stays primary). When token + channel
     #: id are set, production RU Telegram publishes also fan out to Max best-effort.
+    #: Env prefix ``MAX_`` is legacy (conflicts with "maximum" in editorial quotas);
+    #: prefer ``MAXAPP_*`` for new Max-platform settings below. Token + chat_id keep
+    #: ``MAX_BOT_TOKEN`` / ``MAX_RU_CHANNEL_ID`` so existing deployments stay intact.
     max_bot_token: str | None = None
-    #: Numeric API chat_id (e.g. ``-71234567890123``) or public slug / URL
-    #: (``NNNNNNNN_biz``, ``https://max.ru/idNNNNNNNN_biz``).
+    #: Numeric API chat_id (preferred). Public slug/URL also accepted for resolve,
+    #: but production should keep a stable numeric id so public URL renames never
+    #: change the API destination. Never recreate the channel.
     max_ru_channel_id: str | None = None
     max_api_base_url: str = "https://platform-api2.max.ru"
     max_timeout_seconds: float = 30.0
@@ -82,6 +87,22 @@ class Settings(BaseSettings):
     max_ssl_ca_file: str | None = None
     #: Explicit kill-switch; credentials alone are enough to enable Max fan-out.
     max_publish_ru: bool = True
+    #: Canonical public channel URL (addendum v1.1). Display/CTA only — not chat_id.
+    maxapp_channel_public_url: str = "https://max.ru/channel_wegotrip"
+    #: Legacy public alias of the same channel (migration / audit only).
+    maxapp_channel_legacy_url: str | None = None
+    maxapp_audience_country: str = "RU"
+    maxapp_editorial_timezone: str = "Europe/Moscow"
+    #: Soft content mix for Max: local/domestic Russia vs outbound-from-RU.
+    maxapp_ru_domestic_share_target: float = 0.75
+    maxapp_ru_outbound_share_target: float = 0.25
+    maxapp_bot_public_url: str = "https://max.ru/id7816636266_bot"
+    maxapp_utm_source: str = "max"
+    maxapp_posts_per_week_target: int = 4
+    maxapp_posts_per_week_min: int = 3
+    maxapp_posts_per_week_max: int = 4
+    maxapp_max_posts_per_day: int = 1
+    maxapp_auto_publish: bool = False
 
     # ---------------------------------------------------------------- OpenAI
     openai_api_key: str | None = None
@@ -93,6 +114,8 @@ class Settings(BaseSettings):
     openai_image_model: str = "gpt-image-2"
     openai_timeout_seconds: float = 240.0
     openai_max_retries: int = 3
+    #: Minimum spacing between OpenAI HTTP calls (shared limiter per provider instance).
+    openai_rate_limit_rps: float = 0.2
     llm_provider: Literal["openai", "mock"] = "openai"
 
     # ---------------------------------------------------------------- budget
@@ -143,6 +166,8 @@ class Settings(BaseSettings):
     editorial_v2_dry_run: bool = True
     #: Legacy mass article auto-scheduler. Turn off only after V2 calendar rollout.
     old_article_auto_scheduler_enabled: bool = True
+    #: Articles created before this date (publish TZ) cannot be published; backlog is archived.
+    editorial_spec_cutoff_date: dt.date | None = None
     #: Never auto-apply channel title/description/pin without explicit approval.
     channel_branding_apply_enabled: bool = False
     ru_posts_per_week_min: int = 5
@@ -225,6 +250,15 @@ class Settings(BaseSettings):
         if value <= 0:
             raise ValueError("DAILY_AI_BUDGET_USD must be > 0")
         return value
+
+    @field_validator("editorial_spec_cutoff_date", mode="before")
+    @classmethod
+    def _parse_cutoff_date(cls, value: object) -> dt.date | None:
+        if value is None or value == "":
+            return None
+        if isinstance(value, dt.date):
+            return value
+        return dt.date.fromisoformat(str(value).strip())
 
     # ------------------------------------------------------------- accessors
     @property

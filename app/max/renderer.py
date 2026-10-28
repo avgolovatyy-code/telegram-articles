@@ -10,8 +10,10 @@ from __future__ import annotations
 from html import escape as html_escape
 from typing import Any
 
+from app.config import Settings, get_settings
 from app.db.models import Article
 from app.generation.schemas import ArticleDocument
+from app.links.affiliate import AffiliateLinkBuilder, LinkContext
 
 MAX_TEXT_CHARS = 4000
 #: Leave room for a trailing products section / ellipsis.
@@ -110,15 +112,40 @@ def _fit(parts: list[str], budget: int, *, joiner: str = "\n\n") -> str:
     return joiner.join(out)
 
 
-def render_max_payload(article: Article) -> dict[str, Any]:
+def _max_product_url(url: str, article: Article, settings: Settings) -> str:
+    """Force ``coupon`` + ``utm_source=max`` without inheriting Telegram UTM."""
+    builder = AffiliateLinkBuilder(settings)
+    if not builder.is_store_url(url):
+        return url
+    ctx = LinkContext(
+        market="ru",
+        article_id=str(article.id) if article.id is not None else article.public_id,
+        topic_slug=article.topic_slug,
+        utm_source=settings.maxapp_utm_source or "max",
+        utm_medium="organic_social",
+        utm_campaign="editorial_ru",
+    )
+    return builder.decorate(url, ctx)
+
+
+def render_max_payload(
+    article: Article,
+    *,
+    settings: Settings | None = None,
+    document: ArticleDocument | None = None,
+    title: str | None = None,
+) -> dict[str, Any]:
     """Build Max ``POST /messages`` body fields (text + attachments).
 
-    Reads ``article.body`` only — never ``article.rendered_message`` (Telegram).
+    Uses an adapted ``ArticleDocument`` when provided; otherwise reads
+    ``article.body`` only — never ``article.rendered_message`` (Telegram).
     """
-    if not article.body:
-        raise ValueError("article has no body")
-    document = ArticleDocument.model_validate(article.body)
-    title = (article.title or document.title or "").strip() or "WeGoTrip"
+    settings = settings or get_settings()
+    if document is None:
+        if not article.body:
+            raise ValueError("article has no body")
+        document = ArticleDocument.model_validate(article.body)
+    title = (title or article.title or document.title or "").strip() or "WeGoTrip"
 
     if MAX_FORMAT == "html":
         body = _fit(_section_parts_html(document), BODY_BUDGET)
@@ -137,9 +164,10 @@ def render_max_payload(article: Article) -> dict[str, Any]:
     for ap in sorted(article.products, key=lambda p: (p.position, p.id)):
         if not ap.active:
             continue
-        url = (ap.tracking_url or ap.affiliate_url or "").strip()
-        if not url:
+        raw_url = (ap.affiliate_url or ap.tracking_url or "").strip()
+        if not raw_url:
             continue
+        url = _max_product_url(raw_url, article, settings)
         snap = ap.snapshot if isinstance(ap.snapshot, dict) else {}
         label = str(snap.get("title") or snap.get("name") or "WeGoTrip").strip()
         if len(label) > 64:

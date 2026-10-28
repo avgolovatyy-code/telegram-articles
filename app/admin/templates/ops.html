@@ -77,6 +77,10 @@
       <tr><td>Hashtags</td><td>{{ config.hashtags }} (max {{ config.max_hashtags }})</td></tr>
       <tr><td>Catalog provider</td><td class="mono">{{ config.catalog_provider }}</td></tr>
       <tr><td>Telegram dry run</td><td>{{ config.dry_run }}</td></tr>
+      <tr><td>Max RU fan-out</td><td>{{ config.max_active }} (publish={{ config.max_publish_ru }})</td></tr>
+      <tr><td>Max public URL</td><td class="mono">{{ config.max_public_url }}</td></tr>
+      <tr><td>Max audience</td><td>{{ config.max_audience }} · domestic {{ config.max_domestic_share }} / outbound {{ config.max_outbound_share }}</td></tr>
+      <tr><td>Max quotas</td><td>≤{{ config.max_day_max }}/day · ≤{{ config.max_week_max }}/week</td></tr>
     </table>
   </div>
 </div>

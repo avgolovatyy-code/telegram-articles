@@ -6,6 +6,7 @@
 * План: `EDITORIAL_V2_IMPLEMENTATION_PLAN.md`
 * Чеклист: `EDITORIAL_V2_REQUIREMENTS_STATUS.md`
 * Оформление каналов (approval first): `CHANNEL_BRANDING_PROPOSAL.md`
+* MAX addendum v1.1: `WEGOTRIP_MAX_EDITORIAL_ADDENDUM_V1_1_CURSOR.md` · `MAX_IMPLEMENTATION_PLAN.md`
 
 Ниже сохранены архитектурные решения и ограничения API, на которых стоит прод.
 Статус чеклиста v1 — в `REQUIREMENTS_STATUS.md`.

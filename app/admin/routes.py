@@ -530,6 +530,14 @@ def ops_page(
             "max_hashtags": settings.max_hashtags,
             "catalog_provider": settings.catalog_provider,
             "dry_run": settings.telegram_dry_run,
+            "max_active": settings.max_ru_active,
+            "max_public_url": settings.maxapp_channel_public_url,
+            "max_audience": settings.maxapp_audience_country,
+            "max_domestic_share": settings.maxapp_ru_domestic_share_target,
+            "max_outbound_share": settings.maxapp_ru_outbound_share_target,
+            "max_week_max": settings.maxapp_posts_per_week_max,
+            "max_day_max": settings.maxapp_max_posts_per_day,
+            "max_publish_ru": settings.max_publish_ru,
         },
     }
     return templates.TemplateResponse(request, "ops.html", context)

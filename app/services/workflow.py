@@ -18,6 +18,7 @@ from app.config import Settings, get_settings
 from app.db.enums import ArticleStatus, PublicationTarget
 from app.db.models import Article, TelegramPublication
 from app.db.types import utcnow
+from app.editorial.eligibility import publication_allowed
 from app.errors import ConfigurationError, EngineError, ValidationFailed
 from app.generation.pipeline import GenerationOutcome, GenerationPipeline
 from app.logging_setup import get_logger
@@ -168,6 +169,9 @@ class ArticleWorkflow:
         return self._publish(article, PublicationTarget.PRODUCTION)
 
     def _publish(self, article: Article, target: PublicationTarget) -> WorkflowResult:
+        allowed, reason = publication_allowed(article, self.settings, target)
+        if not allowed:
+            return WorkflowResult(False, reason, article)
         rendered = render_stored_article(self.session, article, settings=self.settings)
         article.rendered_message = rendered.message
         client = build_telegram_client(self.settings)
@@ -194,7 +198,9 @@ class ArticleWorkflow:
         # Max fan-out is best-effort and format-independent: Telegram already got
         # the blocks-mode rich message above; Max re-renders article.body itself.
         if target == PublicationTarget.PRODUCTION and article.market == "ru" and result.created:
-            max_result = maybe_publish_ru_to_max(article, settings=self.settings)
+            max_result = maybe_publish_ru_to_max(
+                article, settings=self.settings, session=self.session
+            )
             if max_result.error:
                 return WorkflowResult(
                     True,
@@ -202,9 +208,17 @@ class ArticleWorkflow:
                     article,
                 )
             if max_result.sent is not None:
+                mid = max_result.sent.message_id or "?"
+                chat = max_result.sent.chat_id
                 return WorkflowResult(
                     True,
-                    f"published to {target}: {url}; Max chat_id={max_result.sent.chat_id}",
+                    f"published to {target}: {url}; Max mid={mid} chat_id={chat}",
+                    article,
+                )
+            if max_result.skipped and max_result.skip_reason:
+                return WorkflowResult(
+                    True,
+                    f"published to {target}: {url} (Max skipped: {max_result.skip_reason})",
                     article,
                 )
         return WorkflowResult(True, f"published to {target}: {url}", article)
