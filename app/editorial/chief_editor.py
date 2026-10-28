@@ -15,7 +15,7 @@ from app.db.enums import LLMTask
 from app.db.models import EditorialRun
 from app.db.types import utcnow
 from app.editorial.brief import build_daily_brief
-from app.editorial.planner import apply_decision_set
+from app.editorial.planner import apply_decision_set, last_valid_run
 from app.editorial.schemas import EditorialDecisionSet, editorial_decision_json_schema
 from app.errors import LLMError
 from app.logging_setup import get_logger
@@ -69,6 +69,7 @@ class ChiefEditorService:
                 report.details[f"{market}_run_id"] = run.run_id
                 report.details[f"{market}_status"] = run.status
                 report.details[f"{market}_thesis"] = (run.editorial_thesis or "")[:120]
+                report.details[f"{market}_slots"] = (run.diff or {}).get("applied_slots", 0)
             except Exception as exc:
                 report.ok = False
                 msg = f"{market}: {exc}"
@@ -78,6 +79,9 @@ class ChiefEditorService:
                 report.errors.append(msg)
                 log.error("chief_editor.failed", market=market, error=str(exc))
                 self._record_failure(market, run_date, msg)
+                previous = last_valid_run(self.session, market)
+                if previous is not None:
+                    report.details[f"{market}_kept_last_plan"] = previous.run_id
         return report
 
     def _run_market(

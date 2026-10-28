@@ -2,9 +2,10 @@
   "audit_date": "2026-10-28",
   "timezone_note": "Europe/Moscow for editorial dates",
   "repository": "telegram-articles",
-  "branch_deployed": "cursor/max-russia-audience-acd7",
-  "production_git_sha": "4e304da45fbbf12891e063c6628644a9829637aa",
-  "production_git_subject": "Throttle OpenAI requests to reduce 429 during generation",
+  "branch_deployed": "cursor/editorial-v2-compliance-cc0c",
+  "production_git_sha": "852bc00864653a391151be09fa30d409f673b755",
+  "production_git_subject": "Document OPENAI_KEY_TG_MAX env alias in .env.example",
+  "verification_r2_at": "2026-10-28T20:45:00+03:00",
   "host_domain": "209-38-45-22.sslip.io",
   "services": {
     "api": "healthy",
@@ -40,6 +41,7 @@
     "max_ru": "https://max.ru/channel_wegotrip",
     "admin": "https://209-38-45-22.sslip.io/admin"
   },
-  "openai_production_status": "credit_balance_exhausted (HTTP 429 insufficient_quota at audit time)",
+  "openai_production_status": "ok (wgt doctor openai_responses; chief_editor RU+EN smoke 2026-10-28 R2)",
+  "editorial_runs_summary": {"dry_run": 2, "failed": 4, "plan_slots_total": 0},
   "secrets_store": "5 encrypted entries in /app/var/secrets/secrets.enc"
 }

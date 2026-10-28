@@ -50,10 +50,22 @@ def test_v2_caps_daily_generation_plan(session, settings, monkeypatch):
     plan = BudgetManager(session, settings).plan_daily_generation(session=session)
     assert plan["en"] <= settings.max_posts_per_day
     assert plan["ru"] <= settings.max_posts_per_day
+    assert plan["en"] >= 1
+    assert plan["ru"] >= 1
+
+
+def test_v2_plan_ignores_unscheduled_drafts(session, settings, monkeypatch):
+    monkeypatch.setattr(settings, "editorial_v2_enabled", True)
+    _article(session, "en", status=ArticleStatus.NEEDS_REVIEW)
+    _article(session, "ru", status=ArticleStatus.NEEDS_REVIEW)
+    plan = BudgetManager(session, settings).plan_daily_generation(session=session)
+    assert plan["en"] == 1
+    assert plan["ru"] == 1
 
 
 def test_weekly_hard_cap_blocks_schedule(session, settings, monkeypatch):
     monkeypatch.setattr(settings, "editorial_v2_enabled", True)
+    monkeypatch.setattr(settings, "editorial_v2_dry_run", False)
     monkeypatch.setattr(settings, "auto_publish_en", True)
     monkeypatch.setattr(settings, "max_posts_per_day", 2)
     monkeypatch.setattr(settings, "en_posts_per_week_hard_cap", 1)
@@ -63,6 +75,23 @@ def test_weekly_hard_cap_blocks_schedule(session, settings, monkeypatch):
     report = jobs.schedule_publications(session, markets=("en",), settings=settings)
     assert report.details["en_scheduled"] == 0
     assert "weekly" in report.details.get("en_note", "").lower()
+
+
+def test_archived_takedown_does_not_fill_daily_quota(session, settings, monkeypatch):
+    monkeypatch.setattr(settings, "editorial_v2_enabled", True)
+    monkeypatch.setattr(settings, "editorial_v2_dry_run", False)
+    monkeypatch.setattr(settings, "auto_publish_ru", True)
+    monkeypatch.setattr(settings, "max_posts_per_day", 1)
+    now = utcnow()
+    taken = _article(session, "ru", status=ArticleStatus.ARCHIVED, scheduled=now)
+    taken.published_at = now
+    session.flush()
+    ready = _article(session, "ru", status=ArticleStatus.NEEDS_REVIEW)
+    ready.rendered_message = ready.rendered_message
+    ready.products_refreshed_at = now
+    session.flush()
+    report = jobs.schedule_publications(session, markets=("ru",), settings=settings)
+    assert report.details.get("ru_scheduled", 0) >= 1
 
 
 def test_rolling_week_counts_scheduled(session, settings, monkeypatch):

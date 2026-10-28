@@ -56,6 +56,21 @@ class TelegramClientProtocol(Protocol):
         protect_content: bool = ...,
     ) -> SentMessage: ...
 
+    def send_message(self, chat_id: str, text: str) -> SentMessage: ...
+
+    def send_photo(
+        self, chat_id: str, photo: str, caption: str | None = None
+    ) -> SentMessage: ...
+
+    def send_poll(
+        self,
+        chat_id: str,
+        question: str,
+        options: list[str],
+        *,
+        is_anonymous: bool = True,
+    ) -> SentMessage: ...
+
     def edit_rich_message(
         self, chat_id: str, message_id: int, rich_message: dict[str, Any]
     ) -> dict[str, Any]: ...
@@ -175,9 +190,13 @@ class TelegramPublisher:
             log.info("publisher.already_published", article_id=article.id, key=key)
             return PublicationResult(existing, created=False, reused=True)
 
-        errors = validate_rich_message(rich_message)
-        if errors:
-            raise TelegramValidationError("; ".join(errors))
+        from app.editorial.formats import native_payload
+
+        payload = native_payload(self.session, article)
+        if payload.method == "sendRichMessage":
+            errors = validate_rich_message(rich_message)
+            if errors:
+                raise TelegramValidationError("; ".join(errors))
 
         channel = self.channel_for(market, target)
         worker_id = worker_id or new_job_id("worker")
@@ -188,7 +207,7 @@ class TelegramPublisher:
             )
 
         try:
-            sent = self.client.send_rich_message(channel, rich_message)
+            sent = self._dispatch(channel, payload, rich_message)
         except TelegramRateLimited:
             if queue_item is not None:
                 queue_item.status = PublicationStatus.PENDING
@@ -243,8 +262,19 @@ class TelegramPublisher:
             target=str(target),
             channel=channel,
             message_id=sent.message_id,
+            format=payload.format,
+            method=payload.method,
         )
         return PublicationResult(publication, created=True)
+
+    def _dispatch(self, channel: str, payload: Any, rich_message: dict[str, Any]) -> SentMessage:
+        if payload.method == "sendPoll" and payload.question and payload.options:
+            return self.client.send_poll(channel, payload.question, payload.options)
+        if payload.method == "sendPhoto" and payload.photo:
+            return self.client.send_photo(channel, payload.photo, caption=payload.caption)
+        if payload.method == "sendMessage" and payload.text:
+            return self.client.send_message(channel, payload.text)
+        return self.client.send_rich_message(channel, rich_message)
 
     def edit(
         self,

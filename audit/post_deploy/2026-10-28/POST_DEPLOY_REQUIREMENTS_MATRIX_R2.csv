@@ -1,0 +1,16 @@
+requirement_id,source_document,source_section,requirement_summary,channel_or_scope,code_location,db_location,feature_flag,deployed_verified,method,expected,actual,status,severity,evidence_link,owner,fix_plan
+PROD-01,R2 verification,§3,Deployed SHA matches running service,all,deploy/from-agent.sh,—,—,yes,ssh+git,852bc00 on droplet,852bc00,PASS,—,POST_DEPLOY_VERIFICATION_R2.md,agent,—
+PROD-03,R2 verification,§3,OpenAI reachable in production,all,app/ai/openai_provider.py,—,OPENAI_API_KEY,yes,wgt doctor,200 responses,openai_responses ok,PASS,P0,POST_DEPLOY_VERIFICATION_R2.md,owner,—
+AI-01,v2.2,§6,Daily OpenAI Chief Editor,TG,app/editorial/chief_editor.py,editorial_runs,OPENAI_CHIEF_EDITOR_DAILY,yes,prod smoke+code,cron+structured LLM,RU/EN dry_run ok; 4 prior failed,PARTIAL,P0,POST_DEPLOY_VERIFICATION_R2.md,agent,DRY_RUN false + slots
+AI-04b,v2.2,§6,OpenAI API credits,all,app/ai/openai_provider.py,—,OPENAI_API_KEY,yes,doctor+chief-editor,usable API,LLM chief_editor ok,PASS,P0,POST_DEPLOY_VERIFICATION_R2.md,owner,—
+GATE-B,R2 verification,§15,Product concept gate,TG,app/editorial,editorial_plan_slots,EDITORIAL_V2,yes,prod db+smoke,daily calendar populated,0 slots dry_run,FAIL,P0,POST_DEPLOY_VERIFICATION_R2.md,agent,persist plan
+GATE-A,R2 verification,§15,Safety autopublish,all,app/config.py,.env,AUTO_PUBLISH_*,yes,settings+doctor,review until v2 ready,AUTO_PUBLISH true,FAIL,P1,POST_DEPLOY_VERIFICATION_R2.md,owner,set false
+SCHED-01,v2.2,§5,OLD scheduler off uses v2 plan,TG,app/scheduler/jobs.py,—,OLD_ARTICLE_AUTO_SCHEDULER,yes,wgt generate,editorial_v2_plan,mode=editorial_v2_plan,PASS,P1,POST_DEPLOY_VERIFICATION_R2.md,agent,—
+AUTO-01,v2.2,§6,EDITORIAL_V2 gates jobs,all,app/scheduler/jobs.py,—,EDITORIAL_V2_ENABLED,yes,code+prod,planner path when on,v2 enabled generate from plan,PASS,P1,POST_DEPLOY_VERIFICATION_R2.md,agent,—
+PUB-04,v2.2,§10,Admin calendar 30d,TG,app/admin/routes.py,editorial_plan_slots,—,yes,UI+db,slots visible,UI ok 0 rows,PARTIAL,P1,POST_DEPLOY_VERIFICATION_R2.md,agent,populate slots
+EDIT-03,v2.2,§5,13 rubrics in code,TG,app/editorial/pillars.py,—,—,yes,code,13 pillars,12 pillar codes defined,PARTIAL,P1,POST_DEPLOY_VERIFICATION_R2.md,agent,wire to publish
+EDIT-03b,v2.2,§5,Native poll/short formats,TG,app/telegram/publisher.py,—,—,yes,code grep,sendPoll etc,no sendPoll,FAIL,P1,app/telegram/publisher.py,agent,PostFormatRouter
+EDIT-01,v2.2,§5,RU 5-6 posts/week actual,RU,app/editorial/cadence.py,articles,RU_POSTS_*,yes,sql post-cutoff,5-6/week,0 posts after cutoff,FAIL,P1,POST_DEPLOY_VERIFICATION_R2.md,agent,v2 loop
+NEG-01,audit,§13,OpenAI down keeps plan,TG,app/editorial/chief_editor.py,editorial_runs,—,partial,code review,keep last plan,failed runs recorded no policy test,PARTIAL,P1,—,agent,NEG-01 fixture
+GATE-C,audit,§15,Factcheck gate,TG,app/generation,—,—,yes,pytest 256,VERIFY OR OMIT,tests pass,PASS,—,tests/test_claims_and_verification.py,agent,—
+MAX-01,MAX addendum,§11,MAX channel check,MAX,app/max,—,MAX_RU,yes,check-max,channel ok,verified prior+today,PASS,—,POST_DEPLOY_VERIFICATION_R2.md,agent,—

@@ -121,6 +121,28 @@ def publish_queue(limit: Annotated[int, typer.Option()] = 5) -> None:
         _print(jobs.process_publication_queue(session, limit=limit))
 
 
+@app.command("pause-queue")
+def pause_queue() -> None:
+    """Stop processing the publication queue until resume-queue."""
+    _bootstrap()
+    from app.editorial.queue_control import set_queue_paused
+
+    with session_scope() as session:
+        set_queue_paused(session, True, actor="cli")
+        typer.echo("publication queue paused")
+
+
+@app.command("resume-queue")
+def resume_queue() -> None:
+    """Allow the publication queue to run again."""
+    _bootstrap()
+    from app.editorial.queue_control import set_queue_paused
+
+    with session_scope() as session:
+        set_queue_paused(session, False, actor="cli")
+        typer.echo("publication queue resumed")
+
+
 @app.command("publish-test")
 def publish_test(article_id: int) -> None:
     """Publish one article to the test channel."""

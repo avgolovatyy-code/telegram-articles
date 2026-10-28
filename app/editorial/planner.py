@@ -12,8 +12,10 @@ from sqlalchemy.orm import Session
 from app.config import Market, Settings
 from app.db.models import EditorialPlanSlot, EditorialRun, TopicCandidate
 from app.db.types import utcnow
-from app.editorial.cadence import remaining_weekly_publish_slots
+from app.editorial.diversity import reject_reason
 from app.editorial.schemas import EditorialDecision, EditorialDecisionSet
+
+ACTIVE_STATUSES = ("planned", "locked", "needs_review", "generated")
 
 
 def apply_decision_set(
@@ -27,6 +29,12 @@ def apply_decision_set(
     settings: Settings,
     dry_run: bool,
 ) -> EditorialRun:
+    """Persist the calendar.
+
+    ``dry_run`` records the run as dry and never publishes; slots still land in
+    the 30-day plan so admin preview and diversity work. Generation of drafts is
+    allowed; production enqueue is gated separately.
+    """
     run = EditorialRun(
         run_id=str(uuid.uuid4()),
         run_date=run_date,
@@ -43,39 +51,107 @@ def apply_decision_set(
     session.add(run)
     session.flush()
 
-    if dry_run:
-        session.flush()
-        return run
-
     applied = 0
+    dropped = 0
+    moved = 0
+    kept = 0
+    skipped: list[str] = []
+    accepted_adds: list[EditorialDecision] = []
+
     for decision in decision_set.decisions:
-        if decision.action != "add":
+        if decision.action == "keep":
+            kept += 1
             continue
-        if not _decision_allowed(session, market, decision, settings):
+        if decision.action == "skip" or decision.action == "request_research":
+            skipped.append(f"{decision.action}:{decision.candidate_id or decision.slot_id}")
             continue
-        topic_id = _resolve_topic_id(session, market, decision.candidate_id)
-        slot = EditorialPlanSlot(
-            run_id=run.id,
-            market=market,
-            slot_date=decision.planned_date,
-            topic_id=topic_id,
-            candidate_id=decision.candidate_id,
-            pillar=decision.pillar,
-            format=decision.format,
-            audience=decision.audience,
-            angle=decision.angle,
-            reader_value=decision.reader_value,
-            priority=decision.priority,
-            status="needs_review" if decision.needs_human_review else "planned",
-            needs_human_review=decision.needs_human_review,
-            payload=decision.model_dump(mode="json"),
-        )
-        session.add(slot)
-        applied += 1
+        if decision.action == "drop":
+            if _drop_slot(session, market, decision.slot_id):
+                dropped += 1
+            continue
+        if decision.action == "move":
+            if _move_slot(session, market, decision):
+                moved += 1
+            continue
+        if decision.action == "replace":
+            _drop_slot(session, market, decision.slot_id)
+            dropped += 1
+        if decision.action in {"add", "replace"}:
+            reason = reject_reason(
+                session, market, decision, settings, pending_same_batch=accepted_adds
+            )
+            if reason:
+                skipped.append(f"{decision.planned_date}:{reason}")
+                continue
+            if decision.planned_date < run_date:
+                skipped.append(f"{decision.planned_date}:past date")
+                continue
+            topic_id = _resolve_topic_id(session, market, decision.candidate_id)
+            slot = EditorialPlanSlot(
+                run_id=run.id,
+                market=market,
+                slot_date=decision.planned_date,
+                topic_id=topic_id,
+                candidate_id=decision.candidate_id,
+                pillar=decision.pillar,
+                format=decision.format,
+                audience=decision.audience,
+                angle=decision.angle,
+                reader_value=decision.reader_value,
+                priority=decision.priority,
+                status="needs_review" if decision.needs_human_review else "planned",
+                needs_human_review=decision.needs_human_review,
+                payload=decision.model_dump(mode="json"),
+            )
+            session.add(slot)
+            applied += 1
+            accepted_adds.append(decision)
+
     run.applied_at = utcnow()
-    run.diff = {"applied_slots": applied}
+    run.diff = {
+        "applied_slots": applied,
+        "dropped": dropped,
+        "moved": moved,
+        "kept": kept,
+        "skipped": skipped[:40],
+        "empty_slots_justification": list(decision_set.empty_slots_justification),
+    }
     session.flush()
     return run
+
+
+def last_valid_run(session: Session, market: Market) -> EditorialRun | None:
+    return session.scalar(
+        select(EditorialRun)
+        .where(
+            EditorialRun.market == market,
+            EditorialRun.status.in_(("success", "dry_run")),
+        )
+        .order_by(EditorialRun.created_at.desc())
+        .limit(1)
+    )
+
+
+def _drop_slot(session: Session, market: Market, slot_id: int | None) -> bool:
+    if slot_id is None:
+        return False
+    slot = session.get(EditorialPlanSlot, slot_id)
+    if slot is None or slot.market != market or slot.locked:
+        return False
+    slot.status = "dropped"
+    session.flush()
+    return True
+
+
+def _move_slot(session: Session, market: Market, decision: EditorialDecision) -> bool:
+    if decision.slot_id is None:
+        return False
+    slot = session.get(EditorialPlanSlot, decision.slot_id)
+    if slot is None or slot.market != market or slot.locked:
+        return False
+    slot.slot_date = decision.planned_date
+    session.flush()
+    return True
 
 
 def _resolve_topic_id(
@@ -91,56 +167,6 @@ def _resolve_topic_id(
     if row is None or row.market != market:
         return None
     return topic_id
-
-
-def _decision_allowed(
-    session: Session, market: Market, decision: EditorialDecision, settings: Settings
-) -> bool:
-    if decision.action != "add":
-        return False
-    if decision.planned_date < utcnow().astimezone(settings.publish_tz).date():
-        return False
-    if decision.format == "rich_guide":
-        if _rich_guides_this_month(session, market, settings) >= settings.max_longform_articles_per_month:
-            return False
-    week_room = remaining_weekly_publish_slots(session, market, settings, use_hard_cap=True)
-    # Count planned slots in the same rolling week window when applying batch.
-    if week_room <= 0:
-        return False
-    existing = session.scalar(
-        select(EditorialPlanSlot.id).where(
-            EditorialPlanSlot.market == market,
-            EditorialPlanSlot.slot_date == decision.planned_date,
-            EditorialPlanSlot.status.in_(("planned", "locked", "needs_review")),
-        )
-    )
-    if existing is not None:
-        return False
-    return True
-
-
-def _rich_guides_this_month(session: Session, market: Market, settings: Settings) -> int:
-    local = utcnow().astimezone(settings.publish_tz)
-    month_start = local.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    if local.month == 12:
-        next_month = local.replace(year=local.year + 1, month=1, day=1)
-    else:
-        next_month = local.replace(month=local.month + 1, day=1)
-    start = month_start.astimezone(dt.UTC)
-    end = next_month.astimezone(dt.UTC)
-    rows = session.scalars(
-        select(EditorialPlanSlot).where(
-            EditorialPlanSlot.market == market,
-            EditorialPlanSlot.format == "rich_guide",
-            EditorialPlanSlot.status.in_(("planned", "locked", "generated")),
-        )
-    ).all()
-    count = 0
-    for row in rows:
-        day = dt.datetime.combine(row.slot_date, dt.time.min, tzinfo=settings.publish_tz)
-        if start <= day.astimezone(dt.UTC) < end:
-            count += 1
-    return count
 
 
 def slots_ready_for_generation(
@@ -173,8 +199,27 @@ def mark_slot_generated(session: Session, slot: EditorialPlanSlot, article_id: i
     session.flush()
 
 
+def set_slot_locked(session: Session, slot: EditorialPlanSlot, locked: bool) -> None:
+    slot.locked = locked
+    if locked and slot.status == "planned":
+        slot.status = "locked"
+    elif not locked and slot.status == "locked":
+        slot.status = "planned"
+    session.flush()
+
+
+def skip_slot(session: Session, slot: EditorialPlanSlot) -> None:
+    if slot.locked:
+        return
+    slot.status = "skipped"
+    session.flush()
+
+
 __all__ = [
     "apply_decision_set",
+    "last_valid_run",
     "mark_slot_generated",
+    "set_slot_locked",
+    "skip_slot",
     "slots_ready_for_generation",
 ]

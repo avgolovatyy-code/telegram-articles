@@ -501,9 +501,11 @@ def editorial_calendar(
     session: Session = Depends(get_db),
     settings: Settings = Depends(get_settings),
     _: str = Depends(require_admin),
+    horizon: int = Query(30),
 ) -> HTMLResponse:
     today = dt.date.today()
-    horizon = today + dt.timedelta(days=30)
+    days = horizon if horizon in {2, 7, 30} else 30
+    end = today + dt.timedelta(days=days)
     slots_by_market: dict[str, list[EditorialPlanSlot]] = {}
     for market in ("en", "ru"):
         slots_by_market[market] = list(
@@ -512,7 +514,8 @@ def editorial_calendar(
                 .where(
                     EditorialPlanSlot.market == market,
                     EditorialPlanSlot.slot_date >= today,
-                    EditorialPlanSlot.slot_date <= horizon,
+                    EditorialPlanSlot.slot_date <= end,
+                    EditorialPlanSlot.status.notin_(("dropped", "skipped")),
                 )
                 .order_by(EditorialPlanSlot.slot_date)
             ).all()
@@ -520,9 +523,60 @@ def editorial_calendar(
     recent_runs = list(
         session.scalars(select(EditorialRun).order_by(EditorialRun.created_at.desc()).limit(20)).all()
     )
+    from app.editorial.queue_control import queue_is_paused
+
     context = _base_context(request, session, settings, "editorial")
-    context |= {"slots_by_market": slots_by_market, "recent_runs": recent_runs}
+    context |= {
+        "slots_by_market": slots_by_market,
+        "recent_runs": recent_runs,
+        "horizon": days,
+        "queue_paused": queue_is_paused(session),
+        "dry_run": settings.editorial_v2_dry_run,
+        "v2_enabled": settings.editorial_v2_enabled,
+    }
     return templates.TemplateResponse(request, "editorial.html", context)
+
+
+@router.post("/editorial/slots/{slot_id}/lock")
+def editorial_lock_slot(
+    slot_id: int,
+    session: Session = Depends(get_db),
+    _: str = Depends(require_admin),
+) -> RedirectResponse:
+    from app.editorial.planner import set_slot_locked
+
+    slot = session.get(EditorialPlanSlot, slot_id)
+    if slot is None:
+        raise HTTPException(404, "slot not found")
+    set_slot_locked(session, slot, not slot.locked)
+    return _redirect("/admin/editorial", f"slot {slot_id} lock={slot.locked}")
+
+
+@router.post("/editorial/slots/{slot_id}/skip")
+def editorial_skip_slot(
+    slot_id: int,
+    session: Session = Depends(get_db),
+    _: str = Depends(require_admin),
+) -> RedirectResponse:
+    from app.editorial.planner import skip_slot
+
+    slot = session.get(EditorialPlanSlot, slot_id)
+    if slot is None:
+        raise HTTPException(404, "slot not found")
+    skip_slot(session, slot)
+    return _redirect("/admin/editorial", f"slot {slot_id} skipped")
+
+
+@router.post("/editorial/queue-pause")
+def editorial_queue_pause(
+    paused: str = Form("1"),
+    session: Session = Depends(get_db),
+    _: str = Depends(require_admin),
+) -> RedirectResponse:
+    from app.editorial.queue_control import set_queue_paused
+
+    set_queue_paused(session, paused in {"1", "true", "on"}, actor="admin")
+    return _redirect("/admin/editorial", f"queue paused={paused}")
 
 
 @router.get("/branding", response_class=HTMLResponse)

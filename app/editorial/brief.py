@@ -13,6 +13,8 @@ from app.db.enums import ArticleStatus, TopicStatus
 from app.db.models import Article, EditorialPlanSlot, TopicCandidate
 from app.db.types import utcnow
 from app.editorial.cadence import posts_per_week_target_max, production_posts_in_rolling_week
+from app.editorial.pillars import POST_FORMATS, pillar_codes
+from app.editorial.sources import sources_for_market
 from app.max.holidays import russia_calendar_context
 
 
@@ -104,6 +106,15 @@ def build_daily_brief(
                 "is_fixed_holiday": ctx.is_fixed_holiday,
             }
         )
+    else:
+        holidays.append(
+            {
+                "date": run_date.isoformat(),
+                "label": "weekend" if run_date.weekday() >= 5 else "weekday",
+                "is_weekend": run_date.weekday() >= 5,
+                "is_fixed_holiday": False,
+            }
+        )
 
     weekly_used = production_posts_in_rolling_week(session, market, settings)
     weekly_max = posts_per_week_target_max(settings, market)
@@ -116,6 +127,9 @@ def build_daily_brief(
         "brand_voice_version": settings.editorial_voice_version,
         "candidate_signals": candidate_signals,
         "verified_facts": [],
+        "source_registry": sources_for_market(market),
+        "allowed_pillars": pillar_codes(),
+        "allowed_formats": sorted(POST_FORMATS),
         "events_and_exhibitions": [],
         "google_trends_signals": [],
         "holidays_and_weekends": holidays,

@@ -86,6 +86,32 @@ def production_posts_in_rolling_week(
     return count
 
 
+def production_posts_today(
+    session: Session, market: Market, settings: Settings, *, now: dt.datetime | None = None
+) -> int:
+    """Published or scheduled production posts on the local publish day."""
+    now = now or utcnow()
+    local = now.astimezone(settings.publish_tz)
+    start_local = local.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_local = start_local + dt.timedelta(days=1)
+    start = start_local.astimezone(dt.UTC)
+    end = end_local.astimezone(dt.UTC)
+    rows = session.scalars(
+        select(Article).where(
+            Article.market == market,
+            Article.status.in_((ArticleStatus.PUBLISHED, ArticleStatus.SCHEDULED)),
+        )
+    ).all()
+    count = 0
+    for article in rows:
+        ts = _commit_timestamp(article)
+        if ts is None:
+            continue
+        if start <= ts.astimezone(dt.UTC) < end:
+            count += 1
+    return count
+
+
 def remaining_weekly_publish_slots(
     session: Session, market: Market, settings: Settings, *, use_hard_cap: bool = True
 ) -> int:
@@ -115,6 +141,7 @@ __all__ = [
     "posts_per_week_hard_cap",
     "posts_per_week_target_max",
     "production_posts_in_rolling_week",
+    "production_posts_today",
     "remaining_daily_publish_slots",
     "remaining_weekly_publish_slots",
 ]

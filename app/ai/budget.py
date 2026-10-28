@@ -160,6 +160,25 @@ class BudgetManager:
 
         plan: dict[str, int] = dict.fromkeys(MARKETS, 0)
 
+        if editorial_v2_cadence_active(self.settings) and session is not None:
+            from app.editorial.cadence import production_posts_today
+
+            for market in MARKETS:
+                if affordable <= 0:
+                    break
+                week_left = remaining_weekly_publish_slots(
+                    session, market, self.settings, use_hard_cap=False
+                )
+                day_used = production_posts_today(session, market, self.settings)
+                day_left = max(0, self.settings.max_posts_per_day - day_used)
+                room = min(week_left, day_left)
+                if room <= 0:
+                    continue
+                take = min(room, affordable, self.settings.max_posts_per_day)
+                plan[market] = take
+                affordable -= take
+            return plan
+
         def weekly_ceiling(market: Market) -> int | None:
             if not editorial_v2_cadence_active(self.settings) or session is None:
                 return None
@@ -199,6 +218,8 @@ class BudgetManager:
     def can_start_article(
         self, market: Market, *, estimated_cost_usd: float | None = None
     ) -> GenerationDecision:
+        from app.editorial.cadence import editorial_v2_cadence_active
+
         snapshot = self.snapshot()
         projected = (
             estimated_cost_usd
@@ -207,11 +228,12 @@ class BudgetManager:
         )
         remaining = snapshot.remaining_usd - self.settings.budget_safety_margin_usd
 
-        ceiling = self.settings.articles_max_per_day(market)
-        if ceiling is not None and snapshot.generated[market] >= ceiling:
-            return GenerationDecision(
-                False, f"daily maximum for {market} reached", projected, snapshot.remaining_usd
-            )
+        if not editorial_v2_cadence_active(self.settings):
+            ceiling = self.settings.articles_max_per_day(market)
+            if ceiling is not None and snapshot.generated[market] >= ceiling:
+                return GenerationDecision(
+                    False, f"daily maximum for {market} reached", projected, snapshot.remaining_usd
+                )
         if projected > remaining:
             return GenerationDecision(
                 False,

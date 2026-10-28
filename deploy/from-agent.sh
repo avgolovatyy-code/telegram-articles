@@ -162,8 +162,8 @@ fi
   echo "ACME_EMAIL=\${ACME}"
   echo "API_PORT=${API_PORT}"
   echo "SLACK_CHANNEL=${SLACK_CHANNEL_VALUE}"
-  echo "AUTO_PUBLISH_EN=true"
-  echo "AUTO_PUBLISH_RU=true"
+  echo "AUTO_PUBLISH_EN=false"
+  echo "AUTO_PUBLISH_RU=false"
 } >> .env
 EOF
 fi

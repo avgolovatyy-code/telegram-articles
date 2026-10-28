@@ -358,7 +358,7 @@ def _generate_from_editorial_plan(
                 report.details[f"{market}_stopped"] = decision.reason
                 break
             try:
-                outcome = pipeline.generate(topic)
+                outcome = pipeline.generate(topic, slot=slot)
             except EngineError as exc:
                 report.errors.append(f"{market}/slot-{slot.id}: {exc}")
                 continue
@@ -393,6 +393,10 @@ def schedule_publications(
         return report
     if settings.editorial_v2_enabled:
         report.details["editorial_v2_enabled"] = True
+        if settings.editorial_v2_dry_run:
+            report.details["editorial_v2_dry_run"] = True
+            report.details["skipped_production"] = "dry-run: no production schedule"
+            return report
     client = build_telegram_client(settings)
     publisher = TelegramPublisher(session, client, settings=settings)
 
@@ -476,6 +480,7 @@ def _planned_today(session: Session, market: Market, settings: Settings | None =
         session.scalar(
             select(func.count(Article.id)).where(
                 Article.market == market,
+                Article.status.in_((ArticleStatus.SCHEDULED, ArticleStatus.PUBLISHED)),
                 or_(
                     and_(Article.scheduled_for >= start, Article.scheduled_for < end),
                     and_(Article.published_at >= start, Article.published_at < end),
@@ -650,6 +655,11 @@ def process_publication_queue(
 ) -> JobReport:
     settings = settings or get_settings()
     report = JobReport("process_publication_queue")
+    from app.editorial.queue_control import queue_is_paused
+
+    if queue_is_paused(session):
+        report.details["paused"] = True
+        return report
     worker_id = new_job_id("pub")
     client = build_telegram_client(settings)
     publisher = TelegramPublisher(session, client, settings=settings)
@@ -679,6 +689,14 @@ def process_publication_queue(
             if not allowed:
                 item.status = PublicationStatus.CANCELLED
                 item.last_error = block_reason
+                continue
+            if (
+                settings.editorial_v2_dry_run
+                and settings.editorial_v2_enabled
+                and item.target == PublicationTarget.PRODUCTION
+            ):
+                item.status = PublicationStatus.CANCELLED
+                item.last_error = "EDITORIAL_V2_DRY_RUN blocks production publish"
                 continue
             with job_context(
                 "publication.publish",
