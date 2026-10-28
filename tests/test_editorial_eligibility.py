@@ -59,6 +59,14 @@ def test_schedule_skips_pre_cutoff(session, settings, monkeypatch):
     assert report.details["ru_scheduled"] == 0
 
 
+def test_legacy_scheduler_off_skips_generate_and_schedule(settings, session, monkeypatch):
+    monkeypatch.setattr(settings, "old_article_auto_scheduler_enabled", False)
+    gen = jobs.generate_daily_articles(session, markets=("ru",), settings=settings, max_per_run=1)
+    assert gen.details.get("skipped") == "OLD_ARTICLE_AUTO_SCHEDULER_ENABLED=false"
+    sched = jobs.schedule_publications(session, markets=("ru",), settings=settings)
+    assert sched.details.get("skipped") == "OLD_ARTICLE_AUTO_SCHEDULER_ENABLED=false"
+
+
 def test_workflow_publish_refuses_validation_failed(settings, session, monkeypatch):
     monkeypatch.setattr(settings, "editorial_spec_cutoff_date", None)
     monkeypatch.setattr(settings, "telegram_dry_run", True)

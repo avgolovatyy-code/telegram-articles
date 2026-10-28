@@ -1,0 +1,45 @@
+{
+  "audit_date": "2026-10-28",
+  "timezone_note": "Europe/Moscow for editorial dates",
+  "repository": "telegram-articles",
+  "branch_deployed": "cursor/max-russia-audience-acd7",
+  "production_git_sha": "4e304da45fbbf12891e063c6628644a9829637aa",
+  "production_git_subject": "Throttle OpenAI requests to reduce 429 during generation",
+  "host_domain": "209-38-45-22.sslip.io",
+  "services": {
+    "api": "healthy",
+    "worker": "running",
+    "db": "healthy",
+    "caddy": "running"
+  },
+  "feature_flags_redacted": {
+    "EDITORIAL_V2_ENABLED": true,
+    "EDITORIAL_V2_DRY_RUN": true,
+    "OLD_ARTICLE_AUTO_SCHEDULER_ENABLED": false,
+    "EDITORIAL_SPEC_CUTOFF_DATE": "2026-10-28",
+    "AUTO_PUBLISH_EN": true,
+    "AUTO_PUBLISH_RU": true,
+    "MAX_PUBLISH_RU": true,
+    "DAILY_AI_BUDGET_USD": 3.0,
+    "OPENAI_WRITER_MODEL": "gpt-5.6-terra",
+    "OPENAI_UTILITY_MODEL": "gpt-5.6-luna",
+    "OPENAI_MAX_RETRIES": 10,
+    "OPENAI_RATE_LIMIT_RPS": 0.15,
+    "TELEGRAM_DRY_RUN": false
+  },
+  "article_counts": {
+    "published": 680,
+    "archived": 3263,
+    "failed": 131,
+    "needs_review_after_cutoff": 0
+  },
+  "last_telegram_production_publish": "2026-10-09",
+  "public_urls": {
+    "telegram_ru": "https://t.me/wegotrip_ru",
+    "telegram_en": "https://t.me/wegotrip",
+    "max_ru": "https://max.ru/channel_wegotrip",
+    "admin": "https://209-38-45-22.sslip.io/admin"
+  },
+  "openai_production_status": "credit_balance_exhausted (HTTP 429 insufficient_quota at audit time)",
+  "secrets_store": "5 encrypted entries in /app/var/secrets/secrets.enc"
+}

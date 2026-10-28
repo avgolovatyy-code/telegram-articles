@@ -1,0 +1,68 @@
+requirement_id,source_document,source_section,requirement_summary,channel_or_scope,code_location,db_location,feature_flag,deployed_verified,method,expected,actual,status,severity,evidence_link,owner,fix_plan
+PROD-01,WEGOTRIP_EDITORIAL_POST_DEPLOY_AUDIT,§3,Deployed SHA matches running service,all,deploy/from-agent.sh,articles,—,yes,ssh+git,4e304da on droplet,4e304da,PASS,—,POST_DEPLOY_PRODUCTION_SNAPSHOT.json,agent,—
+PROD-02,audit,§3,Feature flags collected without secrets,all,app/config.py,.env,EDITORIAL_*,yes,read .env+doctor,effective flags documented,see snapshot,PASS,—,POST_DEPLOY_PRODUCTION_SNAPSHOT.json,agent,—
+PROD-03,audit,§3,72h worker logs reviewed,all,app/scheduler/runner.py,—,—,yes,log grep,no silent critical except OpenAI 429/quota,429/credit errors present,PARTIAL,P1,POST_DEPLOY_TEST_RESULTS.md,agent,restore OpenAI billing
+PROD-04,audit,§3,DB vs channel publish dates aligned,TG,telegram_publications,telegram_publications,—,yes,sql,last prod publish 2026-10-09,matches t.me history,PASS,—,POST_DEPLOY_AUDIT_REPORT.md,agent,—
+BRAND-RU-01,CHANNEL_BRANDING,§4,RU username @wegotrip_ru,RU,—,—,—,yes,getChat,@wegotrip_ru,@wegotrip_ru,PASS,—,POST_DEPLOY_AUDIT_REPORT.md,owner,—
+BRAND-RU-02,CHANNEL_BRANDING,§4,RU title approved,RU,app/branding,—,—,yes,getChat,WeGoTrip — Куда сходить и что посмотреть,matches,PASS,—,POST_DEPLOY_AUDIT_REPORT.md,owner,—
+BRAND-RU-03,CHANNEL_BRANDING,§4,RU description + wegotrip.ru,RU,app/branding,—,—,yes,getChat,201 char w/ wegotrip.ru,live text matches proposal,PASS,—,POST_DEPLOY_AUDIT_REPORT.md,owner,verify full URL
+BRAND-EN-01,CHANNEL_BRANDING,§4,EN username @wegotrip,EN,—,—,—,yes,getChat,@wegotrip,@wegotrip,PASS,—,POST_DEPLOY_AUDIT_REPORT.md,owner,—
+BRAND-EN-02,CHANNEL_BRANDING,§4,EN title Travel Ideas,EN,app/branding,—,—,yes,getChat,WeGoTrip — Things to Do & Travel Ideas,matches,PASS,—,POST_DEPLOY_AUDIT_REPORT.md,owner,—
+BRAND-EN-03,CHANNEL_BRANDING,§4,EN description wegotrip.com,EN,app/branding,—,—,yes,getChat,203 char EN desc,matches,PASS,—,POST_DEPLOY_AUDIT_REPORT.md,owner,—
+BRAND-ALL-05,CHANNEL_BRANDING,§4,Pinned welcome applied,TG,app/branding/apply.py,—,CHANNEL_BRANDING_APPLY,partial,getChat pin,approved pin text,not verified in audit,BLOCKED,P2,POST_DEPLOY_FIX_BACKLOG.md,owner,manual pin check
+BRAND-ALL-07,CHANNEL_BRANDING,§4,Branding audit trail in DB,TG,app/branding,—,—,partial,code review,approved_by stored,proposal doc only,PARTIAL,P3,CHANNEL_BRANDING_PROPOSAL.md,agent,persist apply log
+EDIT-01,v2.2,§5,RU 5-6 posts/week target,RU,app/scheduler,articles,RU_POSTS_PER_WEEK_*,no,sql 28d,5-6/week,~18/week w/o 28-09 (old engine),FAIL,P1,POST_DEPLOY_AUDIT_REPORT.md,agent,v2 calendar+disable v1 mins
+EDIT-01b,v2.2,§5,EN 4-5 posts/week target,EN,app/scheduler,articles,EN_POSTS_PER_WEEK_*,no,sql 28d,4-5/week,~22/week old week,FAIL,P1,POST_DEPLOY_AUDIT_REPORT.md,agent,same
+EDIT-01c,v2.2,§5,No posts after new cutoff,TG,app/editorial/eligibility.py,articles,EDITORIAL_SPEC_CUTOFF,yes,sql,0 prod after 2026-10-28,0 (462 takedown),PASS,—,POST_DEPLOY_AUDIT_REPORT.md,agent,—
+EDIT-02,v2.2,§5,Audience local/traveler/both,TG,—,—,—,no,schema,field on posts,not in schema,NOT_IMPLEMENTED,P1,EDITORIAL_V2_REQUIREMENTS_STATUS.md,agent,Phase B models
+EDIT-03,v2.2,§5,13 rubrics active,TG,—,—,—,no,code search,13 pillars,spec only,NOT_IMPLEMENTED,P1,WEGOTRIP_TELEGRAM_EDITORIAL_ENGINE_V2_2_CURSOR.md,agent,Phase B
+EDIT-03b,v2.2,§5,Native formats poll/short post,TG,app/telegram,—,—,no,code,sendPoll etc,rich only,NOT_IMPLEMENTED,P1,app/telegram/publisher.py,agent,PostFormatRouter
+EDIT-04,v2.2,§5,Commercial ≤25% / 1 hard sell/week,TG,—,articles,MAX_COMMERCIAL_POST_SHARE,no,sample posts,≤25%,v1 mostly product cards,FAIL,P1,POST_DEPLOY_EDITORIAL_REVIEW.md,agent,rubric+gate
+EDIT-05,v2.2,§5,Readable non-template voice,TG,app/generation,articles,—,partial,editorial sample,natural media,SEO audio-tour pattern,PARTIAL,P2,POST_DEPLOY_EDITORIAL_REVIEW.md,owner,voice guide
+AI-01,v2.2,§6,Daily OpenAI Chief Editor,TG,—,—,OPENAI_CHIEF_EDITOR_DAILY,no,code+prod,7 planner runs,no job/table,NOT_IMPLEMENTED,P0,EDITORIAL_V2_IMPLEMENTATION_PLAN.md,agent,Phase C
+AI-02,v2.2,§6,News displaces evergreen in plan,TG,—,—,—,no,fixture,replace decision,no planner,NOT_IMPLEMENTED,P1,—,agent,Phase C
+AI-03,v2.2,§6,Writer run per publication,TG,app/generation/pipeline.py,articles,—,partial,sql+code,writer_run_id,pipeline v1 no run_id col,PARTIAL,P2,POST_DEPLOY_TEST_RESULTS.md,agent,trace IDs
+AI-03b,v2.2,§6,EN not RU translation,EN,app/generation,articles,—,partial,sample titles,independent EN,separate topics yes,PASS,—,POST_DEPLOY_EDITORIAL_REVIEW.md,agent,—
+AI-04,v2.2,§6,~$3/day budget enforced,all,app/ai/budget.py,budget ledger,DAILY_AI_BUDGET_USD,yes,code+prod,hard stop,config 3 USD; spend blocked by quota,PARTIAL,P1,POST_DEPLOY_AUDIT_REPORT.md,owner,top up OpenAI
+AI-04b,v2.2,§6,OpenAI API reachable with credits,all,app/ai/openai_provider.py,—,OPENAI_API_KEY,yes,curl audit,200/usage,429 credit_balance_exhausted,FAIL,P0,POST_DEPLOY_AUDIT_REPORT.md,owner,billing
+SOURCE-01,v2.2,§7,Source registry polling,TG,—,—,—,no,code,active sources,catalog sync only,NOT_IMPLEMENTED,P1,—,agent,SourceRegistry
+SOURCE-02,v2.2,§7,Claims ledger VERIFY OR OMIT,TG,app/generation,article_claims,—,yes,tests+code,evidence per claim,implemented v1,PASS,—,tests/test_claims_and_verification.py,agent,—
+SOURCE-02b,v2.2,§7,Negative: unverified claim blocked,TG,app/generation/quality.py,articles,—,yes,pytest,validation_failed,observed prod,PASS,—,tests/test_generation.py,agent,—
+SOURCE-03,v2.2,§7,Prepublish freshness recheck,TG,—,—,—,partial,code,24h event recheck,schedule-time only partial,PARTIAL,P2,—,agent,FreshnessGuard
+SOURCE-04,v2.2,§7,Public link policy,TG,app/generation,—,—,partial,code review,minimal external URLs,v1 rich links,PARTIAL,P2,—,agent,v2 policy module
+SOURCE-05,v2.2,§7,Media rights WeGoTrip API,TG,app/generation/media.py,—,ALLOW_GENERATED_COVERS,yes,tests,API media only,enforced default off covers,PASS,—,tests/test_covers.py,agent,—
+COM-01,Content Engine,§9,coupon=435 on product links,TG,app/affiliate,—,WEGOTRIP_REFERER_ID,yes,pytest,435 in URLs,435 in builder,PASS,—,tests/test_affiliate_links.py,agent,—
+COM-01b,Content Engine,§9,RU wegotrip.ru EN wegotrip.com,TG,app/config.py,products,—,yes,catalog host tests,market domains,split API hosts,PASS,—,tests/test_catalog_api_host.py,agent,—
+COM-01c,MAX,§9,utm_source=max,MAX,app/max,max_publications,MAXAPP_UTM_SOURCE,yes,code+1 pub,utm max,fan-out sets max,PASS,—,app/max/publisher.py,agent,—
+COM-03,v2.2,§9,Click tracking /r/,TG,app/main.py,tracking_links,USE_TRACKING_REDIRECT,yes,code,redirect tokens,enabled,PASS,—,README.md,agent,—
+COM-03b,v2.2,§9,Forward metrics not fabricated,TG,—,—,—,no,schema,real forwards,not collected v2,NOT_IMPLEMENTED,P2,v2.2 spec,agent,analytics phase
+PUB-01,Content Engine,§10,Telegram rich message publish,TG,app/telegram/publisher.py,telegram_publications,—,yes,tests,sendRichMessage,production used,PASS,—,tests/test_telegram.py,agent,—
+PUB-02,v2.2,§10,Prepublish gates fail closed,TG,app/editorial/eligibility.py,articles,EDITORIAL_SPEC_CUTOFF,yes,pytest+prod,block pre-cutoff,archived 3263,PASS,—,tests/test_editorial_eligibility.py,agent,—
+PUB-02b,v2.2,§10,validation_failed cannot publish,TG,app/services/workflow.py,articles,—,yes,pytest,blocked,gate active,PASS,—,tests/test_editorial_eligibility.py,agent,—
+PUB-03,v2.2,§10,Test channel before prod,TG,app/scheduler/jobs.py,publication_queue,—,yes,tests,test then prod,enforced in scheduler,PASS,—,tests/test_scheduling.py,agent,—
+PUB-03b,v2.2,§10,Idempotent publish,TG,app/telegram/publisher.py,telegram_publications,—,yes,tests,no duplicate,idempotency keys,PASS,—,tests/test_telegram.py,agent,—
+PUB-04,v2.2,§10,Admin calendar 30/7/2,TG,app/admin,—,—,no,UI review,calendar UI,article list only,NOT_IMPLEMENTED,P1,EDITORIAL_V2_REQUIREMENTS_STATUS.md,agent,Phase E
+PUB-04b,audit,§10,Secrets not in logs,all,app/security/secrets.py,secrets.enc,—,yes,doctor,encrypted store,5 secrets encrypted,PASS,—,wgt doctor prod,agent,import-env plaintext
+SCHED-01,v2.2,§5,OLD scheduler disabled when flag false,TG,app/scheduler/jobs.py,—,OLD_ARTICLE_AUTO_SCHEDULER,partial,code audit pre-fix,no generate/schedule,generate still ran,FAIL,P1,POST_DEPLOY_FIX_BACKLOG.md,agent,PR cursor/post-deploy-audit-fixes
+SCHED-02,v2.2,§5,v1 min 10 articles/day config,TG,app/config.py,—,EN/RU_ARTICLES_MIN,yes,read config,legacy mins,still 10/market,FAIL,P1,.env.example,agent,lower when v2
+SCHED-03,v2.2,§5,Weekly caps enforced,TG,app/config.py,—,RU_POSTS_PER_WEEK_*,no,code,hard cap 8/week,not wired TG,NOT_IMPLEMENTED,P1,app/config.py,agent,wire caps
+MAX-01,MAX addendum,§11,Canonical channel URL,MAX,app/max/chat_id.py,—,MAX_RU_CHANNEL_ID,yes,wgt check-max,max.ru/channel_wegotrip,verified,PASS,—,check-max prod,agent,—
+MAX-02,MAX addendum,§11,Russia audience gate,MAX,app/max/policy.py,—,MAXAPP_*,yes,pytest,domestic/outbound,MaxRussiaEditorialPolicy,PASS,—,tests/test_max_audience.py,agent,—
+MAX-03,MAX addendum,§11,Separate MAX renderer,MAX,app/max/renderer.py,max_publications,—,yes,pytest,not TG rich,adapt_for_max,PASS,—,tests/test_max.py,agent,—
+MAX-04,MAX addendum,§11,3-4 posts/week quota,MAX,app/max/quota.py,max_publications,MAXAPP_POSTS_PER_WEEK,partial,prod,≤4/week,1 post 28.10 legacy,INSUFFICIENT_DATA,P2,POST_DEPLOY_AUDIT_REPORT.md,agent,wait for v2 posts
+MAX-05,MAX addendum,§11,No MAX production writes in audit,MAX,—,—,—,yes,process,read-only,no writes,PASS,—,audit rules,agent,—
+NEG-01,audit,§13,OpenAI down keeps plan,TG,—,—,—,no,test missing,keep last plan,no chief editor,NOT_IMPLEMENTED,P1,—,agent,NEG-01 fixture
+NEG-05,audit,§13,Product removed from catalog,TG,app/generation,products,—,partial,tests catalog,CTA update,refresh products job,PARTIAL,P2,tests/test_catalog.py,agent,—
+NEG-06,audit,§13,Telegram timeout no duplicate,TG,app/telegram/publisher.py,publication_queue,—,yes,tests/code,reconcile,claim TTL,PASS,—,app/telegram/publisher.py,agent,—
+NEG-12,MAX addendum,§13,MaxRussiaAudienceGate rejects,MAX,app/max/audience.py,—,—,yes,pytest,reject irrelevant,tests pass,PASS,—,tests/test_max_audience.py,agent,—
+NEG-18,audit,§13,coupon URL with existing query,TG,app/affiliate,—,—,yes,pytest,correct merge,test aff links,PASS,—,tests/test_affiliate_links.py,agent,—
+GATE-A,audit,§15,Safety gate,all,—,—,—,partial,audit,no uncontrolled autopublish,AUTO_PUBLISH true,FAIL,P1,POST_DEPLOY_AUDIT_REPORT.md,owner,review mode until v2
+GATE-B,audit,§15,Product concept gate,TG,—,—,EDITORIAL_V2,no,audit,Chief Editor daily,not built,FAIL,P0,POST_DEPLOY_AUDIT_REPORT.md,agent,Phase C
+GATE-C,audit,§15,Factcheck gate,TG,app/generation,—,—,yes,tests,VERIFY OR OMIT,v1 gates work,PASS,—,tests/test_claims_and_verification.py,agent,—
+GATE-D,audit,§15,Ops resilience,all,app/scheduler,—,—,partial,logs,worker up,OpenAI failures,PARTIAL,P1,POST_DEPLOY_AUDIT_REPORT.md,owner,billing+alerting
+GATE-E,audit,§15,Analytics maturity,TG,—,—,—,no,data,28d metrics,old frequency only,INSUFFICIENT_DATA,P2,POST_DEPLOY_AUDIT_REPORT.md,agent,28d follow-up
+AUTO-01,v2.2,§6,EDITORIAL_V2_ENABLED gates behavior,all,app/config.py,—,EDITORIAL_V2_ENABLED,no,grep,planner off when false,flag unused in code,FAIL,P1,app/config.py,agent,wire flags
+AUTO-02,deploy,§3,Slack interactivity URLs configured,all,app/slack,—,SLACK_*,partial,prod,URLs in Slack app,tokens set URLs owner-side,PARTIAL,P2,DEPLOY.md,owner,set interactivity URLs
+AUTO-03,Content Engine,§10,Auto publish vs review default,TG,app/config.py,—,AUTO_PUBLISH_*,yes,prod .env,review first,AUTO_PUBLISH true,FAIL,P1,POST_DEPLOY_AUDIT_REPORT.md,owner,set false until v2
+AUTO-04,deploy,§3,Plaintext secrets in .env,all,app/cli.py,—,—,yes,doctor,import-env,ADMIN_PASSWORD plaintext,PARTIAL,P2,wgt doctor,agent,secrets import-env
+AUTO-05,v2.2,§8,Human editorial review sample,TG,—,—,—,partial,POST_DEPLOY_EDITORIAL_REVIEW,10+10 posts,0 new posts post-cutoff,INSUFFICIENT_DATA,P2,POST_DEPLOY_EDITORIAL_REVIEW.md,owner,score after first v2 posts
