@@ -77,13 +77,13 @@
 
 ## 2. Частота (§3) — замена 10–20/день
 
-- [ ] RU target 5–6/нед., hard cap 8
-- [ ] EN target 4–5/нед., hard cap 7
-- [ ] ≤1 основной пост/день (+ emergency flag)
-- [ ] Min interval ≥6h (предпочитать 18–24h)
+- [~] RU target 5–6/нед., hard cap 8 — `app/editorial/cadence.py` + Settings
+- [~] EN target 4–5/нед., hard cap 7 — wired в scheduler/budget при `EDITORIAL_V2_ENABLED`
+- [~] ≤1 основной пост/день (+ emergency flag) — `max_posts_per_day` + publish caps
+- [~] Min interval ≥6h (предпочитать 18–24h) — `effective_min_post_interval_minutes`
 - [ ] Rich guide ≤1–2/месяц/канал
 - [ ] Weekend/holiday planner hooks
-- [ ] Выключить/ограничить старый mass article auto-scheduler флагом при rollout
+- [x] Выключить/ограничить старый mass article auto-scheduler флагом при rollout
 
 ---
 
@@ -146,9 +146,9 @@
 ## 8. Миграция и флаги (§17)
 
 - [x] План маппинга existing → new (`EDITORIAL_V2_IMPLEMENTATION_PLAN.md`)
-- [ ] `EDITORIAL_V2_ENABLED=false` в Settings
-- [ ] `OLD_ARTICLE_AUTO_SCHEDULER_ENABLED` управляемый
-- [ ] `EDITORIAL_V2_DRY_RUN=true`
+- [~] `EDITORIAL_V2_ENABLED` — cadence/budget/scheduler (Chief Editor — Phase C)
+- [x] `OLD_ARTICLE_AUTO_SCHEDULER_ENABLED` управляемый
+- [x] `EDITORIAL_V2_DRY_RUN=true` в Settings / env
 - [ ] Не удалять старые articles / claims / telegram IDs
 - [ ] Обратная совместимость edit старых Rich Messages
 
