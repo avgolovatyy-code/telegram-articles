@@ -191,6 +191,8 @@ class ArticleWorkflow:
         url = result.publication.message_url or "(no public URL)"
         if not result.created:
             return WorkflowResult(True, f"already published: {url}", article)
+        # Max fan-out is best-effort and format-independent: Telegram already got
+        # the blocks-mode rich message above; Max re-renders article.body itself.
         if target == PublicationTarget.PRODUCTION and article.market == "ru" and result.created:
             max_result = maybe_publish_ru_to_max(article, settings=self.settings)
             if max_result.error:

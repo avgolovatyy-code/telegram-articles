@@ -117,6 +117,13 @@ def test_validation_rejects_an_empty_message():
     assert tb.validate_rich_message({"blocks": []})
 
 
+def test_validation_rejects_max_and_markdown_shapes():
+    assert tb.validate_rich_message({"text": "hello", "format": "markdown"})
+    assert tb.validate_rich_message({"markdown": "# Hello"})
+    assert tb.validate_rich_message({"html": "<b>Hi</b>"})
+    assert tb.validate_rich_message({"text": "plain only"})
+
+
 def test_validation_enforces_the_character_limit():
     message = tb.rich_message([tb.paragraph("x" * (tb.CHAR_LIMIT + 1))])
     assert any("characters" in error for error in tb.validate_rich_message(message))
@@ -253,12 +260,36 @@ def test_renderer_builds_a_valid_rich_message(product, settings):
         entity_name="Paris",
     )
     assert tb.validate_rich_message(rendered.message) == []
-    types = [block["type"] for block in rendered.message["blocks"]]
+    top = rendered.message["blocks"]
+    types = [block["type"] for block in top]
     assert types[0] == "photo"  # cover first
-    assert "heading" in types and "list" in types and "table" in types
-    assert "details" in types  # FAQ
+    assert types[1] == "heading"  # title visible
+    assert types[2] == "paragraph"  # intro visible
+    # Body sections / FAQ are collapsed details (is_open omitted/false).
+    details = [b for b in top if b["type"] == "details"]
+    assert len(details) >= 2
+    assert all(not b.get("is_open") for b in details)
+    nested_types = _block_types(top)
+    assert "list" in nested_types and "table" in nested_types
     assert "footer" in types  # hashtags
     assert rendered.product_cards
+
+
+def _block_types(blocks: list) -> set[str]:
+    found: set[str] = set()
+    stack = list(blocks)
+    while stack:
+        block = stack.pop()
+        if not isinstance(block, dict):
+            continue
+        kind = block.get("type")
+        if kind:
+            found.add(kind)
+        stack.extend(block.get("blocks") or [])
+        for item in block.get("items") or []:
+            if isinstance(item, dict):
+                stack.extend(item.get("blocks") or [])
+    return found
 
 
 def test_renderer_never_emits_an_unmarked_store_url(product, settings):
@@ -318,7 +349,7 @@ def test_audio_block_only_appears_when_a_url_exists(product, settings):
         link_context=LinkContext(market="en", article_id="a1", topic_slug="t"),
         entity_name="Paris",
     )
-    assert not any(b["type"] == "audio" for b in without.message["blocks"])
+    assert "audio" not in _block_types(without.message["blocks"])
 
     with_audio = renderer.render(
         document,
@@ -329,7 +360,7 @@ def test_audio_block_only_appears_when_a_url_exists(product, settings):
         entity_name="Paris",
         audio_urls={"4900": "https://cdn.example/preview.mp3"},
     )
-    assert any(b["type"] == "audio" for b in with_audio.message["blocks"])
+    assert "audio" in _block_types(with_audio.message["blocks"])
 
 
 # ------------------------------------------------------------ media validation

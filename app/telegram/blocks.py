@@ -237,7 +237,26 @@ def message_stats(message: dict[str, Any]) -> RichMessageStats:
 
 
 def validate_rich_message(message: dict[str, Any]) -> list[str]:
+    """Validate a Telegram ``InputRichMessage`` in **blocks** mode only.
+
+    WeGoTrip always publishes Telegram via ``sendRichMessage`` + ``blocks``.
+    Max markdown/html payloads (``text`` + ``format``) must never be accepted here.
+    """
     errors: list[str] = []
+    if not isinstance(message, dict):
+        return ["rich message must be an object"]
+
+    # Reject Max (or any non-Telegram) shapes early so fan-out cannot bleed formats.
+    if message.get("format") in {"markdown", "html"} or (
+        "text" in message and "blocks" not in message and "html" not in message
+    ):
+        return ["payload looks like Max/plain text, not a Telegram InputRichMessage"]
+
+    # InputRichMessage allows html | markdown | blocks — we exclusively use blocks
+    # so headings, media, product cards and buttons stay structured.
+    if message.get("markdown") is not None or message.get("html") is not None:
+        return ["Telegram articles must use blocks-mode InputRichMessage, not markdown/html"]
+
     blocks = message.get("blocks")
     if not isinstance(blocks, list) or not blocks:
         return ["rich message has no blocks"]
