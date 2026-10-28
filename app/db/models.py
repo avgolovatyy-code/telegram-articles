@@ -466,6 +466,9 @@ class Article(Base, TimestampMixin):
     publications: Mapped[list[TelegramPublication]] = relationship(
         back_populates="article", cascade="all, delete-orphan", lazy="selectin"
     )
+    max_publications: Mapped[list[MaxPublication]] = relationship(
+        back_populates="article", cascade="all, delete-orphan", lazy="selectin"
+    )
 
 
 class ArticleVersion(Base):
@@ -629,6 +632,41 @@ class TelegramPublication(Base):
     edit_count: Mapped[int] = mapped_column(Integer, default=0)
 
     article: Mapped[Article] = relationship(back_populates="publications")
+
+
+class MaxPublication(Base):
+    """Successful (or audited skipped) Max messenger publish for an article."""
+
+    __tablename__ = "max_publications"
+    __table_args__ = (
+        UniqueConstraint("idempotency_key", name="uq_max_publication_idempotency"),
+        Index("ix_max_publications_published_at", "published_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    article_id: Mapped[int] = mapped_column(
+        ForeignKey("articles.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    idempotency_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    market: Mapped[str] = mapped_column(String(8), nullable=False, default="ru")
+    target: Mapped[str] = mapped_column(String(16), default="production", nullable=False)
+    chat_id: Mapped[str | None] = mapped_column(String(64))
+    channel_ref: Mapped[str] = mapped_column(
+        String(128), nullable=False, default="channel_wegotrip"
+    )
+    message_id: Mapped[str | None] = mapped_column(String(128))
+    message_url: Mapped[str | None] = mapped_column(Text)
+    article_version: Mapped[int | None] = mapped_column(Integer)
+    audience_country: Mapped[str] = mapped_column(String(8), default="RU", nullable=False)
+    benefit: Mapped[str | None] = mapped_column(String(64))
+    domestic_or_outbound: Mapped[str | None] = mapped_column(String(16))
+    skip_reason: Mapped[str | None] = mapped_column(String(128))
+    skipped: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    adaptation: Mapped[dict[str, Any] | None] = mapped_column(JSONColumn)
+    max_response: Mapped[dict[str, Any] | None] = mapped_column(JSONColumn)
+    published_at: Mapped[dt.datetime] = mapped_column(UTCDateTime, default=utcnow, nullable=False)
+
+    article: Mapped[Article] = relationship(back_populates="max_publications")
 
 
 # ------------------------------------------------------------------- analytics
@@ -818,6 +856,7 @@ __all__ = [
     "KeywordCluster",
     "LLMRun",
     "Market",
+    "MaxPublication",
     "Product",
     "ProductAttraction",
     "ProductCategory",

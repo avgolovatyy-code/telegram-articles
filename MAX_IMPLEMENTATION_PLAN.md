@@ -57,9 +57,10 @@ Telegram остаётся primary. Max fan-out best-effort; ошибки Max н�
 - [x] `MaxRussiaAudienceGate` + `MaxRussiaEditorialPolicy`
 - [x] `RussianRegionCoveragePlanner` + RU holidays helper
 - [x] Fan-out передаёт DB session для geo resolve
+- [x] `adapt_for_max` + `max_publications` idempotency / mid storage
+- [x] Daily/weekly Max quotas on fan-out
 - [ ] Полный platform variant calendar (Telegram / Max slots) в Editorial V2
-- [ ] `adapt_for_max` writer (отдельный текст, не урезание TG)
-- [ ] RussiaTrendsProvider
+- [ ] RussiaTrendsProvider / LLM Max tone adapter (optional polish)
 
 ### MAX-D / MAX-E — Ops & roll-out
 

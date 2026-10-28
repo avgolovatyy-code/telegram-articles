@@ -37,9 +37,9 @@
 - [x] Max errors do not fail Telegram publish
 - [x] Renderer independent of `rendered_message` (TG rich blocks)
 - [x] Product links: `coupon=435`, `utm_source=max`
-- [ ] Independent Max scheduler slots (3–4/week) in Editorial V2 calendar
-- [ ] `adapt_for_max` OpenAI writer
-- [ ] Idempotent Max publication records / mid storage in DB (beyond log)
+- [~] Independent Max scheduler slots (3–4/week) — daily/weekly quotas enforced on fan-out; V2 calendar later
+- [x] `adapt_for_max` — short Max-native rewrite from verified body (no new claims)
+- [x] Idempotent `max_publications` table + mid/url/adaptation persistence
 
 ## 3. Профиль / branding Max
 
@@ -72,11 +72,11 @@
 | 2 | Бот / токен задокументирован или инструкция | [~] |
 | 3 | `GET /chats/{id}` + права | [~] check-max |
 | 4 | RU plan → TG and/or Max; Max = Russia audience | [~] gate on fan-out |
-| 5 | Уникальный Max-текст из fact bundle | [ ] writer |
+| 5 | Уникальный Max-текст из fact bundle | [x] adapt_for_max |
 | 6 | Renderer короткие посты + кнопки | [x] |
-| 7 | Review / preview / kill switch | [~] kill switch |
+| 7 | Review / preview / kill switch | [x] MAX_PUBLISH_RU + quotas |
 | 8 | Links coupon=435 + utm_source=max | [x] |
-| 9 | Persist mid / URL / stats | [~] mid in API result |
+| 9 | Persist mid / URL / stats | [x] max_publications |
 | 10 | TG без регрессий | [x] dual-format |
 | 11 | Manual approval на старте | [x] no auto profile |
 | 12 | Нет тем «для всех RU speakers» без РФ-пользы | [x] gate |

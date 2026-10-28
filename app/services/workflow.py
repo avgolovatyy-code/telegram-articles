@@ -204,9 +204,17 @@ class ArticleWorkflow:
                     article,
                 )
             if max_result.sent is not None:
+                mid = max_result.sent.message_id or "?"
+                chat = max_result.sent.chat_id
                 return WorkflowResult(
                     True,
-                    f"published to {target}: {url}; Max chat_id={max_result.sent.chat_id}",
+                    f"published to {target}: {url}; Max mid={mid} chat_id={chat}",
+                    article,
+                )
+            if max_result.skipped and max_result.skip_reason:
+                return WorkflowResult(
+                    True,
+                    f"published to {target}: {url} (Max skipped: {max_result.skip_reason})",
                     article,
                 )
         return WorkflowResult(True, f"published to {target}: {url}", article)

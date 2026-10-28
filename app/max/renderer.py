@@ -128,16 +128,24 @@ def _max_product_url(url: str, article: Article, settings: Settings) -> str:
     return builder.decorate(url, ctx)
 
 
-def render_max_payload(article: Article, *, settings: Settings | None = None) -> dict[str, Any]:
+def render_max_payload(
+    article: Article,
+    *,
+    settings: Settings | None = None,
+    document: ArticleDocument | None = None,
+    title: str | None = None,
+) -> dict[str, Any]:
     """Build Max ``POST /messages`` body fields (text + attachments).
 
-    Reads ``article.body`` only — never ``article.rendered_message`` (Telegram).
+    Uses an adapted ``ArticleDocument`` when provided; otherwise reads
+    ``article.body`` only — never ``article.rendered_message`` (Telegram).
     """
     settings = settings or get_settings()
-    if not article.body:
-        raise ValueError("article has no body")
-    document = ArticleDocument.model_validate(article.body)
-    title = (article.title or document.title or "").strip() or "WeGoTrip"
+    if document is None:
+        if not article.body:
+            raise ValueError("article has no body")
+        document = ArticleDocument.model_validate(article.body)
+    title = (title or article.title or document.title or "").strip() or "WeGoTrip"
 
     if MAX_FORMAT == "html":
         body = _fit(_section_parts_html(document), BODY_BUDGET)
