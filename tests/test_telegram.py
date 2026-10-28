@@ -117,6 +117,13 @@ def test_validation_rejects_an_empty_message():
     assert tb.validate_rich_message({"blocks": []})
 
 
+def test_validation_rejects_max_and_markdown_shapes():
+    assert tb.validate_rich_message({"text": "hello", "format": "markdown"})
+    assert tb.validate_rich_message({"markdown": "# Hello"})
+    assert tb.validate_rich_message({"html": "<b>Hi</b>"})
+    assert tb.validate_rich_message({"text": "plain only"})
+
+
 def test_validation_enforces_the_character_limit():
     message = tb.rich_message([tb.paragraph("x" * (tb.CHAR_LIMIT + 1))])
     assert any("characters" in error for error in tb.validate_rich_message(message))
@@ -151,6 +158,56 @@ def test_hero_card_shows_only_api_backed_facts(product, settings):
     assert "from 18.52 €" in text
     assert card.url.startswith("https://wegotrip.com/paris-d2988507/")
     assert "coupon=435" in card.url
+    photos = [b for b in card.blocks if b.get("type") == "photo"]
+    assert len(photos) == 1
+    assert "caption" not in photos[0].get("photo", {})
+
+
+def test_hero_skips_photo_when_url_already_used(product, settings):
+    renderer = TelegramProductCardRenderer(settings=settings)
+    card = renderer.hero(
+        product,
+        "en",
+        LinkContext(market="en", article_id="a1", topic_slug="t"),
+        used_image_urls={product.cover},
+    )
+    assert not any(b.get("type") == "photo" for b in card.blocks)
+    assert "🎧" in str(card.blocks)
+
+
+def test_renderer_does_not_duplicate_product_cover_photo(product, settings):
+    """Same product cover must not appear as media_placement and again in the hero card."""
+    media = {
+        "prod-cover": MediaCandidate(
+            id="prod-cover",
+            url=product.cover,
+            kind="photo",
+            source_entity_type="product",
+            role="gallery",
+            caption=product.title,
+            product_external_id=product.external_id,
+        )
+    }
+    document = sample_document()
+    document.media_placements = [
+        MediaPlacement(media_id="prod-cover", after_section=0, caption="Маршрут по Лувру")
+    ]
+    document.product_placements = [
+        ProductPlacement(product_id="4900", placement="hero", after_section=0, pitch="Why")
+    ]
+    rendered = RichMessageRenderer(settings=settings).render(
+        document,
+        market="en",
+        products={"4900": product},
+        media=media,
+        link_context=LinkContext(market="en", article_id="a1", topic_slug="t"),
+        entity_name="Paris",
+    )
+    photos = [b for b in rendered.message["blocks"] if b.get("type") == "photo"]
+    urls = [b["photo"]["media"] for b in photos]
+    assert urls.count(product.cover) == 1
+    assert sum(1 for u in urls if u == product.cover) == 1
+    assert "🎧" in str(rendered.message)
 
 
 def test_card_omits_facts_the_api_did_not_return(bare_product, settings):
@@ -203,12 +260,36 @@ def test_renderer_builds_a_valid_rich_message(product, settings):
         entity_name="Paris",
     )
     assert tb.validate_rich_message(rendered.message) == []
-    types = [block["type"] for block in rendered.message["blocks"]]
+    top = rendered.message["blocks"]
+    types = [block["type"] for block in top]
     assert types[0] == "photo"  # cover first
-    assert "heading" in types and "list" in types and "table" in types
-    assert "details" in types  # FAQ
+    assert types[1] == "heading"  # title visible
+    assert types[2] == "paragraph"  # intro visible
+    # Body sections / FAQ are collapsed details (is_open omitted/false).
+    details = [b for b in top if b["type"] == "details"]
+    assert len(details) >= 2
+    assert all(not b.get("is_open") for b in details)
+    nested_types = _block_types(top)
+    assert "list" in nested_types and "table" in nested_types
     assert "footer" in types  # hashtags
     assert rendered.product_cards
+
+
+def _block_types(blocks: list) -> set[str]:
+    found: set[str] = set()
+    stack = list(blocks)
+    while stack:
+        block = stack.pop()
+        if not isinstance(block, dict):
+            continue
+        kind = block.get("type")
+        if kind:
+            found.add(kind)
+        stack.extend(block.get("blocks") or [])
+        for item in block.get("items") or []:
+            if isinstance(item, dict):
+                stack.extend(item.get("blocks") or [])
+    return found
 
 
 def test_renderer_never_emits_an_unmarked_store_url(product, settings):
@@ -268,7 +349,7 @@ def test_audio_block_only_appears_when_a_url_exists(product, settings):
         link_context=LinkContext(market="en", article_id="a1", topic_slug="t"),
         entity_name="Paris",
     )
-    assert not any(b["type"] == "audio" for b in without.message["blocks"])
+    assert "audio" not in _block_types(without.message["blocks"])
 
     with_audio = renderer.render(
         document,
@@ -279,7 +360,7 @@ def test_audio_block_only_appears_when_a_url_exists(product, settings):
         entity_name="Paris",
         audio_urls={"4900": "https://cdn.example/preview.mp3"},
     )
-    assert any(b["type"] == "audio" for b in with_audio.message["blocks"])
+    assert "audio" in _block_types(with_audio.message["blocks"])
 
 
 # ------------------------------------------------------------ media validation

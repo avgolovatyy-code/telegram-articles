@@ -143,14 +143,39 @@ class CatalogSyncService:
             row.raw = country.raw
             row.last_seen_at = utcnow()
             stats.countries += 1
+        self.session.flush()
 
     def _sync_cities(self, market: Market, stats: SyncStats) -> list[str]:
         ids: list[str] = []
-        for city in self.provider.get_cities(market):
+        seen: set[str] = set()
+        cities = list(self.provider.get_cities(market))
+        if market == "ru":
+            # Domestic destinations are missing from the .com API and easy to
+            # under-sample on a global popular list — pull Russia explicitly.
+            russia_id = self._russia_country_id(market)
+            if russia_id:
+                cities.extend(self.provider.get_cities(market, country_id=russia_id, popular=False))
+        for city in cities:
+            if city.external_id in seen:
+                row = self._find(City, market, city.external_id)
+                if row is not None:
+                    if (city.product_count or 0) > (row.product_count or 0):
+                        row.product_count = city.product_count
+                        row.raw = city.raw or row.raw
+                    country_id = city.country_external_id or self._resolve_country_id(
+                        market, city.country_name
+                    )
+                    row.country_external_id = country_id or row.country_external_id
+                    row.country_name = city.country_name or row.country_name
+                continue
+            seen.add(city.external_id)
             row = self._get_or_create(City, market, city.external_id)
             row.slug = city.slug
             row.name = city.name
-            row.country_external_id = city.country_external_id or row.country_external_id
+            country_id = city.country_external_id or self._resolve_country_id(
+                market, city.country_name
+            )
+            row.country_external_id = country_id or row.country_external_id
             row.country_name = city.country_name or row.country_name
             row.popular = city.popular
             row.media = [asset.model_dump() for asset in city.media]
@@ -160,7 +185,57 @@ class CatalogSyncService:
             row.last_seen_at = utcnow()
             ids.append(city.external_id)
             stats.cities += 1
-        return ids
+        self.session.flush()
+        return self._prioritized_city_ids(market, ids)
+
+    def _russia_country_id(self, market: Market) -> str | None:
+        row = self.session.scalar(
+            select(Country).where(Country.market == market, Country.code == "RU")
+        )
+        if row is not None:
+            return row.external_id
+        row = self.session.scalar(
+            select(Country).where(
+                Country.market == market,
+                Country.name.in_(("Россия", "Russia", "Russian Federation")),
+            )
+        )
+        return row.external_id if row is not None else None
+
+    def _resolve_country_id(self, market: Market, country_name: str | None) -> str | None:
+        """Map a bare country name (common on wegotrip.ru city payloads) to an id."""
+        if not country_name:
+            return None
+        if not hasattr(self, "_country_name_index"):
+            self._country_name_index: dict[tuple[str, str], str] = {}
+            self._country_name_markets: set[str] = set()
+        if market not in self._country_name_markets:
+            for row in self.session.scalars(select(Country).where(Country.market == market)):
+                if row.name:
+                    self._country_name_index[(market, row.name.casefold())] = row.external_id
+            self._country_name_markets.add(market)
+        return self._country_name_index.get((market, country_name.casefold()))
+
+    def _prioritized_city_ids(self, market: Market, ids: list[str]) -> list[str]:
+        """Prefer Russia (for RU market), then deeper inventory, for attraction sync."""
+        if not ids:
+            return ids
+        rows = list(
+            self.session.scalars(
+                select(City).where(City.market == market, City.external_id.in_(ids))
+            )
+        )
+        by_id = {row.external_id: row for row in rows}
+        russia_id = self._russia_country_id(market) if market == "ru" else None
+
+        def sort_key(city_id: str) -> tuple[int, int, str]:
+            row = by_id.get(city_id)
+            if row is None:
+                return (1, 0, city_id)
+            domestic = 0 if (russia_id and row.country_external_id == russia_id) else 1
+            return (domestic, -(row.product_count or 0), city_id)
+
+        return sorted(ids, key=sort_key)
 
     def _sync_attractions(self, market: Market, city_ids: list[str], stats: SyncStats) -> None:
         for city_id in city_ids:
@@ -185,9 +260,22 @@ class CatalogSyncService:
 
     def _sync_products(self, market: Market, stats: SyncStats, options: SyncOptions) -> list[str]:
         started = utcnow()
-        products = self.provider.get_products(market, max_items=options.max_products)
+        products = list(self.provider.get_products(market, max_items=options.max_products))
+        if market == "ru":
+            russia_id = self._russia_country_id(market)
+            if russia_id:
+                # Reserve a dedicated Russia slice so domestic topics are not crowded
+                # out of the global popular cap.
+                domestic_cap = options.max_products or 400
+                products.extend(
+                    self.provider.get_products(market, country_id=russia_id, max_items=domestic_cap)
+                )
         seen: list[str] = []
+        seen_set: set[str] = set()
         for product in products:
+            if product.external_id in seen_set:
+                continue
+            seen_set.add(product.external_id)
             self._upsert_product(product, market, detail=False)
             seen.append(product.external_id)
             stats.products += 1

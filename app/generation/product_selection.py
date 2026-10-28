@@ -33,7 +33,23 @@ RANK_WEIGHTS: dict[str, float] = {
 #: A candidate below this relevance is dropped rather than padded into the article.
 MIN_RELEVANCE = 0.12
 
-MAX_PRODUCTS_PER_ARTICLE = 5
+MAX_PRODUCTS_PER_ARTICLE = 3
+
+#: How many ranked products the writer may *see* for naming places and facts.
+#: Placement cards stay capped by ``MAX_PRODUCTS_PER_ARTICLE``.
+CONTEXT_PRODUCTS_PER_ARTICLE = 8
+
+#: Intents where a route / linked attraction beats a novelty ticket.
+_PLANNING_INTENTS = {
+    "things_to_do",
+    "best_attractions",
+    "one_day",
+    "itinerary",
+    "weekend",
+    "first_time",
+    "family",
+    "with_kids",
+}
 
 
 @dataclass(slots=True)
@@ -83,11 +99,30 @@ def _availability(product: Product) -> float:
 
 
 def _commercial_fit(product: Product, *, entity_match: bool) -> float:
-    score = 0.4 if product.price is not None else 0.2
-    if product.types and product.types.get("audioguide"):
-        score += 0.3
+    # Do not boost audioguides just for being audioguides — relevance + entity match
+    # already decide whether a tour belongs in a cultural plan.
+    score = 0.45 if product.price is not None else 0.25
     if entity_match:
+        score += 0.35
+    return min(1.0, score)
+
+
+def _planning_value(product: Product) -> float:
+    """Prefer tickets/routes that help plan a day over novelty one-offs."""
+    score = 0.0
+    if product.attractions:
+        score += 0.4
+    title = (product.title or "").lower()
+    types = product.types or {}
+    if types.get("audioguide") or "audio" in title or "аудио" in title:
         score += 0.3
+    if product.duration_min:
+        score += 0.15
+    if product.distance:
+        score += 0.1
+    # Slight preference for products that already name a place in the title.
+    if ":" in (product.title or "") and len(title) > 24:
+        score += 0.05
     return min(1.0, score)
 
 
@@ -125,6 +160,14 @@ class ProductSelector:
             # when the wording differs from the query.
             if entity_match:
                 components["relevance"] = min(1.0, components["relevance"] + 0.25)
+            # For city planning articles, prefer products that unlock a place or route.
+            if topic.entity_type == "city" or topic.intent in _PLANNING_INTENTS:
+                plan = _planning_value(product)
+                components["commercial_fit"] = round(
+                    min(1.0, 0.45 * components["commercial_fit"] + 0.55 * plan), 4
+                )
+                if plan >= 0.4:
+                    components["relevance"] = min(1.0, components["relevance"] + 0.08)
             score = sum(components[key] * RANK_WEIGHTS[key] for key in components)
             if components["relevance"] < MIN_RELEVANCE and not entity_match:
                 continue
@@ -138,10 +181,9 @@ class ProductSelector:
 
         ranked.sort(key=lambda item: item.score, reverse=True)
         selected = _diversify(ranked, limit)
-        for index, item in enumerate(selected):
-            item.placement = "hero" if index == 0 else "compact"
-        if len(selected) >= 3:
-            selected[-1].placement = "collection"
+        # Prefer quiet compact cards; hero shop-window layouts push a sales tone.
+        for item in selected:
+            item.placement = "compact"
         return selected
 
     def select(
@@ -151,11 +193,29 @@ class ProductSelector:
         *,
         limit: int = MAX_PRODUCTS_PER_ARTICLE,
     ) -> list[RankedProduct]:
-        candidates = [
-            catalog_products[pid]
-            for pid in (topic.relevant_product_ids or [])
-            if pid in catalog_products
-        ]
+        candidates: list[Product] = []
+        seen: set[str] = set()
+        for pid in topic.relevant_product_ids or []:
+            product = catalog_products.get(pid)
+            if product is None or product.external_id in seen:
+                continue
+            candidates.append(product)
+            seen.add(product.external_id)
+
+        # City / planning topics: also consider the full city catalogue so ranking
+        # is not stuck on a thin niche subset of relevant_product_ids.
+        if topic.entity_type == "city" or topic.intent in _PLANNING_INTENTS:
+            entity_id = topic.entity_external_id.split("@", 1)[0]
+            for product in catalog_products.values():
+                if product.external_id in seen:
+                    continue
+                if topic.entity_type == "city" and product.city_external_id != entity_id:
+                    continue
+                if topic.entity_type != "city" and not _matches_entity(product, topic):
+                    continue
+                candidates.append(product)
+                seen.add(product.external_id)
+
         return self.rank(topic, candidates, limit=limit)
 
 
@@ -252,6 +312,7 @@ def product_summary(product: Product) -> dict[str, Any]:
 
 
 __all__ = [
+    "CONTEXT_PRODUCTS_PER_ARTICLE",
     "MAX_PRODUCTS_PER_ARTICLE",
     "MIN_RELEVANCE",
     "RANK_WEIGHTS",

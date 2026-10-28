@@ -14,6 +14,10 @@ from app.config import Market, Settings, get_settings
 from app.db.enums import ClaimStatus
 from app.generation.claims import split_sentences
 from app.generation.context import WriterContext
+from app.generation.place_names import (
+    GENERIC_ATTRACTION_TOKENS,
+    attraction_mentioned,
+)
 from app.generation.schemas import ArticleDocument, QualityReview
 from app.links.affiliate import AffiliateLinkBuilder
 from app.topics.dedup import normalize_text
@@ -30,6 +34,13 @@ BANNED_PHRASES = {
         "a gem that will leave no one indifferent",
         "nestled in the heart of",
         "look no further",
+        "don't miss this opportunity",
+        "book now",
+        "must-have audio guide",
+        "perfect audio companion",
+        "getyourguide",
+        "viator",
+        "tiqets",
     ],
     "ru": [
         "погрузитесь в удивительный мир",
@@ -39,6 +50,13 @@ BANNED_PHRASES = {
         "не оставит равнодушным",
         "поистине уникальн",
         "маст-хэв для каждого туриста",
+        "бронируйте сейчас",
+        "не упустите возможность",
+        "обязательный аудиогид",
+        "идеальный аудиокомпаньон",
+        "getyourguide",
+        "viator",
+        "tiqets",
     ],
 }
 
@@ -155,8 +173,35 @@ class QualityGate:
             warnings.append(f"{len(document.sections)} sections is above the recommended maximum")
 
         product_ratio = len(document.product_placements) / max(len(document.sections), 1)
-        if product_ratio > 1.0:
-            errors.append("more product cards than sections; the article reads as a shop window")
+        if len(document.product_placements) > 3:
+            errors.append("more than 3 product cards; keep recommendations measured")
+        if product_ratio > 0.6:
+            errors.append(
+                "product cards are too dense relative to sections; reads as a shop window"
+            )
+
+        # Require concrete catalogue places so the piece cannot be pure philosophy.
+        attraction_items = [
+            item for item in (context.catalog_attractions or []) if item.get("name")
+        ]
+        if len(attraction_items) >= 3:
+            body_norm = normalize_text(text)
+            mentioned = 0
+            for item in attraction_items:
+                name = str(item.get("name") or "").strip()
+                aliases = [
+                    str(alias).strip()
+                    for alias in (item.get("mention_as") or [])
+                    if str(alias).strip()
+                ]
+                if attraction_mentioned(name, body_norm, aliases=aliases):
+                    mentioned += 1
+            required = min(4, max(3, len(attraction_items) // 3))
+            if mentioned < required:
+                errors.append(
+                    f"too few concrete catalogue attractions named "
+                    f"({mentioned} < {required}); article is too abstract"
+                )
 
         if not document.intro.strip():
             errors.append("empty intro")
@@ -256,6 +301,7 @@ def normalize_hashtags(tags: list[str], settings: Settings) -> list[str]:
 
 __all__ = [
     "BANNED_PHRASES",
+    "GENERIC_ATTRACTION_TOKENS",
     "MAX_KEYWORD_DENSITY",
     "GateResult",
     "QualityGate",

@@ -85,8 +85,11 @@ class WeGoTripHttpProvider:
         self.close()
 
     # -------------------------------------------------------------- requests
-    def _url(self, path: str, version: str) -> str:
-        base = self._settings.wegotrip_api_base_url.rstrip("/")
+    def _url(self, path: str, version: str, *, market: Market | None = None) -> str:
+        if market is not None:
+            base = self._settings.api_base_url(market)
+        else:
+            base = self._settings.wegotrip_api_base_url.rstrip("/")
         return f"{base}/{version}/{path.strip('/')}/"
 
     def _get(
@@ -101,10 +104,13 @@ class WeGoTripHttpProvider:
         headers: dict[str, str] = {}
         if market:
             headers["Accept-Language"] = market
+            # Match the storefront host so CDN/geo routing stays consistent.
+            headers["Origin"] = f"https://{self._settings.store_domain(market)}"
+            headers["Referer"] = f"https://{self._settings.store_domain(market)}/"
         if self._settings.wegotrip_api_key:
             headers["Authorization"] = f"Bearer {self._settings.wegotrip_api_key}"
 
-        url = self._url(path, version)
+        url = self._url(path, version, market=market)
         response = request_with_retries(
             self._client,
             "GET",

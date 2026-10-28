@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.config import Market, Settings, get_settings
 from app.db.models import Attraction, City, Country, Product, TopicCandidate
+from app.generation.place_names import mention_forms_for
 from app.generation.product_selection import RankedProduct, product_facts, product_summary
 from app.media_assets import MediaCandidate
 
@@ -50,9 +51,11 @@ class WriterContext:
     verified_facts: list[dict[str, Any]] = field(default_factory=list)
     entity: dict[str, Any] = field(default_factory=dict)
     audio: list[dict[str, Any]] = field(default_factory=list)
+    catalog_attractions: list[dict[str, Any]] = field(default_factory=list)
 
     def as_payload(self, settings: Settings) -> dict[str, Any]:
         forbidden = FORBIDDEN_CLAIM_TOPICS_RU if self.market == "ru" else FORBIDDEN_CLAIM_TOPICS_EN
+        placement_cap = min(3, len(self.products))
         return {
             "market": self.market,
             "primary_query": self.topic.primary_query,
@@ -63,15 +66,32 @@ class WriterContext:
                 "entity_type": self.topic.entity_type,
                 "inventory_depth": self.topic.inventory_depth,
             },
+            "catalog_attractions": self.catalog_attractions,
+            "must_mention_attractions": [
+                item.get("name") for item in self.catalog_attractions[:6] if item.get("name")
+            ],
             "catalog_facts": self.catalog_facts,
             "verified_facts": self.verified_facts,
+            # Full ranked set for naming places / durations / ratings; cards are capped.
             "products": [product_summary(item.product) for item in self.products],
             "allowed_media": [item.as_context() for item in self.media],
             "allowed_audio": self.audio,
             "brand_style": {
                 "voice": "friendly, plain, specific, lightly humorous",
+                "purpose": (
+                    "help someone preparing for or already on a trip with concrete "
+                    "places, order and trade-offs drawn from the WeGoTrip catalogue"
+                ),
                 "references": ["Aviasales", "T—J"],
-                "avoid": ["ad pathos", "AI boilerplate", "keyword stuffing"],
+                "avoid": [
+                    "ad pathos",
+                    "AI boilerplate",
+                    "keyword stuffing",
+                    "catalogue / shop-window tone",
+                    "watery philosophy without named places",
+                    "recommending an audio guide for every stop",
+                    "naming competitor apps or ticket resellers",
+                ],
                 "humour_must_not": [
                     "mock people, nationalities, cities or the reader",
                     "use stereotypes or sensitive traits",
@@ -82,7 +102,12 @@ class WriterContext:
                 "min_chars": settings.article_target_min_chars,
                 "max_chars": settings.article_target_max_chars,
                 "hard_max_chars": settings.article_max_chars,
-                "max_products": len(self.products),
+                "preferred_products": 1,
+                "max_products": placement_cap,
+                "min_named_catalog_attractions": min(4, max(2, len(self.catalog_attractions))),
+                "products_are_optional": True,
+                "recommend_wegotrip_only": True,
+                "attractions_are_required_backbone": True,
                 "max_hashtags": settings.max_hashtags if settings.enable_hashtags else 0,
                 "sections_min": 3,
                 "sections_max": 8,
@@ -105,10 +130,17 @@ class ContextBuilder:
         market: Market = topic.market  # type: ignore[assignment]
         entity = self._entity_payload(topic, market)
         media = self._collect_media(topic, products, market)
+        attractions = self._catalog_attractions(topic, market, products)
         facts: list[str] = []
         for item in products:
             facts.extend(product_facts(item.product))
+            for link in item.product.attractions:
+                if link.name:
+                    facts.append(
+                        f"{item.product.title} covers / is linked to {link.name} (WeGoTrip API)"
+                    )
         facts.extend(self._entity_facts(topic, entity))
+        facts.extend(self._attraction_facts(attractions))
 
         audio = [
             {
@@ -125,10 +157,11 @@ class ContextBuilder:
             topic=topic,
             products=products,
             media=media,
-            catalog_facts=facts[:60],
+            catalog_facts=_dedupe_facts(facts)[:80],
             verified_facts=verified_facts or [],
             entity=entity,
             audio=audio,
+            catalog_attractions=attractions,
         )
 
     # -------------------------------------------------------------- entities
@@ -177,6 +210,74 @@ class ContextBuilder:
         if entity.get("city"):
             facts.append(f"{topic.entity_name} is in {entity['city']} (WeGoTrip API).")
         return facts
+
+    def _catalog_attractions(
+        self, topic: TopicCandidate, market: Market, products: list[RankedProduct]
+    ) -> list[dict[str, Any]]:
+        """Concrete places from the WeGoTrip catalogue the writer must lean on."""
+        city_id = self._resolve_city_id(topic, products)
+        rows: list[Attraction] = []
+        if city_id:
+            rows = list(
+                self.session.scalars(
+                    select(Attraction)
+                    .where(Attraction.market == market, Attraction.city_external_id == city_id)
+                    .order_by(Attraction.popularity_rank.asc().nulls_last(), Attraction.name.asc())
+                    .limit(15)
+                ).all()
+            )
+        # Always include attractions linked to the selected products.
+        seen = {row.external_id for row in rows}
+        for item in products:
+            for link in item.product.attractions:
+                if not link.attraction_external_id or link.attraction_external_id in seen:
+                    continue
+                attraction = self._attraction(market, link.attraction_external_id)
+                if attraction is None:
+                    continue
+                rows.append(attraction)
+                seen.add(attraction.external_id)
+
+        return [
+            {
+                "id": row.external_id,
+                "name": row.name,
+                "slug": row.slug,
+                "product_count": row.product_count,
+                "popularity_rank": row.popularity_rank,
+                "mention_as": mention_forms_for(row.name, market=market),
+            }
+            for row in rows[:18]
+        ]
+
+    def _attraction_facts(self, attractions: list[dict[str, Any]]) -> list[str]:
+        facts: list[str] = []
+        for row in attractions[:12]:
+            name = row.get("name")
+            if not name:
+                continue
+            count = row.get("product_count") or 0
+            if count:
+                facts.append(
+                    f"{name}: {count} linked WeGoTrip product(s) in the catalogue (WeGoTrip API)"
+                )
+            else:
+                facts.append(f"{name} is listed as a WeGoTrip catalogue attraction (WeGoTrip API)")
+        return facts
+
+    def _resolve_city_id(self, topic: TopicCandidate, products: list[RankedProduct]) -> str | None:
+        entity_id = topic.entity_external_id.split("@", 1)[0]
+        if topic.entity_type == "city":
+            return entity_id
+        if topic.entity_type in {"category", "collection"}:
+            _, _, city_id = topic.entity_external_id.partition("@")
+            return city_id or None
+        if topic.entity_type == "attraction":
+            attraction = self._attraction(topic.market, entity_id)  # type: ignore[arg-type]
+            return attraction.city_external_id if attraction else None
+        if products:
+            return products[0].product.city_external_id
+        return None
 
     # ----------------------------------------------------------------- media
     def _collect_media(
@@ -298,6 +399,18 @@ def _preferred_cover_index(candidates: list[MediaCandidate]) -> int | None:
             if candidate.source_entity_type == wanted:
                 return index
     return None
+
+
+def _dedupe_facts(facts: list[str]) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for fact in facts:
+        key = fact.strip().lower()
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        out.append(fact)
+    return out
 
 
 __all__ = [

@@ -38,7 +38,11 @@ class Settings(BaseSettings):
     database_echo: bool = False
 
     # -------------------------------------------------------------- WeGoTrip
+    #: EN / default Affiliate API host. Russia inventory is absent here.
     wegotrip_api_base_url: str = "https://app.wegotrip.com/api"
+    #: RU market Affiliate API host. Domestic (Russia) cities/products are only
+    #: returned from the wegotrip.ru storefront API — not from app.wegotrip.com.
+    wegotrip_api_base_url_ru: str = "https://wegotrip.ru/api"
     # The public documentation mentions both v2 and v3. Probing the live API shows
     # that v2 serves currencies/countries/cities/products/search while v3 only serves
     # attractions (and its `city` filter is ignored), so each endpoint pins its version.
@@ -62,6 +66,22 @@ class Settings(BaseSettings):
     telegram_timeout_seconds: float = 60.0
     telegram_max_retries: int = 4
     telegram_dry_run: bool = False
+
+    # -------------------------------------------------------------------- Max
+    #: Secondary RU publish surface (Telegram stays primary). When token + channel
+    #: id are set, production RU Telegram publishes also fan out to Max best-effort.
+    max_bot_token: str | None = None
+    #: Numeric API chat_id (e.g. ``-71234567890123``) or public slug / URL
+    #: (``NNNNNNNN_biz``, ``https://max.ru/idNNNNNNNN_biz``).
+    max_ru_channel_id: str | None = None
+    max_api_base_url: str = "https://platform-api2.max.ru"
+    max_timeout_seconds: float = 30.0
+    max_max_retries: int = 3
+    max_ssl_verify: bool = True
+    #: Optional path to the Russian trusted root (Минцифры). Empty → bundled PEM.
+    max_ssl_ca_file: str | None = None
+    #: Explicit kill-switch; credentials alone are enough to enable Max fan-out.
+    max_publish_ru: bool = True
 
     # ---------------------------------------------------------------- OpenAI
     openai_api_key: str | None = None
@@ -102,9 +122,18 @@ class Settings(BaseSettings):
     min_post_interval_minutes: int = 20
     #: Publishing window, in `publish_timezone` local hours.
     publish_timezone: str = "Europe/Moscow"
-    publish_window_start_hour: int = 10
+    publish_window_start_hour: int = 9
     publish_window_end_hour: int = 21
     stale_article_refresh_hours: int = 24
+    #: Max articles about the same city (or city-scoped category) per publish day.
+    max_same_city_per_day: int = 1
+    #: Max articles about the same attraction per publish day.
+    max_same_attraction_per_day: int = 1
+    #: For RU market: prefer Russia destinations before other countries.
+    ru_prefer_domestic: bool = True
+    #: Target share of the daily RU generation batch that should be Russia-geo
+    #: when domestic candidates exist (0–1).
+    ru_domestic_share: float = 0.7
 
     # ---------------------------------------------------------------- quality
     min_quality_score: float = 0.88
@@ -187,6 +216,16 @@ class Settings(BaseSettings):
     def store_domain(self, market: Market) -> str:
         return self.wegotrip_store_domain_ru if market == "ru" else self.wegotrip_store_domain_en
 
+    def api_base_url(self, market: Market) -> str:
+        """Affiliate API host for a market.
+
+        RU must use ``wegotrip.ru`` — the ``.com`` API returns Russia as an empty
+        country (0 cities / 0 products). EN keeps the ``.com`` host.
+        """
+        if market == "ru":
+            return (self.wegotrip_api_base_url_ru or self.wegotrip_api_base_url).rstrip("/")
+        return self.wegotrip_api_base_url.rstrip("/")
+
     def currency(self, market: Market) -> str:
         return self.wegotrip_currency_ru if market == "ru" else self.wegotrip_currency_en
 
@@ -233,6 +272,13 @@ class Settings(BaseSettings):
         if self.slack_enabled:
             return True
         return bool(self.slack_bot_token and self.slack_signing_secret)
+
+    @property
+    def max_ru_active(self) -> bool:
+        """Whether RU production posts should also be mirrored to Max."""
+        if not self.max_publish_ru:
+            return False
+        return bool((self.max_bot_token or "").strip() and (self.max_ru_channel_id or "").strip())
 
 
 @lru_cache(maxsize=1)

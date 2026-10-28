@@ -2,6 +2,9 @@
 
 The LLM never produces Telegram markup. This renderer owns every heading, list,
 divider, media block, product card and — critically — every URL.
+
+Long body content is wrapped in collapsed ``details`` blocks (``is_open`` omitted /
+false) so channel posts open as a teaser: cover, title, intro — then expanders.
 """
 
 from __future__ import annotations
@@ -21,6 +24,7 @@ from app.telegram.product_cards import RenderedProductCard, TelegramProductCardR
 
 FAQ_TITLE = {"en": "FAQ", "ru": "Частые вопросы"}
 SOURCES_TITLE = {"en": "Sources", "ru": "Источники"}
+READ_MORE = {"en": "Read more", "ru": "Читать дальше"}
 
 #: Resolves a product id + placement to the URL that should be used in the card.
 UrlResolver = Callable[[str, str], str]
@@ -71,6 +75,7 @@ class RichMessageRenderer:
         out: list[dict[str, Any]] = []
         cards: list[RenderedProductCard] = []
         used_media: list[str] = []
+        used_image_urls: set[str] = set()
 
         def resolve(product: Product, placement: str) -> str:
             if url_resolver is not None:
@@ -81,7 +86,9 @@ class RichMessageRenderer:
         if cover is not None:
             out.append(tb.photo(cover.url, caption=cover.caption))
             used_media.append(cover.id)
+            used_image_urls.add(cover.url)
 
+        # Visible teaser — everything below goes into collapsed details.
         out.append(tb.heading(document.title, size=1))
         if document.intro.strip():
             out.append(tb.paragraph(document.intro.strip()))
@@ -99,11 +106,11 @@ class RichMessageRenderer:
         collection_products: list[Product] = []
 
         for index, section in enumerate(document.sections):
-            out.append(tb.heading(section.heading, size=min(max(section.level, 2), 3)))
+            section_blocks: list[dict[str, Any]] = []
             for block in section.blocks:
                 rendered = self._render_block(block)
                 if rendered is not None:
-                    out.append(rendered)
+                    section_blocks.append(rendered)
 
             for placement in media_by_section.get(index, []):
                 candidate = media.get(placement.media_id)
@@ -111,17 +118,21 @@ class RichMessageRenderer:
                     candidate is None
                     or candidate.id in used_media
                     or candidate.id in blocked_media_ids
+                    or candidate.url in used_image_urls
                 ):
                     continue
-                out.append(tb.photo(candidate.url, caption=placement.caption or candidate.caption))
+                section_blocks.append(
+                    tb.photo(candidate.url, caption=placement.caption or candidate.caption)
+                )
                 used_media.append(candidate.id)
+                used_image_urls.add(candidate.url)
 
             for placement in audio_by_section.get(index, []):
                 url = audio_urls.get(placement.product_id)
                 product = products.get(placement.product_id)
                 if not url or product is None:
                     continue
-                out.append(
+                section_blocks.append(
                     tb.audio(
                         url,
                         title=product.title,
@@ -144,6 +155,7 @@ class RichMessageRenderer:
                         link_context,
                         pitch=placement.pitch,
                         url_override=resolve(product, "hero"),
+                        used_image_urls=used_image_urls,
                     )
                     if placement.placement == "hero"
                     else self.cards.compact(
@@ -154,14 +166,22 @@ class RichMessageRenderer:
                         url_override=resolve(product, "compact"),
                     )
                 )
-                out.extend(card.blocks)
+                section_blocks.extend(card.blocks)
                 cards.append(card)
+                image = product.cover or product.preview
+                if image:
+                    used_image_urls.add(image)
+
+            if section_blocks:
+                summary = section.heading.strip() or READ_MORE[market]
+                out.append(tb.details(summary, section_blocks, is_open=False))
 
         if document.faq:
-            out.append(tb.divider())
-            out.append(tb.heading(FAQ_TITLE[market], size=2))
-            for item in document.faq:
-                out.append(tb.details(item.question, [tb.paragraph(item.answer)]))
+            faq_blocks = [
+                tb.details(item.question, [tb.paragraph(item.answer)], is_open=False)
+                for item in document.faq
+            ]
+            out.append(tb.details(FAQ_TITLE[market], faq_blocks, is_open=False))
 
         if collection_products:
             overrides = {p.external_id: resolve(p, "collection") for p in collection_products}
@@ -172,10 +192,18 @@ class RichMessageRenderer:
                 entity_name=entity_name,
                 url_overrides=overrides,
             )
-            out.extend(collection_blocks)
+            if collection_blocks and collection_blocks[0].get("type") == "heading":
+                summary = collection_blocks[0].get("text") or READ_MORE[market]
+                body = collection_blocks[1:]
+            else:
+                summary = READ_MORE[market]
+                body = collection_blocks
+            if body:
+                out.append(tb.details(summary, body, is_open=False))
             cards.extend(collection_cards)
 
         if document.closing:
+            # Short closing stays visible under the expanders.
             out.append(tb.paragraph(document.closing))
 
         hashtags = normalize_hashtags(document.hashtags, self.settings)
@@ -231,4 +259,4 @@ def _hashtag_line(tags: list[str]) -> list[Any]:
     return out
 
 
-__all__ = ["FAQ_TITLE", "RenderedArticle", "RichMessageRenderer", "UrlResolver"]
+__all__ = ["FAQ_TITLE", "READ_MORE", "RenderedArticle", "RichMessageRenderer", "UrlResolver"]

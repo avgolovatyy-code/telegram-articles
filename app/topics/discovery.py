@@ -30,9 +30,9 @@ from app.db.models import (
 from app.db.types import utcnow
 from app.logging_setup import get_logger, job_context
 from app.topics.clusters import ClusterDefinition, KeywordClusterRegistry
-from app.topics.coverage import usable_candidate_query
 from app.topics.dedup import DeduplicationService, canonicalize_query, topic_key, topic_slug
 from app.topics.demand import SearchDemandProvider, build_demand_provider
+from app.topics.diversity import select_diverse_topics
 from app.topics.morphology import render_pattern
 from app.topics.scoring import (
     ScoreInputs,
@@ -566,16 +566,10 @@ def select_topics_for_generation(
     """Highest-scoring candidates that clear the quality floor.
 
     Returning fewer than ``limit`` is a valid answer: the daily counts are a ceiling,
-    and a thin topic is never promoted just to fill it.
+    and a thin topic is never promoted just to fill it. Selection also spreads
+    destinations across the day and (for RU) prefers Russia when inventory exists.
     """
-    settings = settings or get_settings()
-    return list(
-        session.scalars(
-            usable_candidate_query(market, settings)
-            .order_by((TopicCandidate.topic_score + TopicCandidate.boost).desc())
-            .limit(limit)
-        ).all()
-    )
+    return select_diverse_topics(session, market, limit, settings=settings)
 
 
 __all__ = [

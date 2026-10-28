@@ -120,7 +120,7 @@ def test_selection_is_capped(session, settings):
     assert 0 < len(selected) <= MAX_PRODUCTS_PER_ARTICLE
 
 
-def test_first_selected_product_becomes_the_hero(session, settings):
+def test_selected_products_use_compact_placement(session, settings):
     topic = add_topic(session)
     products = [
         add_product(session, external_id=str(200 + i), title=f"Paris tour {i}", popularity_rank=i)
@@ -128,7 +128,8 @@ def test_first_selected_product_becomes_the_hero(session, settings):
     ]
     topic.relevant_product_ids = [p.external_id for p in products]
     selected = ProductSelector(settings).select(topic, {p.external_id: p for p in products})
-    assert selected[0].placement == "hero"
+    assert selected
+    assert all(item.placement == "compact" for item in selected)
 
 
 def test_attraction_topics_prefer_products_linked_to_that_attraction(session, settings):
@@ -191,8 +192,10 @@ def test_context_contains_everything_the_writer_needs(synced_session, settings):
     assert payload["primary_query"] == "things to do in Paris"
     assert payload["entity"]["name"] == "Paris"
     assert payload["catalog_facts"]
+    assert payload["catalog_attractions"], "city topics must expose catalogue attractions"
     assert payload["forbidden_claims"]
     assert payload["article_constraints"]["max_chars"] == settings.article_target_max_chars
+    assert payload["article_constraints"]["min_named_catalog_attractions"] >= 2
     assert "brand_style" in payload
     for product in payload["products"]:
         assert "url" not in product  # the writer must never see a link
@@ -248,6 +251,34 @@ def test_gate_rejects_banned_boilerplate(context, settings):
     result = QualityGate(settings).content(document, context)
     assert not result.passed
     assert any("boilerplate" in error for error in result.errors)
+
+
+def test_gate_rejects_watery_article_without_named_attractions(context, settings):
+    if len(context.catalog_attractions) < 3:
+        pytest.skip("fixture catalogue has too few attractions")
+    watery = (
+        "Choose one focus for the day and leave free time around it. "
+        "Do not turn the city into a checklist of obligations. "
+        "A calm rhythm beats collecting pins on a map."
+    )
+    document = base_document(watery)
+    result = QualityGate(settings).content(document, context)
+    assert not result.passed
+    assert any("too abstract" in error for error in result.errors)
+
+
+def test_gate_accepts_russian_aliases_for_latin_attraction_names():
+    from app.generation.place_names import attraction_mentioned
+    from app.topics.dedup import normalize_text
+
+    body = normalize_text("Начните с Саграды Фамилии, затем Парк Гуэль и музей Пикассо.")
+    assert attraction_mentioned("Basílica de la Sagrada Família", body)
+    assert attraction_mentioned("Park Guell", body)
+    assert attraction_mentioned("Museu Picasso de Barcelona", body)
+    assert not attraction_mentioned(
+        "Музей современного искусства",
+        normalize_text("Билет в Музей Бенкси без очереди."),
+    )
 
 
 def test_gate_rejects_an_unknown_product(context, settings):
