@@ -111,6 +111,9 @@ class Settings(BaseSettings):
     openai_utility_model: str = "gpt-5.6-luna"
     openai_fallback_model: str = "gpt-5.6-sol"
     openai_review_model: str | None = None  # defaults to the utility model
+    openai_critic_model: str | None = None  # alias of review_model
+    openai_editor_model: str | None = None  # Chief Editor; defaults to utility
+    openai_fast_model: str | None = None
     openai_image_model: str = "gpt-image-2"
     openai_timeout_seconds: float = 240.0
     openai_max_retries: int = 3
@@ -178,9 +181,13 @@ class Settings(BaseSettings):
     en_posts_per_week_hard_cap: int = 7
     max_posts_per_day: int = 1
     max_longform_articles_per_month: int = 2
-    max_commercial_post_share: float = 0.25
+    max_commercial_post_share: float = 0.20
     openai_chief_editor_daily: bool = True
-    editorial_voice_version: str = "wegotrip_voice_v1"
+    editorial_voice_version: str = "wegotrip_voice_v3"
+    #: RU market intelligence + mechanics (spec 3.0). Isolated from EN.
+    editorial_ru_market_v3_enabled: bool = True
+    #: Inject MAX↔Telegram RU footer in Engine publications. EN stays off.
+    cross_promo_footer_enabled: bool = True
     #: Prefer own SourceRegistry evidence over hosted web_search in user-facing posts.
     openai_hosted_web_search_for_public_posts: bool = False
 
@@ -202,8 +209,8 @@ class Settings(BaseSettings):
     media_max_bytes: int = 10 * 1024 * 1024
 
     # --------------------------------------------------------------- hashtags
-    enable_hashtags: bool = True
-    max_hashtags: int = 4
+    enable_hashtags: bool = False
+    max_hashtags: int = 2
 
     # -------------------------------------------------------------- analytics
     tracking_base_url: str | None = None  # defaults to admin_base_url
@@ -265,7 +272,15 @@ class Settings(BaseSettings):
     # ------------------------------------------------------------- accessors
     @property
     def review_model(self) -> str:
-        return self.openai_review_model or self.openai_utility_model
+        return self.openai_critic_model or self.openai_review_model or self.openai_utility_model
+
+    @property
+    def editor_model(self) -> str:
+        return self.openai_editor_model or self.openai_utility_model
+
+    @property
+    def fast_model(self) -> str:
+        return self.openai_fast_model or self.openai_utility_model
 
     @property
     def tracking_root(self) -> str:

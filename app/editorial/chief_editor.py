@@ -84,9 +84,7 @@ class ChiefEditorService:
                     report.details[f"{market}_kept_last_plan"] = previous.run_id
         return report
 
-    def _run_market(
-        self, market: Market, *, run_date: dt.date, dry_run: bool
-    ) -> EditorialRun:
+    def _run_market(self, market: Market, *, run_date: dt.date, dry_run: bool) -> EditorialRun:
         brief = build_daily_brief(self.session, market, self.settings, run_date=run_date)
         prompt = chief_editor_prompt(market)
         payload = json.dumps(brief, ensure_ascii=False)
@@ -105,11 +103,7 @@ class ChiefEditorService:
         parsed = result.response.parsed
         if not isinstance(parsed, dict):
             raise LLMError("Chief Editor returned no structured payload")
-        decision_set = EditorialDecisionSet.model_validate(parsed)
-        if decision_set.market != market:
-            decision_set = decision_set.model_copy(update={"market": market})
-        if decision_set.run_date != run_date:
-            decision_set = decision_set.model_copy(update={"run_date": run_date})
+        decision_set = EditorialDecisionSet.model_validate(parsed).normalized(market, run_date)
 
         return apply_decision_set(
             self.session,

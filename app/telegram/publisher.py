@@ -56,10 +56,22 @@ class TelegramClientProtocol(Protocol):
         protect_content: bool = ...,
     ) -> SentMessage: ...
 
-    def send_message(self, chat_id: str, text: str) -> SentMessage: ...
+    def send_message(
+        self,
+        chat_id: str,
+        text: str,
+        *,
+        parse_mode: str | None = ...,
+        disable_web_page_preview: bool = ...,
+    ) -> SentMessage: ...
 
     def send_photo(
-        self, chat_id: str, photo: str, caption: str | None = None
+        self,
+        chat_id: str,
+        photo: str,
+        caption: str | None = None,
+        *,
+        parse_mode: str | None = ...,
     ) -> SentMessage: ...
 
     def send_poll(
@@ -190,9 +202,38 @@ class TelegramPublisher:
             log.info("publisher.already_published", article_id=article.id, key=key)
             return PublicationResult(existing, created=False, reused=True)
 
+        from app.editorial.footer import HOLD_UNSUPPORTED, inject_plain_text, inject_telegram_rich
         from app.editorial.formats import native_payload
 
         payload = native_payload(self.session, article)
+        if self.settings.cross_promo_footer_enabled:
+            if payload.method == "sendRichMessage":
+                footer = inject_telegram_rich(rich_message, market=market)
+                if footer.hold:
+                    raise TelegramValidationError(footer.reason)
+            elif payload.method == "sendMessage" and payload.text:
+                text, footer = inject_plain_text(payload.text, market=market, html=True)
+                if footer.hold:
+                    raise TelegramValidationError(footer.reason or HOLD_UNSUPPORTED)
+                payload.text = text
+            elif payload.method == "sendPhoto":
+                caption, footer = inject_plain_text(
+                    payload.caption, market=market, html=True, max_chars=1024
+                )
+                if footer.hold:
+                    raise TelegramValidationError(footer.reason or HOLD_UNSUPPORTED)
+                payload.caption = caption
+            elif payload.method == "sendPoll" and market == "ru":
+                question = payload.question or ""
+                options = payload.options or []
+                fallback = question
+                if options:
+                    fallback = question + "\n\n" + "\n".join(f"• {item}" for item in options)
+                text, footer = inject_plain_text(fallback, market=market, html=True)
+                if footer.hold:
+                    raise TelegramValidationError(footer.reason or HOLD_UNSUPPORTED)
+                payload.method = "sendMessage"
+                payload.text = text
         if payload.method == "sendRichMessage":
             errors = validate_rich_message(rich_message)
             if errors:
@@ -271,9 +312,13 @@ class TelegramPublisher:
         if payload.method == "sendPoll" and payload.question and payload.options:
             return self.client.send_poll(channel, payload.question, payload.options)
         if payload.method == "sendPhoto" and payload.photo:
-            return self.client.send_photo(channel, payload.photo, caption=payload.caption)
+            return self.client.send_photo(
+                channel, payload.photo, caption=payload.caption, parse_mode="HTML"
+            )
         if payload.method == "sendMessage" and payload.text:
-            return self.client.send_message(channel, payload.text)
+            return self.client.send_message(
+                channel, payload.text, parse_mode="HTML", disable_web_page_preview=True
+            )
         return self.client.send_rich_message(channel, rich_message)
 
     def edit(

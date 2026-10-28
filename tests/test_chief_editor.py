@@ -72,7 +72,9 @@ def test_chief_editor_keeps_last_plan_when_llm_fails(session, settings, monkeypa
     _topic(session)
     first = jobs.run_chief_editor(session, markets=("ru",), settings=settings)
     assert first.ok
-    before = list(session.scalars(select(EditorialPlanSlot).where(EditorialPlanSlot.market == "ru")))
+    before = list(
+        session.scalars(select(EditorialPlanSlot).where(EditorialPlanSlot.market == "ru"))
+    )
     assert before
 
     class BoomGateway:

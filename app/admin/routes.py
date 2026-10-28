@@ -21,14 +21,19 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.admin.preview import render_preview
-from app.branding.proposal import proposed_branding_for, validate_branding_lengths
-from app.db.models import EditorialPlanSlot, EditorialRun
 from app.ai.budget import BudgetManager
 from app.analytics.reports import AnalyticsService
+from app.branding.proposal import proposed_branding_for, validate_branding_lengths
 from app.config import Settings, get_settings
 from app.db.base import get_db
 from app.db.enums import ArticleStatus, EntityType, TopicStatus
-from app.db.models import Article, PublicationQueueItem, TopicCandidate
+from app.db.models import (
+    Article,
+    EditorialPlanSlot,
+    EditorialRun,
+    PublicationQueueItem,
+    TopicCandidate,
+)
 from app.errors import EngineError
 from app.generation.schemas import ArticleDocument
 from app.logging_setup import get_logger
@@ -521,7 +526,9 @@ def editorial_calendar(
             ).all()
         )
     recent_runs = list(
-        session.scalars(select(EditorialRun).order_by(EditorialRun.created_at.desc()).limit(20)).all()
+        session.scalars(
+            select(EditorialRun).order_by(EditorialRun.created_at.desc()).limit(20)
+        ).all()
     )
     from app.editorial.queue_control import queue_is_paused
 
@@ -595,7 +602,9 @@ def branding_preview(
             draft = proposed_branding_for(market)  # type: ignore[arg-type]
             current: dict[str, Any] = {"title": None, "description": None}
             if settings.telegram_bot_token:
-                chat_id = settings.telegram_ru_channel if market == "ru" else settings.telegram_en_channel
+                chat_id = (
+                    settings.telegram_ru_channel if market == "ru" else settings.telegram_en_channel
+                )
                 try:
                     chat = client.get_chat(chat_id)
                     current = {"title": chat.get("title"), "description": chat.get("description")}

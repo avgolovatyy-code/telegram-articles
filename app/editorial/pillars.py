@@ -21,6 +21,43 @@ POST_FORMATS = frozenset(
 
 AUDIENCE_VALUES = frozenset({"local", "traveler", "both"})
 
+#: Spec 3.0 names map onto the existing v2.2 codes already stored in the DB.
+PILLAR_ALIASES: dict[str, str] = {
+    "weekend_plans": "weekend_ideas",
+    "travel_updates": "travel_news",
+    "short_routes": "city_day_route",
+    "hidden_gems": "hidden_gem",
+    "place_stories": "place_story",
+    "occasion_specific": "scenario_picks",
+    "engagement": "community_poll",
+    "wegotrip_native": "product_in_context",
+    "deep_guide": "big_guide",
+}
+
+FORMAT_ALIASES: dict[str, str] = {
+    "short_news": "short_post",
+    "travel_observation": "short_post",
+    "photo_story": "visual_carousel",
+    "quick_list": "short_post",
+    "weekend_selection": "weekend_digest",
+    "mini_itinerary": "city_micro_itinerary",
+    "museum_tip": "museum_spotlight",
+    "faq_tip": "short_post",
+    "quiz": "poll",
+    "native_product_card": "product_spotlight",
+    "rich_article": "rich_guide",
+    "video_note": "short_post",
+    "audio_preview": "short_post",
+}
+
+
+def canonical_pillar(code: str) -> str:
+    return PILLAR_ALIASES.get(code, code)
+
+
+def canonical_format(code: str) -> str:
+    return FORMAT_ALIASES.get(code, code)
+
 
 @dataclass(frozen=True, slots=True)
 class ContentPillar:
@@ -116,10 +153,24 @@ def pillar_codes() -> list[str]:
     return list(PILLARS.keys())
 
 
+def accepted_pillar_codes() -> list[str]:
+    return sorted({*pillar_codes(), *PILLAR_ALIASES.keys()})
+
+
+def accepted_format_codes() -> list[str]:
+    return sorted({*POST_FORMATS, *FORMAT_ALIASES.keys()})
+
+
 __all__ = [
     "AUDIENCE_VALUES",
-    "ContentPillar",
+    "FORMAT_ALIASES",
     "PILLARS",
+    "PILLAR_ALIASES",
     "POST_FORMATS",
+    "ContentPillar",
+    "accepted_format_codes",
+    "accepted_pillar_codes",
+    "canonical_format",
+    "canonical_pillar",
     "pillar_codes",
 ]

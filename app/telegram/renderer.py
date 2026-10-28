@@ -211,6 +211,12 @@ class RichMessageRenderer:
             out.append(tb.footer(_hashtag_line(hashtags)))
 
         message = tb.rich_message(out, is_rtl=False)
+        if self.settings.cross_promo_footer_enabled:
+            from app.editorial.footer import inject_telegram_rich
+
+            footer = inject_telegram_rich(message, market=market)
+            if footer.hold:
+                raise ValueError(f"cross-promo footer hold: {footer.reason}")
         return RenderedArticle(
             message=message,
             product_cards=cards,

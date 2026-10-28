@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import sys
 
+from app.db.base import session_scope
 from app.db.enums import ArticleStatus
 from app.db.models import Article
-from app.db.base import session_scope
 from app.editorial.eligibility import publication_allowed
 from app.services.workflow import ArticleWorkflow
 

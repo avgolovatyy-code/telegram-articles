@@ -47,6 +47,9 @@ os.environ["MAX_SAME_CITY_PER_DAY"] = "20"
 os.environ["MAX_SAME_ATTRACTION_PER_DAY"] = "20"
 os.environ["RU_PREFER_DOMESTIC"] = "true"
 os.environ["RU_DOMESTIC_SHARE"] = "0.7"
+os.environ["ENABLE_HASHTAGS"] = "true"
+os.environ["MAX_HASHTAGS"] = "4"
+os.environ["CROSS_PROMO_FOOTER_ENABLED"] = "true"
 
 from app.config import Settings, reload_settings
 from app.db import models  # noqa: F401

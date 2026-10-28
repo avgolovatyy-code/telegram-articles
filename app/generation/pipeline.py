@@ -455,9 +455,7 @@ class GenerationPipeline:
         if slot is None:
             return True
         rec = (slot.payload or {}).get("product_recommendation", "optional")
-        if rec == "required" or slot.format == "product_spotlight":
-            return False
-        return True
+        return not (rec == "required" or slot.format == "product_spotlight")
 
     def _select_products(self, topic: TopicCandidate, market: Market) -> list[RankedProduct]:
         rows = self.session.scalars(
@@ -480,7 +478,18 @@ class GenerationPipeline:
                 "pillar": slot.pillar,
                 "format": slot.format,
                 "audience": slot.audience,
+                "editorial_mechanic": slot.editorial_mechanic,
+                "audience_axis": slot.audience_axis,
+                "channel_targets": slot.channel_targets or [],
+                "destination_country": slot.destination_country,
+                "destination_city": slot.destination_city,
                 "why_now": (slot.payload or {}).get("why_now"),
+                "why_worth_reading_without_purchase": (slot.payload or {}).get(
+                    "why_worth_reading_without_purchase"
+                ),
+                "travel_practicality_status": (slot.payload or {}).get(
+                    "travel_practicality_status"
+                ),
                 "voice_version": self.settings.editorial_voice_version,
                 "writer_model": self.settings.openai_writer_model,
             }

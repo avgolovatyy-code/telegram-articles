@@ -79,6 +79,9 @@ def seed_reference_data(session: Session, settings: Settings | None = None) -> J
 
     report.details["clusters"] = KeywordClusterRegistry(session).sync_seeds()
     report.details["prompts"] = sync_prompt_versions(session)
+    from app.editorial.russia_demand import RussiaDemandProvider
+
+    report.details["russia_demand_seeded"] = RussiaDemandProvider(session).seed_baseline()
     session.flush()
     return report
 
@@ -190,6 +193,16 @@ def run_chief_editor(
     report = JobReport("run_chief_editor", ok=outcome.ok, details=dict(outcome.details))
     report.errors = list(outcome.errors)
     return report
+
+
+def refresh_russia_travel_demand(
+    session: Session, *, settings: Settings | None = None
+) -> JobReport:
+    from app.editorial.russia_demand import refresh_russia_travel_demand as _refresh
+
+    settings = settings or get_settings()
+    details = _refresh(session)
+    return JobReport("refresh_russia_travel_demand", details=details)
 
 
 # ------------------------------------------------------------------ generation

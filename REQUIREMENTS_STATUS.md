@@ -1,14 +1,15 @@
-# REQUIREMENTS_STATUS (Content Engine v1)
+# REQUIREMENTS_STATUS
 
-Чеклист по спецификации `WEGOTRIP_TELEGRAM_CONTENT_ENGINE_CURSOR_SPEC.md` (фундамент).
+**Актуальный контракт — Editorial Engine 3.0:** `EDITORIAL_V3_REQUIREMENTS_STATUS.md`  
+Спека: `WEGOTRIP_EDITORIAL_ENGINE_FINAL_CURSOR_AUTORELEASE.md`.
 
-**Актуальный чеклист Editorial Engine v2.2:** `EDITORIAL_V2_REQUIREMENTS_STATUS.md`  
-(включая §0.1 позиционирование / описания / pinned — apply только после approval).
+Ниже сохранён чеклист фундамента Content Engine v1.  
+v2.2: `EDITORIAL_V2_REQUIREMENTS_STATUS.md`.
 
 Легенда: `[x]` — сделано, `[~]` — сделано в объёме, доступном без внешних данных,
 `[ ]` — не сделано (с причиной).
 
-Обновлено: 2026-08-27 (v1); навигация на v2.2 — 2026-10-28.
+Обновлено: 2026-08-27 (v1); навигация на v2.2 — 2026-10-28; на 3.0 — 2026-10-28.
 
 ---
 

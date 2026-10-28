@@ -858,7 +858,7 @@ class EditorialRun(Base, TimestampMixin):
     error: Mapped[str | None] = mapped_column(Text)
     applied_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
 
-    slots: Mapped[list["EditorialPlanSlot"]] = relationship(
+    slots: Mapped[list[EditorialPlanSlot]] = relationship(
         back_populates="run", cascade="all, delete-orphan"
     )
 
@@ -887,6 +887,11 @@ class EditorialPlanSlot(Base, TimestampMixin):
     audience: Mapped[str] = mapped_column(String(16), default="both", nullable=False)
     angle: Mapped[str | None] = mapped_column(Text)
     reader_value: Mapped[str | None] = mapped_column(Text)
+    editorial_mechanic: Mapped[str | None] = mapped_column(String(64))
+    audience_axis: Mapped[str | None] = mapped_column(String(64))
+    destination_country: Mapped[str | None] = mapped_column(String(16))
+    destination_city: Mapped[str | None] = mapped_column(String(128))
+    channel_targets: Mapped[list[str]] = mapped_column(JSONColumn, default=list)
     priority: Mapped[int] = mapped_column(Integer, default=50)
     status: Mapped[str] = mapped_column(String(32), default="planned", nullable=False)
     locked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
@@ -931,6 +936,41 @@ class ChannelBrandingHistory(Base):
     created_at: Mapped[dt.datetime] = mapped_column(UTCDateTime, default=utcnow, nullable=False)
 
 
+class RussiaDemandObservation(Base, TimestampMixin):
+    """Sourced Russia travel demand signal (spec 3.0 §7). Not a prompt constant."""
+
+    __tablename__ = "russia_demand_observations"
+    __table_args__ = (
+        Index(
+            "ix_ru_demand_geo_metric_period",
+            "geo",
+            "metric_type",
+            "segment",
+            "period_start",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    geo: Mapped[str] = mapped_column(String(64), nullable=False)
+    audience_origin: Mapped[str] = mapped_column(String(16), default="RU", nullable=False)
+    travel_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    metric_type: Mapped[str] = mapped_column(String(64), nullable=False)
+    segment: Mapped[str] = mapped_column(String(128), nullable=False)
+    value: Mapped[float | None] = mapped_column(Float)
+    unit: Mapped[str] = mapped_column(String(64), nullable=False)
+    period_start: Mapped[dt.date] = mapped_column(Date, nullable=False)
+    period_end: Mapped[dt.date] = mapped_column(Date, nullable=False)
+    published_at: Mapped[dt.date] = mapped_column(Date, nullable=False)
+    source_url: Mapped[str | None] = mapped_column(Text)
+    source_name: Mapped[str | None] = mapped_column(String(255))
+    sample_context: Mapped[str | None] = mapped_column(Text)
+    confidence: Mapped[float | None] = mapped_column(Float)
+    valid_until: Mapped[dt.date | None] = mapped_column(Date)
+    caveat: Mapped[str | None] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(32), default="seeded", nullable=False)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+
+
 __all__ = [
     "Article",
     "ArticleClaim",
@@ -941,8 +981,8 @@ __all__ = [
     "Attraction",
     "BudgetReservation",
     "CatalogSnapshot",
-    "ChannelBrandingHistory",
     "Category",
+    "ChannelBrandingHistory",
     "City",
     "ClickEvent",
     "Collection",
@@ -964,6 +1004,7 @@ __all__ = [
     "PromptVersion",
     "PublicationQueueItem",
     "QueryCandidate",
+    "RussiaDemandObservation",
     "SearchDemandSnapshot",
     "SyncRun",
     "SystemSetting",
