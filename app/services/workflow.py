@@ -194,7 +194,9 @@ class ArticleWorkflow:
         # Max fan-out is best-effort and format-independent: Telegram already got
         # the blocks-mode rich message above; Max re-renders article.body itself.
         if target == PublicationTarget.PRODUCTION and article.market == "ru" and result.created:
-            max_result = maybe_publish_ru_to_max(article, settings=self.settings)
+            max_result = maybe_publish_ru_to_max(
+                article, settings=self.settings, session=self.session
+            )
             if max_result.error:
                 return WorkflowResult(
                     True,

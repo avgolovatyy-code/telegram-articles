@@ -1,8 +1,9 @@
 # Предложение по оформлению каналов WeGoTrip — на одобрение
 
-**Статус:** DRAFT — **не применять** в Telegram / Max, пока нет явного approval.  
+**Статус:** APPROVED (Telegram RU/EN) — применено через Bot API. Max профиль — отдельно, ждёт своего approval.  
 **Спецификация:** `WEGOTRIP_TELEGRAM_EDITORIAL_ENGINE_V2_2_CURSOR.md` §0.1  
 **Дата черновика:** 28.10.2026  
+**Approved by:** владелец (чат Cursor) · **Date:** 28.10.2026 (Europe/Moscow)
 
 ## Что нельзя менять
 
@@ -105,17 +106,23 @@ Your next plan might be one post away.
 
 ## Чеклист одобрения владельца
 
-- [ ] Согласовано: RU title оставить
-- [ ] Согласовано: RU description (текст выше)
-- [ ] Согласовано: EN title rename
-- [ ] Согласовано: EN description
-- [ ] Согласовано: тексты pinned RU/EN (или правки вписаны ниже)
-- [ ] Подтверждено: не создавать новые каналы / не менять username
-- [ ] Способ применения: Bot API **или** ручная инструкция
-- [ ] Approved by: _____________  Date: _____________
+- [x] Согласовано: RU title оставить
+- [x] Согласовано: RU description (текст выше)
+- [x] Согласовано: EN title rename
+- [x] Согласовано: EN description
+- [x] Согласовано: тексты pinned RU/EN (или правки вписаны ниже)
+- [x] Подтверждено: не создавать новые каналы / не менять username
+- [x] Способ применения: Bot API
+- [x] Approved by: владелец (Cursor chat)  Date: 2026-10-28 (Europe/Moscow)
 
 ### Правки владельца (если нужны)
 
 ```
-(свободно)
+(нет — применено как в proposal)
 ```
+
+### Применение (факт)
+
+- Telegram RU: description + pinned welcome
+- Telegram EN: title + description + pinned welcome
+- Max RU branding: **не** применялось в этом approval (см. `MAX_IMPLEMENTATION_PLAN.md`)

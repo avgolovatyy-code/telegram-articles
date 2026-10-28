@@ -426,9 +426,14 @@ def style_max(
         bool, typer.Option("--pin/--no-pin", help="Pin an intro post in the RU Max channel")
     ] = True,
 ) -> None:
-    """Align Max bot + RU channel title/description with Telegram @wegotrip_ru."""
+    """Align Max bot + RU channel title/description (requires Max credentials).
+
+    Does **not** create a channel. Public URL stays https://max.ru/channel_wegotrip;
+    numeric MAX_RU_CHANNEL_ID is unchanged. Prefer owner approval before live apply.
+    """
     _bootstrap()
     from app.max.branding import apply_max_branding
+    from app.max.chat_id import CANONICAL_PUBLIC_URL
 
     settings = get_settings()
     if not settings.max_ru_active:
@@ -439,6 +444,8 @@ def style_max(
         typer.echo(
             json.dumps(
                 {
+                    "public_url": settings.maxapp_channel_public_url or CANONICAL_PUBLIC_URL,
+                    "audience_country": settings.maxapp_audience_country,
                     "bot": result.bot,
                     "chat_title": (result.chat or {}).get("title"),
                     "chat_description": (result.chat or {}).get("description"),
@@ -450,6 +457,69 @@ def style_max(
         )
     except Exception as exc:
         typer.secho(f"Max branding failed: {exc}", fg=typer.colors.RED)
+        raise typer.Exit(code=1) from exc
+
+
+@app.command("apply-telegram-branding")
+def apply_telegram_branding(
+    yes: Annotated[
+        bool, typer.Option("--yes", help="Confirm after CHANNEL_BRANDING_PROPOSAL approval")
+    ] = False,
+    pin: Annotated[bool, typer.Option("--pin/--no-pin", help="Pin the welcome posts")] = True,
+    market: Annotated[
+        str | None, typer.Option("--market", help="ru | en | both (default both)")
+    ] = None,
+) -> None:
+    """Apply approved Telegram channel title/description/pin (RU/EN). Does not touch Max."""
+    _bootstrap()
+    from app.branding.apply import apply_approved_branding
+
+    settings = get_settings()
+    if not yes and not settings.channel_branding_apply_enabled:
+        typer.secho(
+            "Refusing: set CHANNEL_BRANDING_APPLY_ENABLED=true or pass --yes after owner approval",
+            fg=typer.colors.YELLOW,
+        )
+        raise typer.Exit(code=1)
+    markets: tuple[str, ...]
+    if market in {"ru", "en"}:
+        markets = (market,)
+    else:
+        markets = ("ru", "en")
+    try:
+        report = apply_approved_branding(
+            settings=settings,
+            markets=markets,  # type: ignore[arg-type]
+            pin_welcome=pin,
+            force=yes,
+        )
+        typer.echo(
+            json.dumps(
+                {
+                    "branding_version": report.branding_version,
+                    "ok": report.ok,
+                    "results": [
+                        {
+                            "market": r.market,
+                            "username": r.username,
+                            "ok": r.ok,
+                            "errors": r.errors,
+                            "pinned_message_id": r.pinned_message_id,
+                            "before": r.before,
+                            "after": r.after,
+                            "steps": r.steps,
+                        }
+                        for r in report.results
+                    ],
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        if not report.ok:
+            raise typer.Exit(code=1)
+    except Exception as exc:
+        typer.secho(f"Telegram branding failed: {exc}", fg=typer.colors.RED)
         raise typer.Exit(code=1) from exc
 
 

@@ -3,7 +3,8 @@
 Рабочий план миграции с Content Engine v1 / Editorial v2.1 → **v2.2**.  
 Основной источник: `WEGOTRIP_TELEGRAM_EDITORIAL_ENGINE_V2_2_CURSOR.md` (заменяет v2.1).  
 Статус требований: `EDITORIAL_V2_REQUIREMENTS_STATUS.md`.  
-Предложение по оформлению каналов (approval first): `CHANNEL_BRANDING_PROPOSAL.md`.
+Предложение по оформлению каналов (Telegram approved 2026-10-28): `CHANNEL_BRANDING_PROPOSAL.md`.  
+MAX Russia-only addendum v1.1: `WEGOTRIP_MAX_EDITORIAL_ADDENDUM_V1_1_CURSOR.md` · `MAX_IMPLEMENTATION_PLAN.md`.
 
 Предыдущий план Content Engine (`IMPLEMENTATION_PLAN.md` + `REQUIREMENTS_STATUS.md`) **сохраняется** как история реализованного фундамента; новые этапы ведутся здесь.
 

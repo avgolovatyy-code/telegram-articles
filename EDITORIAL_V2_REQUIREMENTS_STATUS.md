@@ -29,8 +29,8 @@
 - [x] Спека v2.2 добавлена в репозиторий
 - [x] `CHANNEL_BRANDING_PROPOSAL.md` — current vs proposed, pinned drafts, чеклист владельца
 - [x] Явная политика: **не применять** title/description/pin без approval
-- [ ] Approval владельца получено (`approved_by` / дата) `[!]`
-- [ ] Live `getChat` сверка title/description перед apply
+- [x] Approval владельца получено (`approved_by` / дата 2026-10-28)
+- [x] Live `getChat` сверка title/description перед apply
 
 ### Целевые строки (draft)
 
@@ -51,17 +51,18 @@
 - [ ] `channel_branding_history` + откат
 - [ ] Список существующих pins перед заменой (без silent unpin)
 - [ ] Chief Editor **не** меняет профиль автоматически
-- [ ] `CHANNEL_BRANDING_APPLY_ENABLED=false` по умолчанию
-- [ ] Оформление не блокирует Editorial Engine при отсутствии прав
-- [ ] Max RU branding sync после approval Telegram RU
+- [x] `CHANNEL_BRANDING_APPLY_ENABLED=false` по умолчанию
+- [x] `app/branding/apply.py` — Bot API apply gated by flag / `--yes`
+- [x] Оформление не блокирует Editorial Engine при отсутствии прав
+- [ ] Max RU branding sync после approval Telegram RU (отдельный Max approval)
 
 ### Acceptance §0.1 / §19.24–27
 
-- [ ] Утверждённые title/description применены или выдана ручная инструкция
-- [ ] `@username` прежние
-- [ ] RU website `.ru`, EN website `.com` в bio
-- [ ] Welcome posts только после отдельного approval
-- [ ] Подписчики / публикации / Community неизменны
+- [x] Утверждённые title/description применены (Telegram RU/EN)
+- [x] `@username` прежние
+- [x] RU website `.ru`, EN website `.com` в bio
+- [x] Welcome posts после approval владельца
+- [x] Подписчики / публикации / Community неизменны
 
 ---
 

@@ -579,7 +579,9 @@ def process_publication_queue(
                                 channel=result.publication.channel_username,
                             )
                             if article.market == "ru":
-                                max_result = maybe_publish_ru_to_max(article, settings=settings)
+                                max_result = maybe_publish_ru_to_max(
+                                    article, settings=settings, session=session
+                                )
                                 ctx["max"] = (
                                     "skipped"
                                     if max_result.skipped

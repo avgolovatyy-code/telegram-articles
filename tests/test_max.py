@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from urllib.parse import parse_qs, urlsplit
+
 from app.db.enums import ArticleStatus
 from app.db.models import Article, ArticleProduct
 from app.max.chat_id import (
+    CANONICAL_PUBLIC_SLUG,
+    CANONICAL_PUBLIC_URL,
     chat_id_from_public_html,
     normalize_channel_ref,
     parse_numeric_chat_id,
@@ -63,6 +67,11 @@ def test_parse_numeric_and_slug_refs():
     assert parse_numeric_chat_id("NNNNNNNN_biz") is None
     assert normalize_channel_ref("https://max.ru/idNNNNNNNN_biz") == "idNNNNNNNN_biz"
     assert normalize_channel_ref("NNNNNNNN_biz") == "NNNNNNNN_biz"
+    assert CANONICAL_PUBLIC_URL == "https://max.ru/channel_wegotrip"
+    assert CANONICAL_PUBLIC_SLUG == "channel_wegotrip"
+    assert normalize_channel_ref(CANONICAL_PUBLIC_URL) == CANONICAL_PUBLIC_SLUG
+    # Numeric chat ids stay preferred — public slug must not replace them.
+    assert resolve_max_chat_id("-73515251781783") == -73515251781783
 
 
 def test_chat_id_from_public_html_negates_channel_id():
@@ -90,7 +99,7 @@ def test_render_max_payload_fits_limit_and_adds_product_buttons(session, setting
     session.flush()
     session.refresh(article)
 
-    payload = render_max_payload(article)
+    payload = render_max_payload(article, settings=settings)
     assert len(payload["text"]) <= MAX_TEXT_CHARS
     assert "Барселона" in payload["text"]
     assert payload["format"] == MAX_FORMAT
@@ -99,7 +108,11 @@ def test_render_max_payload_fits_limit_and_adds_product_buttons(session, setting
         assert "<h2>" in payload["text"] or "<p>" in payload["text"]
         assert "**" not in payload["text"]  # not markdown markers
     assert payload["attachments"][0]["type"] == "inline_keyboard"
-    assert payload["attachments"][0]["payload"]["buttons"][0][0]["url"].startswith("https://")
+    button_url = payload["attachments"][0]["payload"]["buttons"][0][0]["url"]
+    assert button_url.startswith("https://")
+    query = parse_qs(urlsplit(button_url).query)
+    assert query.get("coupon") == ["435"]
+    assert query.get("utm_source") == ["max"]
 
 
 def test_max_payload_is_not_a_telegram_rich_message(session, settings):
@@ -107,7 +120,7 @@ def test_max_payload_is_not_a_telegram_rich_message(session, settings):
     from app.telegram.blocks import validate_rich_message
 
     article = make_article(session)
-    payload = render_max_payload(article)
+    payload = render_max_payload(article, settings=settings)
     errors = validate_rich_message(payload)
     assert errors
     assert any("Max" in e or "blocks" in e for e in errors)
