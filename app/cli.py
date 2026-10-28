@@ -171,7 +171,16 @@ def purge_legacy_posts(
         )
     with session_scope() as session:
         results = takedown_legacy_published_since(session, since=when)
-        _print({"taken_down": len(results), "details": [r.message for r in results]})
+        typer.echo(
+            json.dumps(
+                {
+                    "taken_down": len(results),
+                    "details": [r.message for r in results],
+                },
+                indent=2,
+                default=str,
+            )
+        )
 
 
 @app.command("rewrite")
