@@ -48,14 +48,17 @@ class BrandingApplyReport:
 
 
 def _snapshot(chat: dict[str, Any]) -> dict[str, Any]:
-    pinned = chat.get("pinned_message") if isinstance(chat.get("pinned_message"), dict) else {}
+    pinned: dict[str, Any] = {}
+    raw_pinned = chat.get("pinned_message")
+    if isinstance(raw_pinned, dict):
+        pinned = dict(raw_pinned)
     return {
         "id": chat.get("id"),
         "username": chat.get("username"),
         "title": chat.get("title"),
         "description": chat.get("description"),
         "pinned_message_id": pinned.get("message_id"),
-        "pinned_text_preview": (pinned.get("text") or "")[:160],
+        "pinned_text_preview": str(pinned.get("text") or "")[:160],
     }
 
 
