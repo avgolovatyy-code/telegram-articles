@@ -269,9 +269,7 @@ class MaxPublisher:
                 error=str(exc),
                 error_type=type(exc).__name__,
             )
-            return MaxPublishResult(
-                sent=None, skipped=False, error=str(exc), evaluation=evaluation
-            )
+            return MaxPublishResult(sent=None, skipped=False, error=str(exc), evaluation=evaluation)
 
         self.policy.observe_publish(evaluation)
         pub = self._record(
