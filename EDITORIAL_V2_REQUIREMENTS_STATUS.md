@@ -43,9 +43,9 @@
 
 ### Продукт / админка Channel Identity
 
-- [ ] Блок Channel Identity в admin (RU/EN независимо)
-- [ ] Поля: chat_id, username RO, title, description, website_url, avatar_status, pinned_welcome_text, pinned_message_id, branding_version, status, approved_by, applied_at
-- [ ] Preview proposed changes + length validation (Unicode)
+- [~] Блок Channel Identity в admin (RU/EN независимо) — `/admin/branding` preview
+- [~] Поля: chat_id, username RO, title, description, website_url, avatar_status, pinned_welcome_text, pinned_message_id, branding_version, status, approved_by, applied_at — DB `channel_branding_history` + proposal
+- [x] Preview proposed changes + length validation (Unicode)
 - [ ] Apply через `setChatTitle` / `setChatDescription` / `pinChatMessage` при правах
 - [ ] Manual checklist fallback при отсутствии прав
 - [ ] `channel_branding_history` + откат
@@ -89,7 +89,7 @@
 
 ## 3. Рубрики и форматы (§4–§5)
 
-- [ ] `ContentPillar` + `PostFormat` модели
+- [~] `ContentPillar` + `PostFormat` модели — `app/editorial/pillars.py` + slot fields
 - [ ] Форматы: short_post, story_post, weekend_digest, event_alert, museum_spotlight, city_micro_itinerary, visual_carousel, poll/quiz, product_spotlight, rich_guide
 - [ ] Нативные Telegram methods по формату (`sendMessage` / photo / media group / poll / rich)
 - [ ] Collapsed details для rich body (уже в dual-format branch) `[~]`
@@ -100,8 +100,8 @@
 
 ## 4. OpenAI Chief Editor + календарь (§6)
 
-- [ ] Daily `OpenAIChiefEditor` RU/EN раздельно (обязательный вызов)
-- [ ] Structured `EditorialDecisionSet` + schema validation
+- [x] Daily `OpenAIChiefEditor` RU/EN раздельно — `ChiefEditorService` + cron + `wgt chief-editor`
+- [x] Structured `EditorialDecisionSet` + schema validation — `app/editorial/schemas.py`
 - [ ] Horizons 30 / 7 / 2 days
 - [ ] No silent SQL-only rebuild при падении AI
 - [ ] Locked slots / diversity / caps
@@ -135,7 +135,7 @@
 
 ## 7. Admin / publication / analytics (§15–§16)
 
-- [ ] Calendar UI + review + pre-publish
+- [~] Calendar UI + review + pre-publish — `/admin/editorial` (read-only calendar)
 - [ ] Test channel / pause queue
 - [ ] Metrics: frequency, pillar/format, forwards/shares when available
 - [ ] `branding_change_at` + 14/30d profile funnel (если данные есть)
@@ -146,7 +146,7 @@
 ## 8. Миграция и флаги (§17)
 
 - [x] План маппинга existing → new (`EDITORIAL_V2_IMPLEMENTATION_PLAN.md`)
-- [~] `EDITORIAL_V2_ENABLED` — cadence/budget/scheduler (Chief Editor — Phase C)
+- [x] `EDITORIAL_V2_ENABLED` — cadence, budget, scheduler, Chief Editor path
 - [x] `OLD_ARTICLE_AUTO_SCHEDULER_ENABLED` управляемый
 - [x] `EDITORIAL_V2_DRY_RUN=true` в Settings / env
 - [ ] Не удалять старые articles / claims / telegram IDs
