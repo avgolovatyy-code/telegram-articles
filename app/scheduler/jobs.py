@@ -480,6 +480,7 @@ def _planned_today(session: Session, market: Market, settings: Settings | None =
         session.scalar(
             select(func.count(Article.id)).where(
                 Article.market == market,
+                Article.status.in_((ArticleStatus.SCHEDULED, ArticleStatus.PUBLISHED)),
                 or_(
                     and_(Article.scheduled_for >= start, Article.scheduled_for < end),
                     and_(Article.published_at >= start, Article.published_at < end),

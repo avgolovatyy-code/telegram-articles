@@ -77,6 +77,23 @@ def test_weekly_hard_cap_blocks_schedule(session, settings, monkeypatch):
     assert "weekly" in report.details.get("en_note", "").lower()
 
 
+def test_archived_takedown_does_not_fill_daily_quota(session, settings, monkeypatch):
+    monkeypatch.setattr(settings, "editorial_v2_enabled", True)
+    monkeypatch.setattr(settings, "editorial_v2_dry_run", False)
+    monkeypatch.setattr(settings, "auto_publish_ru", True)
+    monkeypatch.setattr(settings, "max_posts_per_day", 1)
+    now = utcnow()
+    taken = _article(session, "ru", status=ArticleStatus.ARCHIVED, scheduled=now)
+    taken.published_at = now
+    session.flush()
+    ready = _article(session, "ru", status=ArticleStatus.NEEDS_REVIEW)
+    ready.rendered_message = ready.rendered_message
+    ready.products_refreshed_at = now
+    session.flush()
+    report = jobs.schedule_publications(session, markets=("ru",), settings=settings)
+    assert report.details.get("ru_scheduled", 0) >= 1
+
+
 def test_rolling_week_counts_scheduled(session, settings, monkeypatch):
     monkeypatch.setattr(settings, "editorial_v2_enabled", True)
     now = utcnow()
