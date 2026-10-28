@@ -6,9 +6,13 @@
 публикует его в [@wegotrip](https://t.me/wegotrip) и
 [@wegotrip_ru](https://t.me/wegotrip_ru), удерживая расход на ИИ в пределах $3 в сутки.
 
-* Спецификация: [`WEGOTRIP_TELEGRAM_CONTENT_ENGINE_CURSOR_SPEC.md`](WEGOTRIP_TELEGRAM_CONTENT_ENGINE_CURSOR_SPEC.md)
-* План и архитектурные решения: [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)
-* Статус требований: [`REQUIREMENTS_STATUS.md`](REQUIREMENTS_STATUS.md)
+* Спецификация **Editorial Engine v2.2** (актуальная): [`WEGOTRIP_TELEGRAM_EDITORIAL_ENGINE_V2_2_CURSOR.md`](WEGOTRIP_TELEGRAM_EDITORIAL_ENGINE_V2_2_CURSOR.md)
+* План миграции v2.2: [`EDITORIAL_V2_IMPLEMENTATION_PLAN.md`](EDITORIAL_V2_IMPLEMENTATION_PLAN.md)
+* Чеклист требований v2.2: [`EDITORIAL_V2_REQUIREMENTS_STATUS.md`](EDITORIAL_V2_REQUIREMENTS_STATUS.md)
+* Оформление каналов (на approval): [`CHANNEL_BRANDING_PROPOSAL.md`](CHANNEL_BRANDING_PROPOSAL.md)
+* Спецификация Content Engine v1 (архив): [`WEGOTRIP_TELEGRAM_CONTENT_ENGINE_CURSOR_SPEC.md`](WEGOTRIP_TELEGRAM_CONTENT_ENGINE_CURSOR_SPEC.md)
+* План v1 / архитектурные решения: [`IMPLEMENTATION_PLAN.md`](IMPLEMENTATION_PLAN.md)
+* Статус требований v1: [`REQUIREMENTS_STATUS.md`](REQUIREMENTS_STATUS.md)
 * Деплой на DigitalOcean: [`DEPLOY.md`](DEPLOY.md)
 
 ---

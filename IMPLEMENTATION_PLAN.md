@@ -1,10 +1,14 @@
-# IMPLEMENTATION_PLAN — WeGoTrip Telegram Content Engine
+# IMPLEMENTATION_PLAN — WeGoTrip Telegram Content Engine (v1 foundation)
 
-Рабочий план разработки. Основной источник требований —
-`WEGOTRIP_TELEGRAM_CONTENT_ENGINE_CURSOR_SPEC.md`. Здесь фиксируются архитектурные
-решения, реальные ограничения внешних API и статус этапов.
+Архив плана **Content Engine v1**. Актуальная редакция — **Editorial Engine v2.2**:
 
-Статус чеклиста требований — в `REQUIREMENTS_STATUS.md`.
+* Спека: `WEGOTRIP_TELEGRAM_EDITORIAL_ENGINE_V2_2_CURSOR.md`
+* План: `EDITORIAL_V2_IMPLEMENTATION_PLAN.md`
+* Чеклист: `EDITORIAL_V2_REQUIREMENTS_STATUS.md`
+* Оформление каналов (approval first): `CHANNEL_BRANDING_PROPOSAL.md`
+
+Ниже сохранены архитектурные решения и ограничения API, на которых стоит прод.
+Статус чеклиста v1 — в `REQUIREMENTS_STATUS.md`.
 
 ---
 
