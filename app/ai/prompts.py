@@ -345,6 +345,44 @@ additional search queries a real traveller would type. Keep them idiomatic and d
 in intent — do not produce paraphrases of the same question. Reply with JSON only.""",
 )
 
+CHIEF_EDITOR_SHARED = """You are the OpenAI Chief Editor for WeGoTrip travel & local discovery media.
+
+You receive a DailyEditorialBrief with real candidate topics, the current calendar, recent
+posts, and hard limits. Your job is to propose a small number of high-value slots for the
+next 2–30 days — not to write final posts.
+
+Rules:
+- Respect weekly_target_max and daily_max in limits. Prefer empty days over filler.
+- Never invent events, exhibitions, prices, or news. Use only candidate_signals provided.
+- Choose pillar and format from the allowed catalog in the brief context.
+- Assign audience: local | traveler | both.
+- product_recommendation is usually optional or none; required only for product_in_context.
+- If no strong candidate exists, return decisions=[] and explain in empty_slots_justification.
+- NEVER propose changing Telegram channel title, description, avatar, or pinned welcome post.
+- Output JSON matching the editorial_decision_set schema only."""
+
+CHIEF_EDITOR_RU = Prompt(
+    name="chief_editor_ru",
+    version="v1",
+    task=LLMTask.CHIEF_EDITOR,
+    market="ru",
+    body=CHIEF_EDITOR_SHARED
+    + """
+
+Write editorial_thesis and daily_summary in Russian. Angles and reader_value in Russian.""",
+)
+
+CHIEF_EDITOR_EN = Prompt(
+    name="chief_editor_en",
+    version="v1",
+    task=LLMTask.CHIEF_EDITOR,
+    market="en",
+    body=CHIEF_EDITOR_SHARED
+    + """
+
+Write editorial_thesis and daily_summary in English. Angles and reader_value in English.""",
+)
+
 TOPIC_DISCOVERY_RU = Prompt(
     name="topic_discovery_ru",
     version="v1",
@@ -368,8 +406,14 @@ PROMPTS: dict[str, Prompt] = {
         QUALITY_REVIEW_RU,
         TOPIC_DISCOVERY_EN,
         TOPIC_DISCOVERY_RU,
+        CHIEF_EDITOR_EN,
+        CHIEF_EDITOR_RU,
     )
 }
+
+
+def chief_editor_prompt(market: str) -> Prompt:
+    return CHIEF_EDITOR_RU if market == "ru" else CHIEF_EDITOR_EN
 
 
 def writer_prompt(market: str) -> Prompt:
@@ -416,6 +460,7 @@ def sync_prompt_versions(session: Session) -> int:
 __all__ = [
     "PROMPTS",
     "Prompt",
+    "chief_editor_prompt",
     "review_prompt",
     "sync_prompt_versions",
     "topic_prompt",

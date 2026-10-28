@@ -21,6 +21,8 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.admin.preview import render_preview
+from app.branding.proposal import proposed_branding_for, validate_branding_lengths
+from app.db.models import EditorialPlanSlot, EditorialRun
 from app.ai.budget import BudgetManager
 from app.analytics.reports import AnalyticsService
 from app.config import Settings, get_settings
@@ -492,6 +494,79 @@ def analytics_page(
     return templates.TemplateResponse(request, "analytics.html", context)
 
 
+# ------------------------------------------------------------------- editorial
+@router.get("/editorial", response_class=HTMLResponse)
+def editorial_calendar(
+    request: Request,
+    session: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    _: str = Depends(require_admin),
+) -> HTMLResponse:
+    today = dt.date.today()
+    horizon = today + dt.timedelta(days=30)
+    slots_by_market: dict[str, list[EditorialPlanSlot]] = {}
+    for market in ("en", "ru"):
+        slots_by_market[market] = list(
+            session.scalars(
+                select(EditorialPlanSlot)
+                .where(
+                    EditorialPlanSlot.market == market,
+                    EditorialPlanSlot.slot_date >= today,
+                    EditorialPlanSlot.slot_date <= horizon,
+                )
+                .order_by(EditorialPlanSlot.slot_date)
+            ).all()
+        )
+    recent_runs = list(
+        session.scalars(select(EditorialRun).order_by(EditorialRun.created_at.desc()).limit(20)).all()
+    )
+    context = _base_context(request, session, settings, "editorial")
+    context |= {"slots_by_market": slots_by_market, "recent_runs": recent_runs}
+    return templates.TemplateResponse(request, "editorial.html", context)
+
+
+@router.get("/branding", response_class=HTMLResponse)
+def branding_preview(
+    request: Request,
+    session: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    _: str = Depends(require_admin),
+) -> HTMLResponse:
+    from app.telegram.api import build_telegram_client
+
+    channels: list[dict[str, Any]] = []
+    client = build_telegram_client(settings)
+    try:
+        for market in ("en", "ru"):
+            draft = proposed_branding_for(market)  # type: ignore[arg-type]
+            current: dict[str, Any] = {"title": None, "description": None}
+            if settings.telegram_bot_token:
+                chat_id = settings.telegram_ru_channel if market == "ru" else settings.telegram_en_channel
+                try:
+                    chat = client.get_chat(chat_id)
+                    current = {"title": chat.get("title"), "description": chat.get("description")}
+                except EngineError:
+                    pass
+            warnings = validate_branding_lengths(draft)
+            channels.append(
+                {
+                    "market": market,
+                    "draft": draft,
+                    "current": current,
+                    "title_len": len(draft.title),
+                    "desc_len": len(draft.description),
+                    "warnings": warnings,
+                }
+            )
+    finally:
+        close = getattr(client, "close", None)
+        if callable(close):
+            close()
+    context = _base_context(request, session, settings, "branding")
+    context["channels"] = channels
+    return templates.TemplateResponse(request, "branding.html", context)
+
+
 # -------------------------------------------------------------------------- ops
 @router.get("/ops", response_class=HTMLResponse)
 def ops_page(
@@ -554,6 +629,7 @@ def ops_run(
         "seed": jobs.seed_reference_data,
         "sync_catalog": jobs.sync_catalog,
         "discover_topics": jobs.discover_topics,
+        "run_chief_editor": jobs.run_chief_editor,
         "generate": jobs.generate_daily_articles,
         "schedule": jobs.schedule_publications,
         "publish_queue": jobs.process_publication_queue,

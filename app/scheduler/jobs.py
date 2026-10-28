@@ -25,6 +25,12 @@ from app.db.enums import ArticleStatus, PublicationStatus, PublicationTarget
 from app.db.models import Article, ArticleProduct, Product, PublicationQueueItem
 from app.db.models import Market as MarketRow
 from app.db.types import utcnow
+from app.editorial.cadence import (
+    editorial_v2_cadence_active,
+    effective_min_post_interval_minutes,
+    remaining_daily_publish_slots,
+    remaining_weekly_publish_slots,
+)
 from app.editorial.eligibility import article_meets_editorial_spec, publication_allowed
 from app.errors import EngineError, TelegramRateLimited
 from app.generation.pipeline import GenerationPipeline
@@ -170,6 +176,22 @@ def coverage_report(
     return {market: assess_coverage(session, market, settings) for market in markets}
 
 
+# ---------------------------------------------------------------- chief editor
+def run_chief_editor(
+    session: Session,
+    *,
+    markets: tuple[Market, ...] = MARKETS,
+    settings: Settings | None = None,
+) -> JobReport:
+    from app.editorial.chief_editor import ChiefEditorService
+
+    settings = settings or get_settings()
+    outcome = ChiefEditorService(session, settings=settings).run(markets=markets)
+    report = JobReport("run_chief_editor", ok=outcome.ok, details=dict(outcome.details))
+    report.errors = list(outcome.errors)
+    return report
+
+
 # ------------------------------------------------------------------ generation
 def generate_daily_articles(
     session: Session,
@@ -181,12 +203,24 @@ def generate_daily_articles(
     """Generate as many articles as the budget plan allows, minimums first."""
     settings = settings or get_settings()
     report = JobReport("generate_daily_articles")
+    legacy = settings.old_article_auto_scheduler_enabled
+    if not legacy and not settings.editorial_v2_enabled:
+        report.details["skipped"] = "legacy and v2 generation disabled"
+        return report
+    if settings.editorial_v2_enabled and not legacy:
+        return _generate_from_editorial_plan(
+            session, markets=markets, settings=settings, max_per_run=max_per_run
+        )
+    if settings.editorial_v2_enabled:
+        report.details["editorial_v2_enabled"] = True
+        if settings.editorial_v2_dry_run:
+            report.details["editorial_v2_dry_run"] = True
     budget = BudgetManager(session, settings)
     gateway = LLMGateway(session, settings=settings, budget=budget)
     pipeline = GenerationPipeline(session, gateway, settings=settings)
     notifier = SlackNotifier(session, settings)
 
-    plan = budget.plan_daily_generation()
+    plan = budget.plan_daily_generation(session=session)
     report.details["plan"] = plan
 
     for market in markets:
@@ -216,8 +250,13 @@ def generate_daily_articles(
             )
             continue
 
-        # Do not generate more than public channels can still absorb today.
+        # Do not generate more than public channels can still absorb today / this week.
         publish_room = remaining_same_day_publish_slots(session, market, settings)
+        if editorial_v2_cadence_active(settings):
+            publish_room = min(
+                publish_room,
+                remaining_weekly_publish_slots(session, market, settings, use_hard_cap=False),
+            )
         awaiting_schedule = int(
             session.scalar(
                 select(func.count(Article.id)).where(
@@ -278,6 +317,67 @@ def generate_daily_articles(
     return report
 
 
+def _generate_from_editorial_plan(
+    session: Session,
+    *,
+    markets: tuple[Market, ...],
+    settings: Settings,
+    max_per_run: int | None,
+) -> JobReport:
+    from app.db.models import TopicCandidate
+    from app.editorial.planner import mark_slot_generated, slots_ready_for_generation
+
+    report = JobReport("generate_daily_articles")
+    report.details["mode"] = "editorial_v2_plan"
+    budget = BudgetManager(session, settings)
+    gateway = LLMGateway(session, settings=settings, budget=budget)
+    pipeline = GenerationPipeline(session, gateway, settings=settings)
+    notifier = SlackNotifier(session, settings)
+    plan = budget.plan_daily_generation(session=session)
+    report.details["plan"] = plan
+
+    for market in markets:
+        wanted = plan.get(market, 0)
+        if max_per_run is not None:
+            wanted = min(wanted, max_per_run)
+        slots = slots_ready_for_generation(session, market, settings, limit=max(wanted, 1))
+        if wanted <= 0 or not slots:
+            report.details[f"{market}_generated"] = 0
+            if wanted > 0 and not slots:
+                report.details[f"{market}_note"] = "no editorial plan slots; run chief editor"
+            continue
+        produced = 0
+        for slot in slots:
+            if produced >= wanted:
+                break
+            topic = session.get(TopicCandidate, slot.topic_id) if slot.topic_id else None
+            if topic is None:
+                continue
+            decision = budget.can_start_article(market)
+            if not decision.allowed:
+                report.details[f"{market}_stopped"] = decision.reason
+                break
+            try:
+                outcome = pipeline.generate(topic)
+            except EngineError as exc:
+                report.errors.append(f"{market}/slot-{slot.id}: {exc}")
+                continue
+            if outcome.ok and outcome.article is not None:
+                produced += 1
+                mark_slot_generated(session, slot, outcome.article.id)
+                notifier.article_drafted(outcome.article)
+        report.details[f"{market}_generated"] = produced
+
+    snapshot = budget.snapshot()
+    report.details["budget"] = {
+        "date": snapshot.spend_date.isoformat(),
+        "remaining_usd": snapshot.remaining_usd,
+        "generated": snapshot.generated,
+    }
+    report.ok = not report.errors
+    return report
+
+
 # ----------------------------------------------------------------- scheduling
 def schedule_publications(
     session: Session,
@@ -288,8 +388,11 @@ def schedule_publications(
     """Spread approved articles evenly across the publishing window (spec §35)."""
     settings = settings or get_settings()
     report = JobReport("schedule_publications")
-    if not settings.old_article_auto_scheduler_enabled:
-        report.details["legacy_scheduler"] = "disabled"
+    if not settings.old_article_auto_scheduler_enabled and not settings.editorial_v2_enabled:
+        report.details["skipped"] = "legacy and v2 scheduling disabled"
+        return report
+    if settings.editorial_v2_enabled:
+        report.details["editorial_v2_enabled"] = True
     client = build_telegram_client(settings)
     publisher = TelegramPublisher(session, client, settings=settings)
 
@@ -323,9 +426,15 @@ def schedule_publications(
                 wanted = len(pending)
             else:
                 wanted = min(len(pending), ceiling - _planned_today(session, market, settings))
+            if editorial_v2_cadence_active(settings):
+                week_room = remaining_weekly_publish_slots(session, market, settings)
+                wanted = min(wanted, week_room)
+                if week_room <= 0:
+                    report.details[f"{market}_note"] = "weekly publication hard cap reached"
             if wanted <= 0:
                 report.details[f"{market}_scheduled"] = 0
-                report.details[f"{market}_note"] = "daily publication quota already planned"
+                if f"{market}_note" not in report.details:
+                    report.details[f"{market}_note"] = "daily publication quota already planned"
                 continue
 
             slots = _publication_slots(session, market, settings, count=wanted)
@@ -391,7 +500,7 @@ def _publication_slots(
         return []
 
     now = utcnow()
-    min_interval = dt.timedelta(minutes=settings.min_post_interval_minutes)
+    min_interval = dt.timedelta(minutes=effective_min_post_interval_minutes(settings))
     cursor = _next_in_window(now + dt.timedelta(minutes=5), settings)
 
     slots: list[dt.datetime] = []
@@ -461,7 +570,7 @@ def remaining_same_day_publish_slots(session: Session, market: Market, settings:
     if local.hour >= settings.publish_window_end_hour:
         return 0
 
-    min_interval = dt.timedelta(minutes=settings.min_post_interval_minutes)
+    min_interval = dt.timedelta(minutes=effective_min_post_interval_minutes(settings))
     cursor = _next_in_window(now + dt.timedelta(minutes=5), settings)
     window_end = _window_end(cursor, settings)
     # If we were snapped into tomorrow (should not happen before end hour), no same-day room.
@@ -485,7 +594,14 @@ def remaining_same_day_publish_slots(session: Session, market: Market, settings:
     if cursor > window_end:
         return 0
     available = window_end - cursor
-    return int(available / min_interval) + 1
+    spacing_slots = int(available / min_interval) + 1
+    if editorial_v2_cadence_active(settings):
+        daily_left = remaining_daily_publish_slots(
+            session, market, settings, planned_today=_planned_today(session, market, settings)
+        )
+        week_left = remaining_weekly_publish_slots(session, market, settings)
+        return min(spacing_slots, daily_left, week_left)
+    return spacing_slots
 
 
 def _window_start(moment: dt.datetime, settings: Settings) -> dt.datetime:

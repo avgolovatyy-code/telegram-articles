@@ -196,11 +196,16 @@ def apply_secret_aliases() -> list[str]:
     from app.security.names import SECRET_ALIASES
 
     applied: list[str] = []
+    from app.security.names import SECRET_ALIAS_OVERRIDES_CANONICAL
+
     for alias, canonical in SECRET_ALIASES.items():
         raw = os.environ.get(alias)
-        if raw and not os.environ.get(canonical):
+        if not raw:
+            continue
+        if canonical in SECRET_ALIAS_OVERRIDES_CANONICAL or not os.environ.get(canonical):
             os.environ[canonical] = raw
-            applied.append(canonical)
+            if canonical not in applied:
+                applied.append(canonical)
     return applied
 
 

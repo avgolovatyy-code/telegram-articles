@@ -5,7 +5,7 @@ web-search tool calls and generated images.
 
 Rules implemented (spec §13):
 
-1. Serve the per-market minimums first (10 EN + 10 RU), then grow towards the maxima.
+1. Serve the per-market minimums first (legacy v1: 10 EN + 10 RU; v2: 0), then grow towards the maxima.
 2. Use a rolling average cost per article to project spend.
 3. Refuse to start a generation job whose projected cost exceeds the remaining budget.
 4. Never exceed the hard cap automatically.
@@ -140,18 +140,32 @@ class BudgetManager:
         )
 
     # ------------------------------------------------------------- decisions
-    def plan_daily_generation(self, day: dt.date | None = None) -> dict[str, int]:
+    def plan_daily_generation(
+        self, day: dt.date | None = None, session: Session | None = None
+    ) -> dict[str, int]:
         """How many more articles to generate per market today.
 
         Minimums for every market are funded first; only then is the leftover budget
         used to grow towards the maxima, alternating between markets.
         """
+        from app.editorial.cadence import (
+            editorial_v2_cadence_active,
+            remaining_weekly_publish_slots,
+        )
+
         snapshot = self.snapshot(day)
         avg = max(snapshot.average_article_cost_usd, 1e-6)
         budget_left = max(0.0, snapshot.remaining_usd - self.settings.budget_safety_margin_usd)
         affordable = int(budget_left // avg)
 
         plan: dict[str, int] = dict.fromkeys(MARKETS, 0)
+
+        def weekly_ceiling(market: Market) -> int | None:
+            if not editorial_v2_cadence_active(self.settings) or session is None:
+                return None
+            return remaining_weekly_publish_slots(
+                session, market, self.settings, use_hard_cap=False
+            )
 
         def fill(ceiling_for: Callable[[Market], int | None]) -> None:
             """Hand out one article at a time so neither market starves."""
@@ -162,6 +176,11 @@ class BudgetManager:
                     if affordable <= 0:
                         break
                     ceiling = ceiling_for(market)
+                    week_left = weekly_ceiling(market)
+                    if week_left is not None:
+                        if week_left <= 0:
+                            continue
+                        ceiling = week_left if ceiling is None else min(ceiling, week_left)
                     if ceiling is not None and snapshot.generated[market] + plan[market] >= ceiling:
                         continue
                     plan[market] += 1

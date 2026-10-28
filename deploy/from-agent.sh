@@ -184,7 +184,8 @@ store_secret() {
 	printf '%s' "$value" | remote "cd ${APP_DIR} && ${COMPOSE} exec -T api wgt secrets set ${name}"
 }
 
-store_secret OPENAI_API_KEY "${OPENAI_API_KEY:-}"
+OPENAI_FOR_DEPLOY="${OPENAI_KEY_TG_MAX:-${OPENAI_API_KEY:-}}"
+store_secret OPENAI_API_KEY "${OPENAI_FOR_DEPLOY}"
 store_secret TELEGRAM_BOT_TOKEN "${TELEGRAM_BOT_TOKEN:-}"
 store_secret SLACK_BOT_TOKEN "${SLACK_BOT_TOKEN:-${SLACK_BOT_TOKEN_TG:-}}"
 store_secret SLACK_SIGNING_SECRET "${SLACK_SIGNING_SECRET:-${SLACK_SIGNING_SECRET_TG:-}}"

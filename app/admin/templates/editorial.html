@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Editorial calendar · WeGoTrip{% endblock %}
+{% block content %}
+<h1>Editorial calendar</h1>
+<p class="subtitle">Chief Editor plan (v2.2): slots for the next 30 days per market.</p>
+
+<div class="actions">
+  <form method="post" action="/admin/ops/run">
+    <button class="btn" name="job" value="run_chief_editor">Run Chief Editor now</button>
+  </form>
+</div>
+
+{% for market, rows in slots_by_market.items() %}
+<h2>{{ market|upper }}</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Date</th><th>Pillar</th><th>Format</th><th>Audience</th>
+      <th>Priority</th><th>Status</th><th>Topic</th><th>Article</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for slot in rows %}
+    <tr>
+      <td class="nowrap">{{ slot.slot_date }}</td>
+      <td class="small">{{ slot.pillar }}</td>
+      <td class="small">{{ slot.format }}</td>
+      <td>{{ slot.audience }}</td>
+      <td class="num">{{ slot.priority }}</td>
+      <td><span class="badge">{{ slot.status }}</span></td>
+      <td class="num">{{ slot.topic_id or '—' }}</td>
+      <td class="num">
+        {% if slot.article_id %}
+        <a href="/admin/articles/{{ slot.article_id }}">#{{ slot.article_id }}</a>
+        {% else %}—{% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="8" class="muted small">No slots — run Chief Editor or enable EDITORIAL_V2.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endfor %}
+
+<h2>Recent Chief Editor runs</h2>
+<table>
+  <thead><tr><th>Date</th><th>Market</th><th>Status</th><th>Thesis</th><th>Run ID</th></tr></thead>
+  <tbody>
+  {% for run in recent_runs %}
+    <tr>
+      <td>{{ run.run_date }}</td>
+      <td>{{ run.market }}</td>
+      <td>{{ run.status }}{% if run.dry_run %} (dry){% endif %}</td>
+      <td class="small wrap">{{ run.editorial_thesis or '—' }}</td>
+      <td class="mono small">{{ run.run_id[:8] }}…</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5" class="muted small">No runs yet.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

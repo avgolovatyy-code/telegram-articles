@@ -227,11 +227,11 @@ def test_digest_summarises_budget_and_coverage(synced_session, settings, monkeyp
 
 
 # ------------------------------------------------------------------- defaults
-def test_auto_publish_is_on_by_default():
-    """The client asked for hands-off publishing; the shipped default reflects that."""
+def test_auto_publish_is_off_by_default():
+    """Editorial v2.2: production publish only after review unless AUTO_PUBLISH_* is set."""
     shipped = Settings(_env_file=None, _env_prefix="__none__")  # type: ignore[call-arg]
-    assert shipped.auto_publish_en is True
-    assert shipped.auto_publish_ru is True
+    assert shipped.auto_publish_en is False
+    assert shipped.auto_publish_ru is False
     # Slack stays optional: nothing breaks when it is not configured.
     assert shipped.slack_enabled is False
     assert shipped.slack_active is False

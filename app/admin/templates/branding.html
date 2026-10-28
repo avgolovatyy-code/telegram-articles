@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Channel identity · WeGoTrip{% endblock %}
+{% block content %}
+<h1>Channel identity</h1>
+<p class="subtitle">Preview proposed v2.2 packaging. Apply only with approval and <code>CHANNEL_BRANDING_APPLY_ENABLED</code>.</p>
+
+{% for item in channels %}
+<section class="card">
+  <h2>{{ item.market|upper }} · {{ item.draft.username }}</h2>
+  <table>
+    <tr><th></th><th>Current (live)</th><th>Proposed</th></tr>
+    <tr>
+      <td>Title</td>
+      <td class="wrap">{{ item.current.title or '—' }}</td>
+      <td class="wrap">{{ item.draft.title }} <span class="muted">({{ item.title_len }}/128)</span></td>
+    </tr>
+    <tr>
+      <td>Description</td>
+      <td class="wrap small">{{ item.current.description or '—' }}</td>
+      <td class="wrap small">{{ item.draft.description }} <span class="muted">({{ item.desc_len }}/255)</span></td>
+    </tr>
+  </table>
+  {% if item.warnings %}
+  <ul class="muted small">
+    {% for w in item.warnings %}<li>{{ w }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+</section>
+{% endfor %}
+
+<p class="muted small">CLI: <code>wgt apply-telegram-branding --yes</code> when apply flag is on.</p>
+{% endblock %}

@@ -134,8 +134,8 @@ class Settings(BaseSettings):
     #: Hands-off by default at the client's request: articles publish themselves once
     #: they pass every automatic gate, and Slack is where you watch and intervene.
     #: A test-channel publication is still mandatory before the first production post.
-    auto_publish_en: bool = True
-    auto_publish_ru: bool = True
+    auto_publish_en: bool = False
+    auto_publish_ru: bool = False
     #: Publications scheduled per market per day. 0 means "everything that is ready",
     #: spread across the window; the budget already bounds how much gets written.
     en_publish_per_day: int = 0
@@ -172,8 +172,10 @@ class Settings(BaseSettings):
     channel_branding_apply_enabled: bool = False
     ru_posts_per_week_min: int = 5
     ru_posts_per_week_max: int = 6
+    ru_posts_per_week_hard_cap: int = 8
     en_posts_per_week_min: int = 4
     en_posts_per_week_max: int = 5
+    en_posts_per_week_hard_cap: int = 7
     max_posts_per_day: int = 1
     max_longform_articles_per_month: int = 2
     max_commercial_post_share: float = 0.25
@@ -292,15 +294,21 @@ class Settings(BaseSettings):
         return self.auto_publish_ru if market == "ru" else self.auto_publish_en
 
     def articles_min_per_day(self, market: Market) -> int:
+        if self.editorial_v2_enabled:
+            return 0
         return self.ru_articles_min_per_day if market == "ru" else self.en_articles_min_per_day
 
     def articles_max_per_day(self, market: Market) -> int | None:
         """Daily ceiling, or ``None`` when only the budget limits generation."""
+        if self.editorial_v2_enabled:
+            return self.max_posts_per_day
         value = self.ru_articles_max_per_day if market == "ru" else self.en_articles_max_per_day
         return value if value > 0 else None
 
     def publish_per_day(self, market: Market) -> int | None:
         """Daily publication ceiling, or ``None`` for "everything that is ready"."""
+        if self.editorial_v2_enabled:
+            return self.max_posts_per_day
         value = self.ru_publish_per_day if market == "ru" else self.en_publish_per_day
         return value if value > 0 else None
 
