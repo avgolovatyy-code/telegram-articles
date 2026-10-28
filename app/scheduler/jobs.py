@@ -181,6 +181,10 @@ def generate_daily_articles(
     """Generate as many articles as the budget plan allows, minimums first."""
     settings = settings or get_settings()
     report = JobReport("generate_daily_articles")
+    if not settings.old_article_auto_scheduler_enabled:
+        report.details["legacy_scheduler"] = "disabled"
+        report.details["skipped"] = "OLD_ARTICLE_AUTO_SCHEDULER_ENABLED=false"
+        return report
     budget = BudgetManager(session, settings)
     gateway = LLMGateway(session, settings=settings, budget=budget)
     pipeline = GenerationPipeline(session, gateway, settings=settings)
@@ -290,6 +294,8 @@ def schedule_publications(
     report = JobReport("schedule_publications")
     if not settings.old_article_auto_scheduler_enabled:
         report.details["legacy_scheduler"] = "disabled"
+        report.details["skipped"] = "OLD_ARTICLE_AUTO_SCHEDULER_ENABLED=false"
+        return report
     client = build_telegram_client(settings)
     publisher = TelegramPublisher(session, client, settings=settings)
 
