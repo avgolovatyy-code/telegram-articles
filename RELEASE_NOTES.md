@@ -1,6 +1,7 @@
 # Release notes — Editorial Engine 3.0
 
 **Ветка:** `cursor/editorial-engine-v3-01af`  
+**Коммит / production:** `00bbe9b` · задеплоен 28 октября 2026, 22:52 Europe/Moscow  
 **Миграция:** `c8f9a0b1d2e3` (аддитивная: колонки слотов + `russia_demand_observations`)  
 **Откат:** `alembic downgrade b7e8f9a0c1d2`; флаги `CROSS_PROMO_FOOTER_ENABLED=false`, `EDITORIAL_RU_MARKET_V3_ENABLED=false`.
 

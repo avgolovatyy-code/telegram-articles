@@ -1,7 +1,7 @@
 # Pre-release acceptance — Editorial Engine 3.0
 
 Дата прогона тестов: 2026-10-28, Europe/Moscow  
-Коммит: будет зафиксирован после push.
+Коммит: `00bbe9b385af592156023fbf8801d653028b8949` (production, 28 октября 2026, 22:52 Europe/Moscow).
 
 ## Автоматические тесты (локально)
 
@@ -32,9 +32,9 @@
 | CP-03 | PASS | EN без футера |
 | CP-07 | PASS | legacy MAX URL → HOLD |
 | COM-02 | PASS | черновики без товара |
-| PLAN-01 | PARTIAL | mock + схема; live OpenAI на production после деплоя |
-| BRAND-01/02 | INSUFFICIENT_DATA | сверка live `getChat` после деплоя |
-| RELEASE-01 | pending | деплой через `deploy/from-agent.sh` |
+| PLAN-01 | PASS | live `wgt chief-editor` RU+EN, prompt v3, `gpt-5.6-luna` |
+| BRAND-01/02 | PASS | getChat title/description/pin match; pin не дублировали |
+| RELEASE-01 | PASS | `deploy/from-agent.sh`, SHA `00bbe9b` |
 
 Негативные сценарии 3, 7, 8, 11, 17, 19, 20 частично покрыты unit-тестами (`test_editorial_v3.py`, существующие generation/affiliate тесты).
 

@@ -17,8 +17,8 @@
 | H8 coupon=435 | PASS существующий AffiliateUrlBuilder | |
 | H9 без дублей/backfill | PASS существующая очередь | |
 | H10 админка | PASS колонки mechanic/axis/channels | |
-| H11 CI + deploy | в работе | |
-| H12 evidence | этот файл + PRE_RELEASE + pytest | |
+| H11 CI + deploy | PASS | CI run 40757555872; prod SHA `00bbe9b`; `healthz` ok |
+| H12 evidence | PASS | live doctor / check-max / chief-editor v3; см. `POST_DEPLOY_AUDIT_REPORT.md` |
 
 ## Не делаем в этом релизе
 
