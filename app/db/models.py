@@ -836,6 +836,101 @@ class VerifiedFactCache(Base):
     expires_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
 
 
+# ----------------------------------------------------------- Editorial v2.2
+class EditorialRun(Base, TimestampMixin):
+    """One OpenAI Chief Editor invocation per market per day (spec §6.4a)."""
+
+    __tablename__ = "editorial_runs"
+    __table_args__ = (Index("ix_editorial_runs_market_date", "market", "run_date"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    run_id: Mapped[str] = mapped_column(String(36), unique=True, nullable=False, index=True)
+    run_date: Mapped[dt.date] = mapped_column(Date, nullable=False)
+    market: Mapped[str] = mapped_column(String(8), nullable=False, index=True)
+    status: Mapped[str] = mapped_column(String(32), default="success", nullable=False)
+    dry_run: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    editorial_thesis: Mapped[str | None] = mapped_column(Text)
+    daily_summary: Mapped[str | None] = mapped_column(Text)
+    brief: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    decisions: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    diff: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    llm_run_id: Mapped[int | None] = mapped_column(Integer, index=True)
+    error: Mapped[str | None] = mapped_column(Text)
+    applied_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+
+    slots: Mapped[list["EditorialPlanSlot"]] = relationship(
+        back_populates="run", cascade="all, delete-orphan"
+    )
+
+
+class EditorialPlanSlot(Base, TimestampMixin):
+    """Calendar slot produced or updated by the Chief Editor."""
+
+    __tablename__ = "editorial_plan_slots"
+    __table_args__ = (
+        Index("ix_editorial_slots_market_date", "market", "slot_date"),
+        Index("ix_editorial_slots_market_status", "market", "status"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    run_id: Mapped[int | None] = mapped_column(
+        ForeignKey("editorial_runs.id", ondelete="SET NULL"), index=True
+    )
+    market: Mapped[str] = mapped_column(String(8), nullable=False)
+    slot_date: Mapped[dt.date] = mapped_column(Date, nullable=False)
+    topic_id: Mapped[int | None] = mapped_column(
+        ForeignKey("topic_candidates.id", ondelete="SET NULL"), index=True
+    )
+    candidate_id: Mapped[str | None] = mapped_column(String(64))
+    pillar: Mapped[str] = mapped_column(String(64), nullable=False)
+    format: Mapped[str] = mapped_column(String(64), nullable=False)
+    audience: Mapped[str] = mapped_column(String(16), default="both", nullable=False)
+    angle: Mapped[str | None] = mapped_column(Text)
+    reader_value: Mapped[str | None] = mapped_column(Text)
+    priority: Mapped[int] = mapped_column(Integer, default=50)
+    status: Mapped[str] = mapped_column(String(32), default="planned", nullable=False)
+    locked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    needs_human_review: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    article_id: Mapped[int | None] = mapped_column(
+        ForeignKey("articles.id", ondelete="SET NULL"), index=True
+    )
+
+    run: Mapped[EditorialRun | None] = relationship(back_populates="slots")
+    topic: Mapped[TopicCandidate | None] = relationship()
+
+
+class EditorialPreferenceLog(Base):
+    __tablename__ = "editorial_preference_log"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    market: Mapped[str] = mapped_column(String(8), nullable=False, index=True)
+    action: Mapped[str] = mapped_column(String(64), nullable=False)
+    subject: Mapped[str | None] = mapped_column(String(255))
+    note: Mapped[str | None] = mapped_column(Text)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    created_by: Mapped[str] = mapped_column(String(128), default="admin")
+    created_at: Mapped[dt.datetime] = mapped_column(UTCDateTime, default=utcnow, nullable=False)
+
+
+class ChannelBrandingHistory(Base):
+    """Audit trail for channel title/description/pin apply (spec §0.1)."""
+
+    __tablename__ = "channel_branding_history"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    market: Mapped[str] = mapped_column(String(8), nullable=False, index=True)
+    branding_version: Mapped[str] = mapped_column(String(64), nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False)
+    approved_by: Mapped[str | None] = mapped_column(String(128))
+    before: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    after: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    steps: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    error: Mapped[str | None] = mapped_column(Text)
+    applied_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+    created_at: Mapped[dt.datetime] = mapped_column(UTCDateTime, default=utcnow, nullable=False)
+
+
 __all__ = [
     "Article",
     "ArticleClaim",
@@ -846,6 +941,7 @@ __all__ = [
     "Attraction",
     "BudgetReservation",
     "CatalogSnapshot",
+    "ChannelBrandingHistory",
     "Category",
     "City",
     "ClickEvent",
@@ -853,6 +949,9 @@ __all__ = [
     "ConversionEvent",
     "CostLedgerEntry",
     "Country",
+    "EditorialPlanSlot",
+    "EditorialPreferenceLog",
+    "EditorialRun",
     "KeywordCluster",
     "LLMRun",
     "Market",

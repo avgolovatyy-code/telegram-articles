@@ -80,6 +80,14 @@ class SchedulerRunner:
             coalesce=True,
         )
         add(
+            _wrap(jobs.run_chief_editor, "run_chief_editor", settings),
+            CronTrigger(hour="3,9,15", minute=30),
+            id="run_chief_editor",
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+        add(
             _wrap(jobs.generate_daily_articles, "generate_articles", settings),
             CronTrigger(hour="4,10,16", minute=0),
             id="generate_articles",

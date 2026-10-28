@@ -97,6 +97,14 @@ def generate(
         )
 
 
+@app.command("chief-editor")
+def chief_editor(market: Annotated[str | None, typer.Option()] = None) -> None:
+    """Run OpenAI Chief Editor for RU/EN (requires EDITORIAL_V2_ENABLED)."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.run_chief_editor(session, markets=_markets(market)))
+
+
 @app.command()
 def schedule(market: Annotated[str | None, typer.Option()] = None) -> None:
     """Spread approved articles over the publishing window."""

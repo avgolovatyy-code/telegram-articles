@@ -176,6 +176,22 @@ def coverage_report(
     return {market: assess_coverage(session, market, settings) for market in markets}
 
 
+# ---------------------------------------------------------------- chief editor
+def run_chief_editor(
+    session: Session,
+    *,
+    markets: tuple[Market, ...] = MARKETS,
+    settings: Settings | None = None,
+) -> JobReport:
+    from app.editorial.chief_editor import ChiefEditorService
+
+    settings = settings or get_settings()
+    outcome = ChiefEditorService(session, settings=settings).run(markets=markets)
+    report = JobReport("run_chief_editor", ok=outcome.ok, details=dict(outcome.details))
+    report.errors = list(outcome.errors)
+    return report
+
+
 # ------------------------------------------------------------------ generation
 def generate_daily_articles(
     session: Session,
@@ -187,16 +203,18 @@ def generate_daily_articles(
     """Generate as many articles as the budget plan allows, minimums first."""
     settings = settings or get_settings()
     report = JobReport("generate_daily_articles")
-    if not settings.old_article_auto_scheduler_enabled:
-        report.details["legacy_scheduler"] = "disabled"
-        report.details["skipped"] = "OLD_ARTICLE_AUTO_SCHEDULER_ENABLED=false"
+    legacy = settings.old_article_auto_scheduler_enabled
+    if not legacy and not settings.editorial_v2_enabled:
+        report.details["skipped"] = "legacy and v2 generation disabled"
         return report
+    if settings.editorial_v2_enabled and not legacy:
+        return _generate_from_editorial_plan(
+            session, markets=markets, settings=settings, max_per_run=max_per_run
+        )
     if settings.editorial_v2_enabled:
         report.details["editorial_v2_enabled"] = True
         if settings.editorial_v2_dry_run:
             report.details["editorial_v2_dry_run"] = True
-        if settings.openai_chief_editor_daily:
-            report.details["chief_editor"] = "pending_implementation"
     budget = BudgetManager(session, settings)
     gateway = LLMGateway(session, settings=settings, budget=budget)
     pipeline = GenerationPipeline(session, gateway, settings=settings)
@@ -299,6 +317,67 @@ def generate_daily_articles(
     return report
 
 
+def _generate_from_editorial_plan(
+    session: Session,
+    *,
+    markets: tuple[Market, ...],
+    settings: Settings,
+    max_per_run: int | None,
+) -> JobReport:
+    from app.db.models import TopicCandidate
+    from app.editorial.planner import mark_slot_generated, slots_ready_for_generation
+
+    report = JobReport("generate_daily_articles")
+    report.details["mode"] = "editorial_v2_plan"
+    budget = BudgetManager(session, settings)
+    gateway = LLMGateway(session, settings=settings, budget=budget)
+    pipeline = GenerationPipeline(session, gateway, settings=settings)
+    notifier = SlackNotifier(session, settings)
+    plan = budget.plan_daily_generation(session=session)
+    report.details["plan"] = plan
+
+    for market in markets:
+        wanted = plan.get(market, 0)
+        if max_per_run is not None:
+            wanted = min(wanted, max_per_run)
+        slots = slots_ready_for_generation(session, market, settings, limit=max(wanted, 1))
+        if wanted <= 0 or not slots:
+            report.details[f"{market}_generated"] = 0
+            if wanted > 0 and not slots:
+                report.details[f"{market}_note"] = "no editorial plan slots; run chief editor"
+            continue
+        produced = 0
+        for slot in slots:
+            if produced >= wanted:
+                break
+            topic = session.get(TopicCandidate, slot.topic_id) if slot.topic_id else None
+            if topic is None:
+                continue
+            decision = budget.can_start_article(market)
+            if not decision.allowed:
+                report.details[f"{market}_stopped"] = decision.reason
+                break
+            try:
+                outcome = pipeline.generate(topic)
+            except EngineError as exc:
+                report.errors.append(f"{market}/slot-{slot.id}: {exc}")
+                continue
+            if outcome.ok and outcome.article is not None:
+                produced += 1
+                mark_slot_generated(session, slot, outcome.article.id)
+                notifier.article_drafted(outcome.article)
+        report.details[f"{market}_generated"] = produced
+
+    snapshot = budget.snapshot()
+    report.details["budget"] = {
+        "date": snapshot.spend_date.isoformat(),
+        "remaining_usd": snapshot.remaining_usd,
+        "generated": snapshot.generated,
+    }
+    report.ok = not report.errors
+    return report
+
+
 # ----------------------------------------------------------------- scheduling
 def schedule_publications(
     session: Session,
@@ -309,9 +388,8 @@ def schedule_publications(
     """Spread approved articles evenly across the publishing window (spec §35)."""
     settings = settings or get_settings()
     report = JobReport("schedule_publications")
-    if not settings.old_article_auto_scheduler_enabled:
-        report.details["legacy_scheduler"] = "disabled"
-        report.details["skipped"] = "OLD_ARTICLE_AUTO_SCHEDULER_ENABLED=false"
+    if not settings.old_article_auto_scheduler_enabled and not settings.editorial_v2_enabled:
+        report.details["skipped"] = "legacy and v2 scheduling disabled"
         return report
     if settings.editorial_v2_enabled:
         report.details["editorial_v2_enabled"] = True

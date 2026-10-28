@@ -75,7 +75,48 @@ class MockLLMProvider:
                     for item in context.get("claims", [])
                 ]
             }
+        if name == "editorial_decision_set":
+            return _editorial_decision_set(context)
         return {}
+
+
+def _editorial_decision_set(context: dict[str, Any]) -> dict[str, Any]:
+    market = context.get("market", "en")
+    run_date = context.get("run_date", "2026-10-28")
+    candidates = context.get("candidate_signals") or []
+    decisions: list[dict[str, Any]] = []
+    if candidates:
+        first = candidates[0]
+        decisions.append(
+            {
+                "action": "add",
+                "slot_id": None,
+                "candidate_id": str(first.get("id")),
+                "planned_date": run_date,
+                "audience": "both",
+                "pillar": "weekend_ideas",
+                "format": "weekend_digest",
+                "angle": "Mock editorial angle for tests",
+                "reader_value": "Pick a plan for the weekend",
+                "hook_hypothesis": "Start with a relatable planning moment",
+                "fact_ids_needed": [],
+                "product_recommendation": "optional",
+                "source_link_policy": "internal_sources_only",
+                "priority": 80,
+                "why_now": "Mock run",
+                "why_replace_existing": None,
+                "needs_human_review": False,
+            }
+        )
+    return {
+        "market": market,
+        "run_date": run_date,
+        "editorial_thesis": "Mock thesis",
+        "decisions": decisions,
+        "empty_slots_justification": [] if decisions else ["No mock candidates"],
+        "daily_summary": "Mock daily summary",
+        "risks": [],
+    }
 
 
 def _claim_text(item: Any) -> str:

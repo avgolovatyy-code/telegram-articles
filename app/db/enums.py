@@ -143,6 +143,7 @@ class LLMTask(StrEnum):
     QUALITY_REVIEW = "quality_review"
     IMAGE_GENERATION = "image_generation"
     REWRITE = "rewrite"
+    CHIEF_EDITOR = "chief_editor"
 
 
 class CostKind(StrEnum):
