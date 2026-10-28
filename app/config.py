@@ -6,6 +6,7 @@ budgets, channels or affiliate identifiers.
 
 from __future__ import annotations
 
+import datetime as dt
 import os
 from functools import lru_cache
 from typing import Literal
@@ -163,6 +164,8 @@ class Settings(BaseSettings):
     editorial_v2_dry_run: bool = True
     #: Legacy mass article auto-scheduler. Turn off only after V2 calendar rollout.
     old_article_auto_scheduler_enabled: bool = True
+    #: Articles created before this date (publish TZ) cannot be published; backlog is archived.
+    editorial_spec_cutoff_date: dt.date | None = None
     #: Never auto-apply channel title/description/pin without explicit approval.
     channel_branding_apply_enabled: bool = False
     ru_posts_per_week_min: int = 5
@@ -245,6 +248,15 @@ class Settings(BaseSettings):
         if value <= 0:
             raise ValueError("DAILY_AI_BUDGET_USD must be > 0")
         return value
+
+    @field_validator("editorial_spec_cutoff_date", mode="before")
+    @classmethod
+    def _parse_cutoff_date(cls, value: object) -> dt.date | None:
+        if value is None or value == "":
+            return None
+        if isinstance(value, dt.date):
+            return value
+        return dt.date.fromisoformat(str(value).strip())
 
     # ------------------------------------------------------------- accessors
     @property

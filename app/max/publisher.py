@@ -177,6 +177,12 @@ class MaxPublisher:
             return MaxPublishResult(sent=None, skipped=True, skip_reason="non_ru_market")
         if not self.settings.max_ru_active:
             return MaxPublishResult(sent=None, skipped=True, skip_reason="max_inactive")
+        from app.editorial.eligibility import article_meets_editorial_spec
+
+        if not article_meets_editorial_spec(article, self.settings):
+            return MaxPublishResult(
+                sent=None, skipped=True, skip_reason="pre_editorial_spec_cutoff"
+            )
 
         existing = self._existing(article)
         if existing is not None and not existing.skipped and existing.message_id:

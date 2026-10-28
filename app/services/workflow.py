@@ -18,6 +18,7 @@ from app.config import Settings, get_settings
 from app.db.enums import ArticleStatus, PublicationTarget
 from app.db.models import Article, TelegramPublication
 from app.db.types import utcnow
+from app.editorial.eligibility import publication_allowed
 from app.errors import ConfigurationError, EngineError, ValidationFailed
 from app.generation.pipeline import GenerationOutcome, GenerationPipeline
 from app.logging_setup import get_logger
@@ -168,6 +169,9 @@ class ArticleWorkflow:
         return self._publish(article, PublicationTarget.PRODUCTION)
 
     def _publish(self, article: Article, target: PublicationTarget) -> WorkflowResult:
+        allowed, reason = publication_allowed(article, self.settings, target)
+        if not allowed:
+            return WorkflowResult(False, reason, article)
         rendered = render_stored_article(self.session, article, settings=self.settings)
         article.rendered_message = rendered.message
         client = build_telegram_client(self.settings)

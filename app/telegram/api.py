@@ -132,6 +132,10 @@ class TelegramBotClient:
         result = self.call("sendMessage", {"chat_id": chat_id, "text": text})
         return _to_sent_message(result, chat_id)
 
+    def delete_message(self, chat_id: str, message_id: int) -> bool:
+        self.call("deleteMessage", {"chat_id": chat_id, "message_id": message_id})
+        return True
+
     def get_updates(self, *, limit: int = 100) -> list[dict[str, Any]]:
         """Recent updates — used to discover the id of a private channel."""
         result = self.call(
@@ -210,6 +214,10 @@ class DryRunTelegramClient:
     def send_message(self, chat_id: str, text: str) -> SentMessage:
         self._counter += 1
         return SentMessage(self._counter, str(chat_id), str(chat_id).lstrip("@"), {"text": text})
+
+    def delete_message(self, chat_id: str, message_id: int) -> bool:
+        log.info("telegram.dry_run_delete", chat_id=chat_id, message_id=message_id)
+        return True
 
     def get_updates(self, *, limit: int = 100) -> list[dict[str, Any]]:
         return []

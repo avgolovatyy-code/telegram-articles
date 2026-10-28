@@ -128,6 +128,52 @@ def publish_test(article_id: int) -> None:
         typer.secho(result.message, fg=typer.colors.GREEN if result.ok else typer.colors.RED)
 
 
+@app.command("takedown-article")
+def takedown_article(article_id: int) -> None:
+    """Delete Telegram messages for an article and archive it."""
+    _bootstrap()
+    from app.db.models import Article
+    from app.services.takedown import ArticleTakedown
+
+    with session_scope() as session:
+        article = session.get(Article, article_id)
+        if article is None:
+            raise typer.BadParameter(f"article {article_id} not found")
+        result = ArticleTakedown(session).takedown(article)
+        typer.secho(result.message, fg=typer.colors.GREEN if result.ok else typer.colors.RED)
+
+
+@app.command("archive-legacy-backlog")
+def archive_legacy_backlog_cmd() -> None:
+    """Archive pre-cutoff drafts so they never enter the publish queue."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.archive_legacy_backlog(session))
+
+
+@app.command("purge-legacy-posts")
+def purge_legacy_posts(
+    since: Annotated[
+        str,
+        typer.Option(help="ISO date; remove prod posts for pre-cutoff articles published since"),
+    ] = "",
+) -> None:
+    """Take down Telegram production posts that slipped out after the editorial cutoff."""
+    _bootstrap()
+    import datetime as dt
+
+    from app.services.takedown import takedown_legacy_published_since
+
+    when = dt.datetime.now(dt.UTC) - dt.timedelta(days=1)
+    if since.strip():
+        when = dt.datetime.combine(
+            dt.date.fromisoformat(since.strip()), dt.time.min, tzinfo=dt.UTC
+        )
+    with session_scope() as session:
+        results = takedown_legacy_published_since(session, since=when)
+        _print({"taken_down": len(results), "details": [r.message for r in results]})
+
+
 @app.command("rewrite")
 def rewrite(
     article_id: Annotated[
