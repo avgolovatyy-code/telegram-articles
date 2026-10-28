@@ -198,6 +198,11 @@ class MaxPublisher:
                 publication=existing,
             )
 
+        editorial = (article.quality_scores or {}).get("editorial") or {}
+        if isinstance(editorial, dict):
+            targets = editorial.get("channel_targets") or []
+            if targets and "max_ru" not in targets:
+                return MaxPublishResult(sent=None, skipped=True, skip_reason="not_targeted_for_max")
         geo = self._resolve_geo(article)
         evaluation = self.policy.evaluate(
             geo=geo,
@@ -206,6 +211,10 @@ class MaxPublisher:
             entity_name=article.entity_name,
             city_name=article.entity_name if article.entity_type == "city" else None,
             product_available_on_ru_store=True,
+            audience_axis=editorial.get("audience_axis") if isinstance(editorial, dict) else None,
+            editorial_mechanic=(
+                editorial.get("editorial_mechanic") if isinstance(editorial, dict) else None
+            ),
         )
         if not evaluation.should_publish:
             pub = self._record(

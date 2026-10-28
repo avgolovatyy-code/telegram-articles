@@ -2,7 +2,7 @@
 {% block title %}Editorial calendar · WeGoTrip{% endblock %}
 {% block content %}
 <h1>Editorial calendar</h1>
-<p class="subtitle">Chief Editor plan (v2.2): rolling 30 / 7 / 2 days. Dry-run={{ dry_run }}; v2={{ v2_enabled }}.</p>
+<p class="subtitle">Chief Editor plan (v3.0): rolling 30 / 7 / 2 days. Dry-run={{ dry_run }}; v2={{ v2_enabled }}. RU market brief + mechanics.</p>
 
 <div class="actions">
   <a class="btn {{ 'primary' if horizon == 2 }}" href="/admin/editorial?horizon=2">2 days</a>
@@ -27,7 +27,7 @@
 <table>
   <thead>
     <tr>
-      <th>Date</th><th>Pillar</th><th>Format</th><th>Audience</th>
+      <th>Date</th><th>Pillar</th><th>Mechanic</th><th>Axis</th><th>Channels</th>
       <th>Why now</th><th>Priority</th><th>Status</th><th>Topic</th><th>Article</th><th></th>
     </tr>
   </thead>
@@ -35,9 +35,10 @@
   {% for slot in rows %}
     <tr>
       <td class="nowrap">{{ slot.slot_date }}</td>
-      <td class="small">{{ slot.pillar }}</td>
-      <td class="small">{{ slot.format }}</td>
-      <td>{{ slot.audience }}</td>
+      <td class="small">{{ slot.pillar }} / {{ slot.format }}</td>
+      <td class="small">{{ slot.editorial_mechanic or '—' }}</td>
+      <td class="small">{{ slot.audience_axis or slot.audience }}</td>
+      <td class="small">{{ (slot.channel_targets or [])|join(', ') or '—' }}</td>
       <td class="small wrap">{{ (slot.payload or {}).get('why_now') or slot.reader_value or '—' }}</td>
       <td class="num">{{ slot.priority }}</td>
       <td><span class="badge">{{ slot.status }}{% if slot.locked %} · locked{% endif %}</span></td>
@@ -57,7 +58,7 @@
       </td>
     </tr>
   {% else %}
-    <tr><td colspan="10" class="muted small">No slots — run Chief Editor or enable EDITORIAL_V2.</td></tr>
+    <tr><td colspan="11" class="muted small">No slots — run Chief Editor or enable EDITORIAL_V2.</td></tr>
   {% endfor %}
   </tbody>
 </table>

@@ -87,21 +87,30 @@ def apply_decision_set(
                 skipped.append(f"{decision.planned_date}:past date")
                 continue
             topic_id = _resolve_topic_id(session, market, decision.candidate_id)
+            filled = decision.fill_defaults(market)
+            if filled.travel_practicality_status == "hold":
+                skipped.append(f"{filled.planned_date}:practicality HOLD")
+                continue
             slot = EditorialPlanSlot(
                 run_id=run.id,
                 market=market,
-                slot_date=decision.planned_date,
+                slot_date=filled.planned_date,
                 topic_id=topic_id,
-                candidate_id=decision.candidate_id,
-                pillar=decision.pillar,
-                format=decision.format,
-                audience=decision.audience,
-                angle=decision.angle,
-                reader_value=decision.reader_value,
-                priority=decision.priority,
-                status="needs_review" if decision.needs_human_review else "planned",
-                needs_human_review=decision.needs_human_review,
-                payload=decision.model_dump(mode="json"),
+                candidate_id=filled.candidate_id,
+                pillar=filled.pillar,
+                format=filled.format,
+                audience=filled.audience,
+                angle=filled.angle,
+                reader_value=filled.reader_value,
+                editorial_mechanic=filled.editorial_mechanic,
+                audience_axis=filled.audience_axis,
+                destination_country=filled.destination_country,
+                destination_city=filled.destination_city,
+                channel_targets=list(filled.channel_targets),
+                priority=filled.priority,
+                status="needs_review" if filled.needs_human_review else "planned",
+                needs_human_review=filled.needs_human_review,
+                payload=filled.model_dump(mode="json"),
             )
             session.add(slot)
             applied += 1
@@ -154,9 +163,7 @@ def _move_slot(session: Session, market: Market, decision: EditorialDecision) ->
     return True
 
 
-def _resolve_topic_id(
-    session: Session, market: Market, candidate_id: str | None
-) -> int | None:
+def _resolve_topic_id(session: Session, market: Market, candidate_id: str | None) -> int | None:
     if not candidate_id:
         return None
     try:

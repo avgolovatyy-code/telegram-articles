@@ -99,4 +99,7 @@ def test_rolling_week_counts_scheduled(session, settings, monkeypatch):
     now = utcnow()
     _article(session, "ru", status=ArticleStatus.SCHEDULED, scheduled=now)
     assert production_posts_in_rolling_week(session, "ru", settings) == 1
-    assert remaining_weekly_publish_slots(session, "ru", settings) == settings.ru_posts_per_week_hard_cap - 1
+    assert (
+        remaining_weekly_publish_slots(session, "ru", settings)
+        == settings.ru_posts_per_week_hard_cap - 1
+    )

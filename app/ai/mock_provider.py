@@ -87,6 +87,7 @@ def _editorial_decision_set(context: dict[str, Any]) -> dict[str, Any]:
     decisions: list[dict[str, Any]] = []
     if candidates:
         first = candidates[0]
+        ru = market == "ru"
         decisions.append(
             {
                 "action": "add",
@@ -96,15 +97,24 @@ def _editorial_decision_set(context: dict[str, Any]) -> dict[str, Any]:
                 "audience": "both",
                 "pillar": "weekend_ideas",
                 "format": "weekend_digest",
+                "editorial_mechanic": "weekend_utility",
+                "audience_axis": "ru_local_leisure" if ru else "en_local",
+                "channel_targets": ["telegram_ru", "max_ru"] if ru else ["telegram_en"],
+                "destination_country": "RU" if ru else "FR",
+                "destination_city": first.get("entity_name"),
                 "angle": "Mock editorial angle for tests",
                 "reader_value": "Pick a plan for the weekend",
                 "hook_hypothesis": "Start with a relatable planning moment",
                 "fact_ids_needed": [],
-                "product_recommendation": "optional",
+                "product_recommendation": "none",
                 "source_link_policy": "internal_sources_only",
                 "priority": 80,
                 "why_now": "Mock run",
                 "why_replace_existing": None,
+                "why_worth_reading_without_purchase": "A usable weekend idea without a ticket",
+                "travel_practicality_status": "not_applicable",
+                "russia_demand_evidence_ids": [],
+                "market_fit_reason": "local leisure",
                 "needs_human_review": False,
             }
         )
@@ -116,6 +126,12 @@ def _editorial_decision_set(context: dict[str, Any]) -> dict[str, Any]:
         "empty_slots_justification": [] if decisions else ["No mock candidates"],
         "daily_summary": "Mock daily summary",
         "risks": [],
+        "rejected_topics": [],
+        "diversity_analysis": {
+            "notes": "mock",
+            "mechanic_mix": "weekend_utility",
+            "geo_mix": "mixed",
+        },
     }
 
 

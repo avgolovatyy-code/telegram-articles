@@ -5,7 +5,8 @@ web-search tool calls and generated images.
 
 Rules implemented (spec §13):
 
-1. Serve the per-market minimums first (legacy v1: 10 EN + 10 RU; v2: 0), then grow towards the maxima.
+1. Serve the per-market minimums first (legacy v1: 10 EN + 10 RU; v2: 0),
+   then grow towards the maxima.
 2. Use a rolling average cost per article to project spend.
 3. Refuse to start a generation job whose projected cost exceeds the remaining budget.
 4. Never exceed the hard cap automatically.

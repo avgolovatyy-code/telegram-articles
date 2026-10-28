@@ -1,11 +1,21 @@
-# IMPLEMENTATION_PLAN — WeGoTrip Telegram Content Engine (v1 foundation)
+# IMPLEMENTATION_PLAN — WeGoTrip Telegram Content Engine
 
-Архив плана **Content Engine v1**. Актуальная редакция — **Editorial Engine v2.2**:
+**Актуальная редакция — Editorial Engine 3.0** (`WEGOTRIP_EDITORIAL_ENGINE_FINAL_CURSOR_AUTORELEASE.md`).
+
+v3 поверх v2.2 / MAX v1.1:
+
+1. Gap: не было `editorial_mechanic`, RU demand ledger, clickable RU↔MAX footer, независимых `channel_targets`.
+2. Реализация: `app/editorial/{mechanics,footer,russia_demand,practicality,curiosity,demo_plan}.py`, миграция `c8f9a0b1d2e3`.
+3. Тесты: `tests/test_editorial_v3.py` + полный pytest.
+4. Деплой: существующий `deploy/from-agent.sh`, без новых каналов и без роста бюджета.
+5. Флаги: `CROSS_PROMO_FOOTER_ENABLED`, `EDITORIAL_RU_MARKET_V3_ENABLED`. Автопубликация не меняется этим релизом.
+
+Архив плана **Content Engine v1**. Предыдущая редакция — **Editorial Engine v2.2**:
 
 * Спека: `WEGOTRIP_TELEGRAM_EDITORIAL_ENGINE_V2_2_CURSOR.md`
 * План: `EDITORIAL_V2_IMPLEMENTATION_PLAN.md`
 * Чеклист: `EDITORIAL_V2_REQUIREMENTS_STATUS.md`
-* Оформление каналов (approval first): `CHANNEL_BRANDING_PROPOSAL.md`
+* Оформление каналов: `CHANNEL_BRANDING_PROPOSAL.md`
 * MAX addendum v1.1: `WEGOTRIP_MAX_EDITORIAL_ADDENDUM_V1_1_CURSOR.md` · `MAX_IMPLEMENTATION_PLAN.md`
 
 Ниже сохранены архитектурные решения и ограничения API, на которых стоит прод.

@@ -128,12 +128,36 @@ class TelegramBotClient:
             {"chat_id": chat_id, "message_id": message_id, "rich_message": rich_message},
         )
 
-    def send_message(self, chat_id: str, text: str) -> SentMessage:
-        result = self.call("sendMessage", {"chat_id": chat_id, "text": text})
+    def send_message(
+        self,
+        chat_id: str,
+        text: str,
+        *,
+        parse_mode: str | None = None,
+        disable_web_page_preview: bool = True,
+    ) -> SentMessage:
+        payload: dict[str, Any] = {
+            "chat_id": chat_id,
+            "text": text,
+            "disable_web_page_preview": disable_web_page_preview,
+        }
+        if parse_mode:
+            payload["parse_mode"] = parse_mode
+        result = self.call("sendMessage", payload)
         return _to_sent_message(result, chat_id)
 
-    def send_photo(self, chat_id: str, photo: str, caption: str | None = None) -> SentMessage:
-        result = self.call("sendPhoto", {"chat_id": chat_id, "photo": photo, "caption": caption})
+    def send_photo(
+        self,
+        chat_id: str,
+        photo: str,
+        caption: str | None = None,
+        *,
+        parse_mode: str | None = None,
+    ) -> SentMessage:
+        payload: dict[str, Any] = {"chat_id": chat_id, "photo": photo, "caption": caption}
+        if parse_mode:
+            payload["parse_mode"] = parse_mode
+        result = self.call("sendPhoto", payload)
         return _to_sent_message(result, chat_id)
 
     def send_poll(
@@ -234,14 +258,33 @@ class DryRunTelegramClient:
         self.sent.append((chat_id, rich_message))
         return {"dry_run": True, "message_id": message_id}
 
-    def send_message(self, chat_id: str, text: str) -> SentMessage:
+    def send_message(
+        self,
+        chat_id: str,
+        text: str,
+        *,
+        parse_mode: str | None = None,
+        disable_web_page_preview: bool = True,
+    ) -> SentMessage:
         self._counter += 1
-        self.sent.append((chat_id, {"text": text}))
-        return SentMessage(self._counter, str(chat_id), str(chat_id).lstrip("@"), {"text": text})
+        payload = {
+            "text": text,
+            "parse_mode": parse_mode,
+            "disable_web_page_preview": disable_web_page_preview,
+        }
+        self.sent.append((chat_id, payload))
+        return SentMessage(self._counter, str(chat_id), str(chat_id).lstrip("@"), payload)
 
-    def send_photo(self, chat_id: str, photo: str, caption: str | None = None) -> SentMessage:
+    def send_photo(
+        self,
+        chat_id: str,
+        photo: str,
+        caption: str | None = None,
+        *,
+        parse_mode: str | None = None,
+    ) -> SentMessage:
         self._counter += 1
-        payload = {"photo": photo, "caption": caption}
+        payload = {"photo": photo, "caption": caption, "parse_mode": parse_mode}
         self.sent.append((chat_id, payload))
         return SentMessage(self._counter, str(chat_id), str(chat_id).lstrip("@"), payload)
 

@@ -105,6 +105,32 @@ def chief_editor(market: Annotated[str | None, typer.Option()] = None) -> None:
         _print(jobs.run_chief_editor(session, markets=_markets(market)))
 
 
+@app.command("russia-demand-refresh")
+def russia_demand_refresh() -> None:
+    """Reload dated Russia demand observations; never invent search volumes."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.refresh_russia_travel_demand(session))
+
+
+@app.command("editorial-demo-plan")
+def editorial_demo_plan(
+    output: Annotated[str, typer.Option()] = "audit/v3/demo_plan.json",
+) -> None:
+    """Write a dry-run 30-day RU/EN/MAX plan plus 36 sample drafts. Does not publish."""
+    _bootstrap()
+    import json
+    from pathlib import Path
+
+    from app.editorial.demo_plan import SAMPLE_DRAFTS, build_three_channel_plan
+
+    path = Path(output)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {"plan": build_three_channel_plan(), "drafts": SAMPLE_DRAFTS, "published": False}
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    typer.echo(str(path))
+
+
 @app.command()
 def schedule(market: Annotated[str | None, typer.Option()] = None) -> None:
     """Spread approved articles over the publishing window."""
@@ -196,9 +222,7 @@ def purge_legacy_posts(
 
     when = dt.datetime.now(dt.UTC) - dt.timedelta(days=1)
     if since.strip():
-        when = dt.datetime.combine(
-            dt.date.fromisoformat(since.strip()), dt.time.min, tzinfo=dt.UTC
-        )
+        when = dt.datetime.combine(dt.date.fromisoformat(since.strip()), dt.time.min, tzinfo=dt.UTC)
     with session_scope() as session:
         results = takedown_legacy_published_since(session, since=when)
         typer.echo(
@@ -937,7 +961,9 @@ def doctor() -> None:
                 checks.append(("openai_responses", True, f"ok (…{suffix})"))
             else:
                 detail = response.text[:120].replace("\n", " ")
-                checks.append(("openai_responses", False, f"HTTP {response.status_code} …{suffix} {detail}"))
+                checks.append(
+                    ("openai_responses", False, f"HTTP {response.status_code} …{suffix} {detail}")
+                )
         except Exception as exc:
             checks.append(("openai_responses", False, f"…{suffix} {exc}"))
 

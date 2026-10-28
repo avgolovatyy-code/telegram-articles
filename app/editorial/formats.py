@@ -122,10 +122,10 @@ def native_payload(session: Session, article: Article) -> NativePayload:
 
 
 __all__ = [
-    "NativePayload",
     "PHOTO_FORMATS",
     "POLL_FORMATS",
     "RICH_FORMATS",
+    "NativePayload",
     "format_for_article",
     "native_payload",
     "slot_for_article",

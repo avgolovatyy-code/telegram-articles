@@ -88,6 +88,14 @@ class SchedulerRunner:
             coalesce=True,
         )
         add(
+            _wrap(jobs.refresh_russia_travel_demand, "refresh_russia_travel_demand", settings),
+            CronTrigger(day_of_week="sun", hour=2, minute=15),
+            id="refresh_russia_travel_demand",
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+        add(
             _wrap(jobs.generate_daily_articles, "generate_articles", settings),
             CronTrigger(hour="4,10,16", minute=0),
             id="generate_articles",

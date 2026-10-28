@@ -56,6 +56,8 @@ class ModelRouter:
             return self.settings.openai_writer_model
         if task == LLMTask.QUALITY_REVIEW:
             return self.settings.review_model
+        if task == LLMTask.CHIEF_EDITOR:
+            return self.settings.editor_model
         return self.settings.openai_utility_model
 
 

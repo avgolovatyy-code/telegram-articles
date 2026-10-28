@@ -17,6 +17,7 @@ Benefit = Literal[
     "domestic_trip",
     "outbound_trip_from_ru",
     "russia_relevant_news",
+    "culture_curiosity",
 ]
 
 
@@ -100,6 +101,9 @@ class MaxRussiaAudienceGate:
         entry_rules_mentioned: bool = False,
         expired_local_event: bool = False,
         product_available_on_ru_store: bool | None = None,
+        audience_axis: str | None = None,
+        editorial_mechanic: str | None = None,
+        recommends_travel: bool = False,
     ) -> MaxAudienceDecision:
         if expired_local_event:
             return MaxAudienceDecision(
@@ -129,13 +133,30 @@ class MaxRussiaAudienceGate:
                 reason="domestic Russia topic for local leisure or trip",
             )
 
-        # Foreign destination: only as outbound travel *from* Russia.
-        if tokens & _FOREIGN_LOCAL_ONLY:
+        from app.editorial.mechanics import CULTURE_AXES, CULTURE_MECHANICS
+
+        culture = audience_axis in CULTURE_AXES or editorial_mechanic in CULTURE_MECHANICS
+
+        # Foreign destination: only as outbound travel *from* Russia — unless it is
+        # a genuine culture/curiosity story without bogus logistics.
+        if tokens & _FOREIGN_LOCAL_ONLY and not culture:
             return MaxAudienceDecision(
                 topic_id=topic_id,
                 relevance_for_russia="none",
                 should_publish=False,
                 reason="foreign local/expat topic without value for residents of Russia",
+            )
+
+        if culture and not recommends_travel:
+            return MaxAudienceDecision(
+                topic_id=topic_id,
+                relevance_for_russia="medium",
+                benefit="culture_curiosity",
+                covered_region_ids=[],
+                practicality_verified=True,
+                requires_country_entry_verification=False,
+                should_publish=True,
+                reason="international culture/curiosity without practical travel advice",
             )
 
         if product_available_on_ru_store is False:

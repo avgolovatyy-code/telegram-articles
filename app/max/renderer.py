@@ -152,13 +152,11 @@ def render_max_payload(
         text = f"<h1>{_html_escape(title)}</h1>"
         if body:
             text = f"{text}\n{body}"
-        footer = "\n<p>Билеты и аудиогиды — в кнопках ниже.</p>"
     else:
         body = _fit(_section_parts_markdown(document), BODY_BUDGET)
         text = f"# {_md_escape(title)}"
         if body:
             text = f"{text}\n\n{body}"
-        footer = "\n\nБилеты и аудиогиды — в кнопках ниже."
 
     buttons: list[list[dict[str, str]]] = []
     for ap in sorted(article.products, key=lambda p: (p.position, p.id)):
@@ -176,10 +174,12 @@ def render_max_payload(
         if len(buttons) >= MAX_PRODUCT_BUTTONS:
             break
 
-    if buttons:
-        if len(text) + len(footer) > MAX_TEXT_CHARS:
-            text = text[: MAX_TEXT_CHARS - len(footer) - 1].rstrip() + "…"
-        text = text + footer
+    if settings.cross_promo_footer_enabled:
+        from app.editorial.footer import HOLD_UNSUPPORTED, inject_max_html
+
+        text, footer_result = inject_max_html(text, max_chars=MAX_TEXT_CHARS)
+        if footer_result.hold:
+            raise ValueError(footer_result.reason or HOLD_UNSUPPORTED)
     elif len(text) > MAX_TEXT_CHARS:
         text = text[: MAX_TEXT_CHARS - 1].rstrip() + "…"
 

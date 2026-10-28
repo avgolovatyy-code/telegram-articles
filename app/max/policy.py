@@ -103,6 +103,9 @@ class MaxRussiaEditorialPolicy:
         day: dt.date | None = None,
         enforce_region_cap: bool = True,
         enforce_balance_soft: bool = True,
+        audience_axis: str | None = None,
+        editorial_mechanic: str | None = None,
+        recommends_travel: bool = False,
     ) -> MaxTopicEvaluation:
         calendar = russia_calendar_context(day)
         decision = self.gate.evaluate(
@@ -114,6 +117,9 @@ class MaxRussiaEditorialPolicy:
             entry_rules_mentioned=entry_rules_mentioned,
             expired_local_event=expired_local_event,
             product_available_on_ru_store=product_available_on_ru_store,
+            audience_axis=audience_axis,
+            editorial_mechanic=editorial_mechanic,
+            recommends_travel=recommends_travel,
         )
 
         domestic_or_outbound: DomesticOrOutbound | None = None
@@ -121,6 +127,8 @@ class MaxRussiaEditorialPolicy:
             domestic_or_outbound = "domestic"
         elif decision.benefit == "outbound_trip_from_ru":
             domestic_or_outbound = "outbound"
+        elif decision.benefit == "culture_curiosity":
+            domestic_or_outbound = None  # not counted in 75/25 geo mix
 
         region_key = normalize_region_key(city_name) or normalize_region_key(geo.city_id)
         region_allowed = True
