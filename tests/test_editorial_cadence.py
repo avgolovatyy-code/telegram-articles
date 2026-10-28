@@ -50,6 +50,17 @@ def test_v2_caps_daily_generation_plan(session, settings, monkeypatch):
     plan = BudgetManager(session, settings).plan_daily_generation(session=session)
     assert plan["en"] <= settings.max_posts_per_day
     assert plan["ru"] <= settings.max_posts_per_day
+    assert plan["en"] >= 1
+    assert plan["ru"] >= 1
+
+
+def test_v2_plan_ignores_unscheduled_drafts(session, settings, monkeypatch):
+    monkeypatch.setattr(settings, "editorial_v2_enabled", True)
+    _article(session, "en", status=ArticleStatus.NEEDS_REVIEW)
+    _article(session, "ru", status=ArticleStatus.NEEDS_REVIEW)
+    plan = BudgetManager(session, settings).plan_daily_generation(session=session)
+    assert plan["en"] == 1
+    assert plan["ru"] == 1
 
 
 def test_weekly_hard_cap_blocks_schedule(session, settings, monkeypatch):
