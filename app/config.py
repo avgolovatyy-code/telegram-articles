@@ -135,6 +135,28 @@ class Settings(BaseSettings):
     #: when domestic candidates exist (0–1).
     ru_domestic_share: float = 0.7
 
+    # ------------------------------------------------------- Editorial Engine v2.2
+    #: Master switch for the new editorial calendar / Chief Editor path.
+    #: Keep false until Phase C dry-run is ready; existing Content Engine stays primary.
+    editorial_v2_enabled: bool = False
+    #: When true, Chief Editor / calendar runs do not publish — decisions only.
+    editorial_v2_dry_run: bool = True
+    #: Legacy mass article auto-scheduler. Turn off only after V2 calendar rollout.
+    old_article_auto_scheduler_enabled: bool = True
+    #: Never auto-apply channel title/description/pin without explicit approval.
+    channel_branding_apply_enabled: bool = False
+    ru_posts_per_week_min: int = 5
+    ru_posts_per_week_max: int = 6
+    en_posts_per_week_min: int = 4
+    en_posts_per_week_max: int = 5
+    max_posts_per_day: int = 1
+    max_longform_articles_per_month: int = 2
+    max_commercial_post_share: float = 0.25
+    openai_chief_editor_daily: bool = True
+    editorial_voice_version: str = "wegotrip_voice_v1"
+    #: Prefer own SourceRegistry evidence over hosted web_search in user-facing posts.
+    openai_hosted_web_search_for_public_posts: bool = False
+
     # ---------------------------------------------------------------- quality
     min_quality_score: float = 0.88
     min_factuality_score: float = 0.97
