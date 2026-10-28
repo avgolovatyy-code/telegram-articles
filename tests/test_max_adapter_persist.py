@@ -33,9 +33,7 @@ def _make_article(session, *, market: str = "ru", **overrides) -> Article:
                     {
                         "heading": "Кремль",
                         "level": 2,
-                        "blocks": [
-                            {"type": "paragraph", "text": "Прогулка по кремлю. " * 200}
-                        ],
+                        "blocks": [{"type": "paragraph", "text": "Прогулка по кремлю. " * 200}],
                     }
                 ],
                 "product_placements": [],
