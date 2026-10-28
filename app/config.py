@@ -114,6 +114,8 @@ class Settings(BaseSettings):
     openai_image_model: str = "gpt-image-2"
     openai_timeout_seconds: float = 240.0
     openai_max_retries: int = 3
+    #: Minimum spacing between OpenAI HTTP calls (shared limiter per provider instance).
+    openai_rate_limit_rps: float = 0.2
     llm_provider: Literal["openai", "mock"] = "openai"
 
     # ---------------------------------------------------------------- budget
