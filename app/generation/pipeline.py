@@ -35,6 +35,7 @@ from app.db.models import (
     ArticleSource,
     ArticleVersion,
     CostLedgerEntry,
+    EditorialPlanSlot,
     Product,
     TopicCandidate,
 )
@@ -107,7 +108,9 @@ class GenerationPipeline:
         self.covers = GeneratedCoverService(gateway.provider, self.budget, settings=self.settings)
 
     # ------------------------------------------------------------------ main
-    def generate(self, topic: TopicCandidate) -> GenerationOutcome:
+    def generate(
+        self, topic: TopicCandidate, *, slot: EditorialPlanSlot | None = None
+    ) -> GenerationOutcome:
         market: Market = topic.market  # type: ignore[assignment]
         job_id = new_job_id("gen")
 
@@ -120,7 +123,8 @@ class GenerationPipeline:
             entity_id=topic.entity_external_id,
         ) as ctx:
             products = self._select_products(topic, market)
-            if not products:
+            allow_empty = self._allow_empty_products(slot)
+            if not products and not allow_empty:
                 topic.status = TopicStatus.REJECTED
                 topic.status_reason = "no relevant available products"
                 ctx["status"] = "skipped"
@@ -141,7 +145,7 @@ class GenerationPipeline:
                 log.info("generation.budget_blocked", market=market, reason=str(exc))
                 return GenerationOutcome(None, "budget_blocked", str(exc))
 
-            article = self._create_article(topic, market, estimate)
+            article = self._create_article(topic, market, estimate, slot=slot)
             reservation.article_id = article.id
             topic.status = TopicStatus.GENERATING
             self.session.flush()
@@ -445,6 +449,16 @@ class GenerationPipeline:
         self.session.flush()
         return GenerationOutcome(article, ArticleStatus.NEEDS_REVIEW, "", cost, last_issues)
 
+    def _allow_empty_products(self, slot: EditorialPlanSlot | None) -> bool:
+        if not self.settings.editorial_v2_enabled:
+            return False
+        if slot is None:
+            return True
+        rec = (slot.payload or {}).get("product_recommendation", "optional")
+        if rec == "required" or slot.format == "product_spotlight":
+            return False
+        return True
+
     def _select_products(self, topic: TopicCandidate, market: Market) -> list[RankedProduct]:
         rows = self.session.scalars(
             select(Product).where(Product.market == market, Product.available.is_(True))
@@ -452,7 +466,24 @@ class GenerationPipeline:
         catalog = {row.external_id: row for row in rows}
         return self.selector.select(topic, catalog, limit=CONTEXT_PRODUCTS_PER_ARTICLE)
 
-    def _create_article(self, topic: TopicCandidate, market: Market, estimate: float) -> Article:
+    def _create_article(
+        self,
+        topic: TopicCandidate,
+        market: Market,
+        estimate: float,
+        *,
+        slot: EditorialPlanSlot | None = None,
+    ) -> Article:
+        editorial = {}
+        if slot is not None:
+            editorial = {
+                "pillar": slot.pillar,
+                "format": slot.format,
+                "audience": slot.audience,
+                "why_now": (slot.payload or {}).get("why_now"),
+                "voice_version": self.settings.editorial_voice_version,
+                "writer_model": self.settings.openai_writer_model,
+            }
         article = Article(
             public_id=secrets.token_urlsafe(8),
             market=market,
@@ -466,6 +497,7 @@ class GenerationPipeline:
             secondary_queries=list(topic.secondary_queries or []),
             status=ArticleStatus.GENERATING,
             estimated_cost_usd=estimate,
+            quality_scores={"editorial": editorial} if editorial else {},
         )
         self.session.add(article)
         self.session.flush()
@@ -615,8 +647,12 @@ class GenerationPipeline:
         )
         article.actual_cost_usd = round(float(ledger_total or cost), 6)
         article.validation_issues = [*gate.errors, *gate.warnings][:20]
+        editorial_meta = (article.quality_scores or {}).get("editorial")
         if review is not None:
-            article.quality_scores = review.model_dump()
+            scores = review.model_dump()
+            if editorial_meta:
+                scores["editorial"] = editorial_meta
+            article.quality_scores = scores
             article.quality_score = review.overall
             article.factuality_score = review.factuality
         article.current_version += 1

@@ -2,11 +2,23 @@
 {% block title %}Editorial calendar · WeGoTrip{% endblock %}
 {% block content %}
 <h1>Editorial calendar</h1>
-<p class="subtitle">Chief Editor plan (v2.2): slots for the next 30 days per market.</p>
+<p class="subtitle">Chief Editor plan (v2.2): rolling 30 / 7 / 2 days. Dry-run={{ dry_run }}; v2={{ v2_enabled }}.</p>
 
 <div class="actions">
+  <a class="btn {{ 'primary' if horizon == 2 }}" href="/admin/editorial?horizon=2">2 days</a>
+  <a class="btn {{ 'primary' if horizon == 7 }}" href="/admin/editorial?horizon=7">7 days</a>
+  <a class="btn {{ 'primary' if horizon == 30 }}" href="/admin/editorial?horizon=30">30 days</a>
   <form method="post" action="/admin/ops/run">
     <button class="btn" name="job" value="run_chief_editor">Run Chief Editor now</button>
+  </form>
+  <form method="post" action="/admin/editorial/queue-pause">
+    {% if queue_paused %}
+    <input type="hidden" name="paused" value="0">
+    <button class="btn" type="submit">Resume publication queue</button>
+    {% else %}
+    <input type="hidden" name="paused" value="1">
+    <button class="btn" type="submit">Pause publication queue</button>
+    {% endif %}
   </form>
 </div>
 
@@ -16,7 +28,7 @@
   <thead>
     <tr>
       <th>Date</th><th>Pillar</th><th>Format</th><th>Audience</th>
-      <th>Priority</th><th>Status</th><th>Topic</th><th>Article</th>
+      <th>Why now</th><th>Priority</th><th>Status</th><th>Topic</th><th>Article</th><th></th>
     </tr>
   </thead>
   <tbody>
@@ -26,17 +38,26 @@
       <td class="small">{{ slot.pillar }}</td>
       <td class="small">{{ slot.format }}</td>
       <td>{{ slot.audience }}</td>
+      <td class="small wrap">{{ (slot.payload or {}).get('why_now') or slot.reader_value or '—' }}</td>
       <td class="num">{{ slot.priority }}</td>
-      <td><span class="badge">{{ slot.status }}</span></td>
+      <td><span class="badge">{{ slot.status }}{% if slot.locked %} · locked{% endif %}</span></td>
       <td class="num">{{ slot.topic_id or '—' }}</td>
       <td class="num">
         {% if slot.article_id %}
         <a href="/admin/articles/{{ slot.article_id }}">#{{ slot.article_id }}</a>
         {% else %}—{% endif %}
       </td>
+      <td class="nowrap">
+        <form method="post" action="/admin/editorial/slots/{{ slot.id }}/lock" style="display:inline">
+          <button class="btn small" type="submit">{{ 'Unlock' if slot.locked else 'Lock' }}</button>
+        </form>
+        <form method="post" action="/admin/editorial/slots/{{ slot.id }}/skip" style="display:inline">
+          <button class="btn small" type="submit">Skip</button>
+        </form>
+      </td>
     </tr>
   {% else %}
-    <tr><td colspan="8" class="muted small">No slots — run Chief Editor or enable EDITORIAL_V2.</td></tr>
+    <tr><td colspan="10" class="muted small">No slots — run Chief Editor or enable EDITORIAL_V2.</td></tr>
   {% endfor %}
   </tbody>
 </table>
@@ -44,7 +65,7 @@
 
 <h2>Recent Chief Editor runs</h2>
 <table>
-  <thead><tr><th>Date</th><th>Market</th><th>Status</th><th>Thesis</th><th>Run ID</th></tr></thead>
+  <thead><tr><th>Date</th><th>Market</th><th>Status</th><th>Thesis</th><th>Diff</th><th>Run ID</th></tr></thead>
   <tbody>
   {% for run in recent_runs %}
     <tr>
@@ -52,10 +73,11 @@
       <td>{{ run.market }}</td>
       <td>{{ run.status }}{% if run.dry_run %} (dry){% endif %}</td>
       <td class="small wrap">{{ run.editorial_thesis or '—' }}</td>
+      <td class="small">{{ (run.diff or {}).get('applied_slots', '—') }} slots</td>
       <td class="mono small">{{ run.run_id[:8] }}…</td>
     </tr>
   {% else %}
-    <tr><td colspan="5" class="muted small">No runs yet.</td></tr>
+    <tr><td colspan="6" class="muted small">No runs yet.</td></tr>
   {% endfor %}
   </tbody>
 </table>

@@ -162,7 +162,7 @@ class Settings(BaseSettings):
     #: Master switch for the new editorial calendar / Chief Editor path.
     #: Keep false until Phase C dry-run is ready; existing Content Engine stays primary.
     editorial_v2_enabled: bool = False
-    #: When true, Chief Editor / calendar runs do not publish — decisions only.
+    #: Persist the calendar without production enqueue. Draft generation is allowed.
     editorial_v2_dry_run: bool = True
     #: Legacy mass article auto-scheduler. Turn off only after V2 calendar rollout.
     old_article_auto_scheduler_enabled: bool = True

@@ -6,7 +6,7 @@
 
 ## Вердикт
 
-| Область | Вердict |
+| Область | Вердикт |
 |---------|---------|
 | **Content Engine v1** (инфра, Telegram/Max, affiliate, factcheck, idempotency) | **GO** — стабилен, 256/256 unit-тестов |
 | **Editorial Engine v2.2** (продукт по спеке) | **NO_GO** — Phase C частично, календарь пустой, контент-пайплайн v2 не замкнут |
@@ -82,7 +82,7 @@ Cron зарегистрирован: `run_chief_editor` 03:30/09:30/15:30, `gene
 | AUTO-01 | FAIL | **PASS** | Флаги wired в `jobs.py` / cadence |
 | AUTO-03 | FAIL | **FAIL** | Autopublish всё ещё true |
 | PUB-04 | NOT_IMPLEMENTED | **PARTIAL** | `/admin/editorial` 30d UI, данных нет |
-| EDIT-03 | NOT_IMPLEMENTED | **PARTIAL** | 12 pillar codes + formats в `pillars.py`, нет router |
+| EDIT-03 | NOT_IMPLEMENTED | **PARTIAL** | 13 pillar codes + formats в `pillars.py`, нет router |
 | EDIT-03b | NOT_IMPLEMENTED | **FAIL** | Нет `sendPoll` / native format router |
 | NEG-01 | NOT_IMPLEMENTED | **PARTIAL** | Failed runs пишутся; нет «keep last plan» policy test |
 

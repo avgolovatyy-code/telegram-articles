@@ -54,6 +54,7 @@ def test_v2_caps_daily_generation_plan(session, settings, monkeypatch):
 
 def test_weekly_hard_cap_blocks_schedule(session, settings, monkeypatch):
     monkeypatch.setattr(settings, "editorial_v2_enabled", True)
+    monkeypatch.setattr(settings, "editorial_v2_dry_run", False)
     monkeypatch.setattr(settings, "auto_publish_en", True)
     monkeypatch.setattr(settings, "max_posts_per_day", 2)
     monkeypatch.setattr(settings, "en_posts_per_week_hard_cap", 1)

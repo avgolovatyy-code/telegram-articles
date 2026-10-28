@@ -132,6 +132,29 @@ class TelegramBotClient:
         result = self.call("sendMessage", {"chat_id": chat_id, "text": text})
         return _to_sent_message(result, chat_id)
 
+    def send_photo(self, chat_id: str, photo: str, caption: str | None = None) -> SentMessage:
+        result = self.call("sendPhoto", {"chat_id": chat_id, "photo": photo, "caption": caption})
+        return _to_sent_message(result, chat_id)
+
+    def send_poll(
+        self,
+        chat_id: str,
+        question: str,
+        options: list[str],
+        *,
+        is_anonymous: bool = True,
+    ) -> SentMessage:
+        result = self.call(
+            "sendPoll",
+            {
+                "chat_id": chat_id,
+                "question": question,
+                "options": options,
+                "is_anonymous": is_anonymous,
+            },
+        )
+        return _to_sent_message(result, chat_id)
+
     def delete_message(self, chat_id: str, message_id: int) -> bool:
         self.call("deleteMessage", {"chat_id": chat_id, "message_id": message_id})
         return True
@@ -213,7 +236,27 @@ class DryRunTelegramClient:
 
     def send_message(self, chat_id: str, text: str) -> SentMessage:
         self._counter += 1
+        self.sent.append((chat_id, {"text": text}))
         return SentMessage(self._counter, str(chat_id), str(chat_id).lstrip("@"), {"text": text})
+
+    def send_photo(self, chat_id: str, photo: str, caption: str | None = None) -> SentMessage:
+        self._counter += 1
+        payload = {"photo": photo, "caption": caption}
+        self.sent.append((chat_id, payload))
+        return SentMessage(self._counter, str(chat_id), str(chat_id).lstrip("@"), payload)
+
+    def send_poll(
+        self,
+        chat_id: str,
+        question: str,
+        options: list[str],
+        *,
+        is_anonymous: bool = True,
+    ) -> SentMessage:
+        self._counter += 1
+        payload = {"question": question, "options": options, "is_anonymous": is_anonymous}
+        self.sent.append((chat_id, payload))
+        return SentMessage(self._counter, str(chat_id), str(chat_id).lstrip("@"), payload)
 
     def delete_message(self, chat_id: str, message_id: int) -> bool:
         log.info("telegram.dry_run_delete", chat_id=chat_id, message_id=message_id)
