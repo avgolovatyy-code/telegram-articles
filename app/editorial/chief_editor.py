@@ -72,9 +72,12 @@ class ChiefEditorService:
             except Exception as exc:
                 report.ok = False
                 msg = f"{market}: {exc}"
+                if isinstance(exc, LLMError) and exc.payload:
+                    snippet = str(exc.payload)[:240].replace("\n", " ")
+                    msg = f"{msg} — {snippet}"
                 report.errors.append(msg)
                 log.error("chief_editor.failed", market=market, error=str(exc))
-                self._record_failure(market, run_date, str(exc))
+                self._record_failure(market, run_date, msg)
         return report
 
     def _run_market(

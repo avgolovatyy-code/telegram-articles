@@ -69,8 +69,95 @@ class EditorialDecisionSet(BaseModel):
     risks: list[str] = Field(default_factory=list)
 
 
+_DECISION_ITEM = {
+    "type": "object",
+    "additionalProperties": False,
+    "properties": {
+        "action": {
+            "type": "string",
+            "enum": [
+                "add",
+                "keep",
+                "move",
+                "replace",
+                "drop",
+                "request_research",
+                "skip",
+            ],
+        },
+        "slot_id": {"type": ["integer", "null"]},
+        "candidate_id": {"type": ["string", "null"]},
+        "planned_date": {"type": "string"},
+        "audience": {"type": "string", "enum": ["local", "traveler", "both"]},
+        "pillar": {"type": "string", "enum": pillar_codes()},
+        "format": {"type": "string", "enum": sorted(POST_FORMATS)},
+        "angle": {"type": ["string", "null"]},
+        "reader_value": {"type": ["string", "null"]},
+        "hook_hypothesis": {"type": ["string", "null"]},
+        "fact_ids_needed": {"type": "array", "items": {"type": "string"}},
+        "product_recommendation": {
+            "type": "string",
+            "enum": ["none", "optional", "required"],
+        },
+        "source_link_policy": {
+            "type": "string",
+            "enum": [
+                "internal_sources_only",
+                "verified_external_allowed",
+                "no_external_links",
+            ],
+        },
+        "priority": {"type": "integer", "minimum": 0, "maximum": 100},
+        "why_now": {"type": ["string", "null"]},
+        "why_replace_existing": {"type": ["string", "null"]},
+        "needs_human_review": {"type": "boolean"},
+    },
+    "required": [
+        "action",
+        "slot_id",
+        "candidate_id",
+        "planned_date",
+        "audience",
+        "pillar",
+        "format",
+        "angle",
+        "reader_value",
+        "hook_hypothesis",
+        "fact_ids_needed",
+        "product_recommendation",
+        "source_link_policy",
+        "priority",
+        "why_now",
+        "why_replace_existing",
+        "needs_human_review",
+    ],
+}
+
+
 def editorial_decision_json_schema() -> dict[str, Any]:
-    return EditorialDecisionSet.model_json_schema()
+    """OpenAI Responses ``strict`` JSON schema (no ``$ref`` / ``$defs``)."""
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "market": {"type": "string", "enum": ["en", "ru"]},
+            "run_date": {"type": "string"},
+            "editorial_thesis": {"type": "string"},
+            "decisions": {"type": "array", "items": _DECISION_ITEM},
+            "empty_slots_justification": {"type": "array", "items": {"type": "string"}},
+            "daily_summary": {"type": "string"},
+            "risks": {"type": "array", "items": {"type": "string"}},
+        },
+        "required": [
+            "market",
+            "run_date",
+            "editorial_thesis",
+            "decisions",
+            "empty_slots_justification",
+            "daily_summary",
+            "risks",
+        ],
+    }
 
 
 __all__ = [
