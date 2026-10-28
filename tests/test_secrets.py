@@ -188,6 +188,20 @@ def test_canonical_env_wins_over_the_alias(monkeypatch):
     assert os.environ["SLACK_BOT_TOKEN"] == "canonical-token-value"
 
 
+def test_openai_key_tg_max_overrides_legacy_openai_api_key(monkeypatch):
+    from app.security.secrets import apply_secret_aliases
+
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-legacy-key-value01234567890123456789012")
+    monkeypatch.setenv(
+        "OPENAI_KEY_TG_MAX",
+        "sk-new-tg-max-key-value0123456789012345678901234",
+    )
+
+    apply_secret_aliases()
+
+    assert os.environ["OPENAI_API_KEY"].startswith("sk-new-tg-max")
+
+
 def test_unregistered_credentials_are_masked_by_shape():
     # Assembled at runtime so the literals do not trip secret scanners in this repo —
     # which is itself a reminder of why the redactor matches on shape.

@@ -28,11 +28,15 @@ SECRET_NAMES: frozenset[str] = frozenset(
 #: stored Slack as ``*_TG`` and the droplet key as ``DEPLOY_SSH_KEY`` (shared with
 #: the video-generation repo).
 SECRET_ALIASES: dict[str, str] = {
+    "OPENAI_KEY_TG_MAX": "OPENAI_API_KEY",
     "SLACK_BOT_TOKEN_TG": "SLACK_BOT_TOKEN",
     "SLACK_SIGNING_SECRET_TG": "SLACK_SIGNING_SECRET",
     "DEPLOY_SSH_KEY": "DEPLOY_SSH_PRIVATE_KEY",
     "DROPLET_SSH_PRIVATE_KEY": "DEPLOY_SSH_PRIVATE_KEY",
 }
+
+#: When both the legacy env name and a dedicated alias are set, the alias wins.
+SECRET_ALIAS_OVERRIDES_CANONICAL: frozenset[str] = frozenset({"OPENAI_API_KEY"})
 
 #: Canonical names plus aliases — anything that must be stored encrypted and masked.
 SECRET_INPUT_NAMES: frozenset[str] = SECRET_NAMES | frozenset(SECRET_ALIASES)
@@ -45,6 +49,7 @@ def canonical_secret_name(name: str) -> str:
 
 __all__ = [
     "SECRET_ALIASES",
+    "SECRET_ALIAS_OVERRIDES_CANONICAL",
     "SECRET_INPUT_NAMES",
     "SECRET_NAMES",
     "canonical_secret_name",

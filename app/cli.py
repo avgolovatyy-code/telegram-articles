@@ -895,6 +895,30 @@ def doctor() -> None:
             ("secrets_plaintext", False, ", ".join(plaintext) + " — run `wgt secrets import-env`")
         )
 
+    if settings.openai_api_key and settings.llm_provider == "openai":
+        import httpx
+
+        suffix = settings.openai_api_key[-4:]
+        try:
+            response = httpx.post(
+                f"{settings.openai_base_url.rstrip('/')}/responses",
+                headers={"Authorization": f"Bearer {settings.openai_api_key}"},
+                json={
+                    "model": settings.openai_utility_model,
+                    "instructions": "ping",
+                    "input": "{}",
+                    "max_output_tokens": 16,
+                },
+                timeout=45.0,
+            )
+            if response.status_code < 400:
+                checks.append(("openai_responses", True, f"ok (…{suffix})"))
+            else:
+                detail = response.text[:120].replace("\n", " ")
+                checks.append(("openai_responses", False, f"HTTP {response.status_code} …{suffix} {detail}"))
+        except Exception as exc:
+            checks.append(("openai_responses", False, f"…{suffix} {exc}"))
+
     for name, ok, detail in checks:
         colour = typer.colors.GREEN if ok else typer.colors.YELLOW
         typer.secho(f"{'✓' if ok else '!'} {name}: {detail}", fg=colour)
