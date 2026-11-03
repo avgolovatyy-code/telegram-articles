@@ -91,6 +91,9 @@ def apply_decision_set(
             if filled.travel_practicality_status == "hold":
                 skipped.append(f"{filled.planned_date}:practicality HOLD")
                 continue
+            auto = settings.auto_publish(market)
+            if auto and filled.travel_practicality_status != "hold":
+                filled = filled.model_copy(update={"needs_human_review": False})
             slot = EditorialPlanSlot(
                 run_id=run.id,
                 market=market,
@@ -176,9 +179,40 @@ def _resolve_topic_id(session: Session, market: Market, candidate_id: str | None
     return topic_id
 
 
+def promote_auto_review_slots(session: Session, settings: Settings) -> int:
+    """When auto-publish is on, parked ``needs_review`` slots become generatable."""
+    from app.editorial.topics import ensure_editorial_topic
+
+    promoted = 0
+    rows = list(
+        session.scalars(
+            select(EditorialPlanSlot).where(
+                EditorialPlanSlot.status == "needs_review",
+                EditorialPlanSlot.article_id.is_(None),
+            )
+        ).all()
+    )
+    for slot in rows:
+        if not settings.auto_publish(slot.market):  # type: ignore[arg-type]
+            continue
+        payload = slot.payload if isinstance(slot.payload, dict) else {}
+        if payload.get("travel_practicality_status") == "hold":
+            continue
+        slot.needs_human_review = False
+        slot.status = "planned"
+        ensure_editorial_topic(session, slot)
+        promoted += 1
+    if promoted:
+        session.flush()
+    return promoted
+
+
 def slots_ready_for_generation(
     session: Session, market: Market, settings: Settings, *, limit: int = 3
 ) -> list[EditorialPlanSlot]:
+    from app.editorial.topics import ensure_editorial_topic
+
+    promote_auto_review_slots(session, settings)
     today = utcnow().astimezone(settings.publish_tz).date()
     horizon = today + dt.timedelta(days=2)
     rows = list(
@@ -186,9 +220,8 @@ def slots_ready_for_generation(
             select(EditorialPlanSlot)
             .where(
                 EditorialPlanSlot.market == market,
-                EditorialPlanSlot.status == "planned",
+                EditorialPlanSlot.status.in_(("planned", "locked")),
                 EditorialPlanSlot.needs_human_review.is_(False),
-                EditorialPlanSlot.topic_id.is_not(None),
                 EditorialPlanSlot.article_id.is_(None),
                 EditorialPlanSlot.slot_date >= today,
                 EditorialPlanSlot.slot_date <= horizon,
@@ -197,7 +230,12 @@ def slots_ready_for_generation(
             .limit(limit)
         ).all()
     )
-    return rows
+    ready: list[EditorialPlanSlot] = []
+    for slot in rows:
+        ensure_editorial_topic(session, slot)
+        if slot.topic_id:
+            ready.append(slot)
+    return ready
 
 
 def mark_slot_generated(session: Session, slot: EditorialPlanSlot, article_id: int) -> None:
@@ -226,6 +264,7 @@ __all__ = [
     "apply_decision_set",
     "last_valid_run",
     "mark_slot_generated",
+    "promote_auto_review_slots",
     "set_slot_locked",
     "skip_slot",
     "slots_ready_for_generation",

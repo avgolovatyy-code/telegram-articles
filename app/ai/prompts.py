@@ -378,6 +378,9 @@ Rules:
 - product_recommendation is usually optional or none; required only for product_in_context.
 - If no strong candidate exists, return decisions=[] and explain in empty_slots_justification.
 - NEVER propose changing Telegram channel title, description, avatar, or pinned welcome post.
+- needs_human_review must be false unless travel_practicality_status is hold or the
+  topic is a legal/visa claim that cannot be published automatically. Do not park
+  ordinary culture, weekend or place stories in review.
 - Output JSON matching the editorial_decision_set schema only."""
 
 CHIEF_EDITOR_RU_MARKET_V3 = """

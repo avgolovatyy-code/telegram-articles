@@ -337,7 +337,6 @@ def _generate_from_editorial_plan(
     settings: Settings,
     max_per_run: int | None,
 ) -> JobReport:
-    from app.db.models import TopicCandidate
     from app.editorial.planner import mark_slot_generated, slots_ready_for_generation
 
     report = JobReport("generate_daily_articles")
@@ -363,7 +362,9 @@ def _generate_from_editorial_plan(
         for slot in slots:
             if produced >= wanted:
                 break
-            topic = session.get(TopicCandidate, slot.topic_id) if slot.topic_id else None
+            from app.editorial.topics import ensure_editorial_topic
+
+            topic = ensure_editorial_topic(session, slot)
             if topic is None:
                 continue
             decision = budget.can_start_article(market)
@@ -430,6 +431,8 @@ def schedule_publications(
                 ).all()
             )
             pending = [row for row in pending if article_meets_editorial_spec(row, settings)]
+            if settings.editorial_v2_enabled and not settings.old_article_auto_scheduler_enabled:
+                pending = [row for row in pending if _article_has_editorial_slot(session, row.id)]
             if not pending:
                 report.details[f"{market}_scheduled"] = 0
                 continue
@@ -479,6 +482,17 @@ def schedule_publications(
             close()
     session.flush()
     return report
+
+
+def _article_has_editorial_slot(session: Session, article_id: int) -> bool:
+    from app.db.models import EditorialPlanSlot
+
+    return (
+        session.scalar(
+            select(EditorialPlanSlot.id).where(EditorialPlanSlot.article_id == article_id)
+        )
+        is not None
+    )
 
 
 def _planned_today(session: Session, market: Market, settings: Settings | None = None) -> int:

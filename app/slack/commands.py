@@ -57,6 +57,29 @@ class CommandHandler:
         return "\n".join(lines)
 
     def _coverage(self) -> str:
+        if self.settings.editorial_v2_enabled:
+            from sqlalchemy import func, select
+
+            from app.db.models import EditorialPlanSlot
+            from app.db.types import utcnow
+
+            today = utcnow().astimezone(self.settings.publish_tz).date()
+            lines = ["*Редакционный календарь (не каталог v1):*"]
+            for market in MARKETS:
+                pending = int(
+                    self.session.scalar(
+                        select(func.count(EditorialPlanSlot.id)).where(
+                            EditorialPlanSlot.market == market,
+                            EditorialPlanSlot.slot_date >= today,
+                            EditorialPlanSlot.status.in_(("planned", "locked", "needs_review")),
+                            EditorialPlanSlot.article_id.is_(None),
+                        )
+                    )
+                    or 0
+                )
+                flag = sb.MARKET_FLAG.get(market, market)
+                lines.append(f"{flag} слотов без черновика: *{pending}*")
+            return "\n".join(lines)
         lines = []
         for market in MARKETS:
             report = assess_coverage(self.session, market, self.settings)
@@ -82,9 +105,28 @@ class CommandHandler:
                     )
                 )
                 .order_by(Article.scheduled_for.is_(None), Article.scheduled_for)
-                .limit(15)
+                .limit(40)
             ).all()
         )
+        if (
+            self.settings.editorial_v2_enabled
+            and not self.settings.old_article_auto_scheduler_enabled
+        ):
+            from app.db.models import EditorialPlanSlot
+
+            linked = set(
+                self.session.scalars(
+                    select(EditorialPlanSlot.article_id).where(
+                        EditorialPlanSlot.article_id.is_not(None)
+                    )
+                ).all()
+            )
+            rows = [
+                article
+                for article in rows
+                if article.id in linked or (article.quality_scores or {}).get("editorial")
+            ]
+        rows = rows[:15]
         if not rows:
             return "Очередь пуста — всё опубликовано."
         lines = ["*Ожидают публикации:*"]

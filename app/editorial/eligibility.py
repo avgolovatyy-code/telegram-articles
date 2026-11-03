@@ -54,6 +54,14 @@ def publication_allowed(
             False,
             "article predates EDITORIAL_SPEC_CUTOFF_DATE; regenerate or archive it",
         )
+    if (
+        settings.editorial_v2_enabled
+        and not settings.old_article_auto_scheduler_enabled
+        and str(target) != PublicationTarget.TEST
+    ):
+        editorial = (article.quality_scores or {}).get("editorial")
+        if not editorial:
+            return False, "legacy catalog article; editorial plan slot required"
     return True, ""
 
 
