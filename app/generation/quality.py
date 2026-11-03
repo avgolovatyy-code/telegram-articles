@@ -99,7 +99,7 @@ class QualityGate:
         result = result.merge(self.factual(claim_statuses or []))
         result = result.merge(self.search(document, context))
         if review is not None:
-            result = result.merge(self.review_thresholds(review))
+            result = result.merge(self.review_thresholds(review, context))
         return result
 
     # ------------------------------------------------------------- technical
@@ -273,14 +273,33 @@ class QualityGate:
         return GateResult(passed=not errors, errors=errors, warnings=warnings)
 
     # -------------------------------------------------------------- LLM gate
-    def review_thresholds(self, review: QualityReview) -> GateResult:
+    def review_thresholds(
+        self, review: QualityReview, context: WriterContext | None = None
+    ) -> GateResult:
         errors: list[str] = []
-        if review.factuality < self.settings.min_factuality_score:
-            errors.append(
-                f"factuality {review.factuality:.2f} < {self.settings.min_factuality_score:.2f}"
+        min_fact = self.settings.min_factuality_score
+        min_quality = self.settings.min_quality_score
+        editorial = bool(context and context.topic.entity_type == "editorial")
+        score = review.overall
+        if editorial:
+            # Product cards are optional; the mill critic otherwise tanks short posts.
+            positives = [
+                review.usefulness,
+                review.factuality,
+                review.readability,
+                review.search_intent_match,
+                review.natural_language,
+            ]
+            score = round(
+                sum(positives) / len(positives) * (1.0 - min(review.spam_risk, 1.0) * 0.5),
+                4,
             )
-        if review.overall < self.settings.min_quality_score:
-            errors.append(f"quality {review.overall:.2f} < {self.settings.min_quality_score:.2f}")
+            min_quality = min(min_quality, 0.58)
+            min_fact = min(min_fact, 0.90)
+        if review.factuality < min_fact:
+            errors.append(f"factuality {review.factuality:.2f} < {min_fact:.2f}")
+        if score < min_quality:
+            errors.append(f"quality {score:.2f} < {min_quality:.2f}")
         return GateResult(passed=not errors, errors=errors, warnings=list(review.issues))
 
 

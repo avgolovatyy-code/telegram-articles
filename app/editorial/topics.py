@@ -24,6 +24,9 @@ def ensure_editorial_topic(session: Session, slot: EditorialPlanSlot) -> TopicCa
             and existing.entity_type == "editorial"
             and existing.topic_key == key
         ):
+            if existing.status in {TopicStatus.REJECTED, TopicStatus.USED}:
+                existing.status = TopicStatus.CANDIDATE
+                existing.generation_failures = 0
             return existing
     found = session.scalar(
         select(TopicCandidate).where(
@@ -31,6 +34,9 @@ def ensure_editorial_topic(session: Session, slot: EditorialPlanSlot) -> TopicCa
         )
     )
     if found is not None:
+        if found.status in {TopicStatus.REJECTED, TopicStatus.USED}:
+            found.status = TopicStatus.CANDIDATE
+            found.generation_failures = 0
         slot.topic_id = found.id
         session.flush()
         return found

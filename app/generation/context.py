@@ -59,6 +59,15 @@ class WriterContext:
         editorial = self.topic.entity_type == "editorial"
         min_chars = 280 if editorial else settings.article_target_min_chars
         max_chars = 1400 if editorial else settings.article_target_max_chars
+        breakdown = self.topic.score_breakdown or {}
+        purpose = (
+            "write a short editorial post people enjoy even if they are not buying a ticket"
+            if editorial
+            else (
+                "help someone preparing for or already on a trip with concrete "
+                "places, order and trade-offs drawn from the WeGoTrip catalogue"
+            )
+        )
         return {
             "market": self.market,
             "primary_query": self.topic.primary_query,
@@ -79,12 +88,19 @@ class WriterContext:
             "products": [product_summary(item.product) for item in self.products],
             "allowed_media": [item.as_context() for item in self.media],
             "allowed_audio": self.audio,
+            "editorial_brief": {
+                "pillar": breakdown.get("pillar"),
+                "format": breakdown.get("format") or "short_post",
+                "editorial_mechanic": breakdown.get("editorial_mechanic"),
+                "channel_targets": list(breakdown.get("channel_targets") or []),
+                "angle": self.topic.primary_query,
+                "destination": self.topic.entity_name,
+            }
+            if editorial
+            else None,
             "brand_style": {
                 "voice": "friendly, plain, specific, lightly humorous",
-                "purpose": (
-                    "help someone preparing for or already on a trip with concrete "
-                    "places, order and trade-offs drawn from the WeGoTrip catalogue"
-                ),
+                "purpose": purpose,
                 "references": ["Aviasales", "T—J"],
                 "avoid": [
                     "ad pathos",
@@ -207,6 +223,13 @@ class ContextBuilder:
         return payload
 
     def _entity_facts(self, topic: TopicCandidate, entity: dict[str, Any]) -> list[str]:
+        if topic.entity_type == "editorial":
+            return [
+                "This is an Engine 3.0 editorial short post, not a catalogue mill article.",
+                "Write the angle with named, well-known places from the destination; "
+                "do not invent hours, prices, tickets, visas or current exhibitions.",
+                "Never write a meta-post about missing catalogue data or WeGoTrip inventory.",
+            ]
         facts = [
             f"WeGoTrip currently has {topic.inventory_depth} available products matching "
             f"{topic.entity_name} (WeGoTrip API)."

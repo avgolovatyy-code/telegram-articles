@@ -197,7 +197,7 @@ class GenerationPipeline:
             entity_id=topic.entity_external_id,
         ) as ctx:
             products = self._select_products(topic, market)
-            if not products:
+            if not products and topic.entity_type != "editorial":
                 ctx["status"] = "skipped"
                 return GenerationOutcome(article, "skipped", "no relevant available products")
 

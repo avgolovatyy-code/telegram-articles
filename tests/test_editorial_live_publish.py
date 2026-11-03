@@ -161,6 +161,26 @@ def test_quality_gate_allows_short_editorial_post(settings):
     assert result.passed, result.errors
 
 
+def test_editorial_critic_does_not_require_mill_product_score(settings):
+    from app.generation.schemas import QualityReview
+
+    review = QualityReview(
+        usefulness=0.8,
+        factuality=0.99,
+        readability=0.8,
+        search_intent_match=0.75,
+        natural_language=0.8,
+        product_relevance=0.1,
+        spam_risk=0.0,
+        issues=["no product cards"],
+    )
+    topic = SimpleNamespace(entity_type="editorial")
+    context = SimpleNamespace(topic=topic)
+    monkey_settings = settings
+    result = QualityGate(monkey_settings).review_thresholds(review, context)  # type: ignore[arg-type]
+    assert result.passed, result.errors
+
+
 def test_coverage_command_uses_editorial_calendar(session, settings, monkeypatch):
     monkeypatch.setattr(settings, "editorial_v2_enabled", True)
     monkeypatch.setattr(settings, "auto_publish_ru", True)
