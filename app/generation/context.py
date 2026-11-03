@@ -56,6 +56,18 @@ class WriterContext:
     def as_payload(self, settings: Settings) -> dict[str, Any]:
         forbidden = FORBIDDEN_CLAIM_TOPICS_RU if self.market == "ru" else FORBIDDEN_CLAIM_TOPICS_EN
         placement_cap = min(3, len(self.products))
+        editorial = self.topic.entity_type == "editorial"
+        min_chars = 280 if editorial else settings.article_target_min_chars
+        max_chars = 1400 if editorial else settings.article_target_max_chars
+        breakdown = self.topic.score_breakdown or {}
+        purpose = (
+            "write a short editorial post people enjoy even if they are not buying a ticket"
+            if editorial
+            else (
+                "help someone preparing for or already on a trip with concrete "
+                "places, order and trade-offs drawn from the WeGoTrip catalogue"
+            )
+        )
         return {
             "market": self.market,
             "primary_query": self.topic.primary_query,
@@ -76,12 +88,19 @@ class WriterContext:
             "products": [product_summary(item.product) for item in self.products],
             "allowed_media": [item.as_context() for item in self.media],
             "allowed_audio": self.audio,
+            "editorial_brief": {
+                "pillar": breakdown.get("pillar"),
+                "format": breakdown.get("format") or "short_post",
+                "editorial_mechanic": breakdown.get("editorial_mechanic"),
+                "channel_targets": list(breakdown.get("channel_targets") or []),
+                "angle": self.topic.primary_query,
+                "destination": self.topic.entity_name,
+            }
+            if editorial
+            else None,
             "brand_style": {
                 "voice": "friendly, plain, specific, lightly humorous",
-                "purpose": (
-                    "help someone preparing for or already on a trip with concrete "
-                    "places, order and trade-offs drawn from the WeGoTrip catalogue"
-                ),
+                "purpose": purpose,
                 "references": ["Aviasales", "T—J"],
                 "avoid": [
                     "ad pathos",
@@ -99,18 +118,21 @@ class WriterContext:
             },
             "forbidden_claims": forbidden,
             "article_constraints": {
-                "min_chars": settings.article_target_min_chars,
-                "max_chars": settings.article_target_max_chars,
-                "hard_max_chars": settings.article_max_chars,
-                "preferred_products": 1,
+                "min_chars": min_chars,
+                "max_chars": max_chars,
+                "hard_max_chars": settings.article_max_chars if not editorial else 2000,
+                "preferred_products": 0 if editorial else 1,
                 "max_products": placement_cap,
-                "min_named_catalog_attractions": min(4, max(2, len(self.catalog_attractions))),
+                "min_named_catalog_attractions": (
+                    0 if editorial else min(4, max(2, len(self.catalog_attractions)))
+                ),
                 "products_are_optional": True,
                 "recommend_wegotrip_only": True,
-                "attractions_are_required_backbone": True,
+                "attractions_are_required_backbone": not editorial,
                 "max_hashtags": settings.max_hashtags if settings.enable_hashtags else 0,
-                "sections_min": 3,
-                "sections_max": 8,
+                "sections_min": 1 if editorial else 3,
+                "sections_max": 4 if editorial else 8,
+                "format": (self.topic.score_breakdown or {}).get("format") or "short_post",
             },
         }
 
@@ -201,6 +223,13 @@ class ContextBuilder:
         return payload
 
     def _entity_facts(self, topic: TopicCandidate, entity: dict[str, Any]) -> list[str]:
+        if topic.entity_type == "editorial":
+            return [
+                "This is an Engine 3.0 editorial short post, not a catalogue mill article.",
+                "Write the angle with named, well-known places from the destination; "
+                "do not invent hours, prices, tickets, visas or current exhibitions.",
+                "Never write a meta-post about missing catalogue data or WeGoTrip inventory.",
+            ]
         facts = [
             f"WeGoTrip currently has {topic.inventory_depth} available products matching "
             f"{topic.entity_name} (WeGoTrip API)."

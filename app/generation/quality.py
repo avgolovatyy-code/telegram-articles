@@ -99,7 +99,7 @@ class QualityGate:
         result = result.merge(self.factual(claim_statuses or []))
         result = result.merge(self.search(document, context))
         if review is not None:
-            result = result.merge(self.review_thresholds(review))
+            result = result.merge(self.review_thresholds(review, context))
         return result
 
     # ------------------------------------------------------------- technical
@@ -110,10 +110,13 @@ class QualityGate:
         warnings: list[str] = []
 
         chars = document.char_count()
-        if chars < self.settings.article_min_chars:
-            errors.append(f"article too short: {chars} < {self.settings.article_min_chars} chars")
-        if chars > self.settings.article_max_chars:
-            errors.append(f"article too long: {chars} > {self.settings.article_max_chars} chars")
+        editorial = context.topic.entity_type == "editorial"
+        min_chars = 180 if editorial else self.settings.article_min_chars
+        max_chars = 2000 if editorial else self.settings.article_max_chars
+        if chars < min_chars:
+            errors.append(f"article too short: {chars} < {min_chars} chars")
+        if chars > max_chars:
+            errors.append(f"article too long: {chars} > {max_chars} chars")
         if chars > self.settings.telegram_rich_message_char_limit:
             errors.append("article exceeds the Telegram rich message character limit")
 
@@ -167,9 +170,14 @@ class QualityGate:
             if repeated / len(paragraphs) > MAX_REPEATED_PARAGRAPH_RATIO:
                 errors.append("too many repeated sentences")
 
-        if len(document.sections) < 3:
-            errors.append(f"only {len(document.sections)} sections; at least 3 required")
-        if len(document.sections) > 8:
+        editorial = context.topic.entity_type == "editorial"
+        min_sections = 1 if editorial else 3
+        max_sections = 4 if editorial else 8
+        if len(document.sections) < min_sections:
+            errors.append(
+                f"only {len(document.sections)} sections; at least {min_sections} required"
+            )
+        if len(document.sections) > max_sections:
             warnings.append(f"{len(document.sections)} sections is above the recommended maximum")
 
         product_ratio = len(document.product_placements) / max(len(document.sections), 1)
@@ -181,10 +189,11 @@ class QualityGate:
             )
 
         # Require concrete catalogue places so the piece cannot be pure philosophy.
+        # Editorial Engine 3.0 short posts may have no catalogue backbone.
         attraction_items = [
             item for item in (context.catalog_attractions or []) if item.get("name")
         ]
-        if len(attraction_items) >= 3:
+        if (not editorial) and len(attraction_items) >= 3:
             body_norm = normalize_text(text)
             mentioned = 0
             for item in attraction_items:
@@ -220,6 +229,10 @@ class QualityGate:
     def search(self, document: ArticleDocument, context: WriterContext) -> GateResult:
         errors: list[str] = []
         warnings: list[str] = []
+        if context.topic.entity_type == "editorial":
+            if any(len(section.heading.strip()) < 3 for section in document.sections):
+                errors.append("a section heading is empty or meaningless")
+            return GateResult(passed=not errors, errors=errors, warnings=warnings)
         entity = context.topic.entity_name.split("—")[0].strip()
         query_tokens = [
             t for t in normalize_text(context.topic.primary_query).split() if len(t) > 2
@@ -260,14 +273,33 @@ class QualityGate:
         return GateResult(passed=not errors, errors=errors, warnings=warnings)
 
     # -------------------------------------------------------------- LLM gate
-    def review_thresholds(self, review: QualityReview) -> GateResult:
+    def review_thresholds(
+        self, review: QualityReview, context: WriterContext | None = None
+    ) -> GateResult:
         errors: list[str] = []
-        if review.factuality < self.settings.min_factuality_score:
-            errors.append(
-                f"factuality {review.factuality:.2f} < {self.settings.min_factuality_score:.2f}"
+        min_fact = self.settings.min_factuality_score
+        min_quality = self.settings.min_quality_score
+        editorial = bool(context and context.topic.entity_type == "editorial")
+        score = review.overall
+        if editorial:
+            # Product cards are optional; the mill critic otherwise tanks short posts.
+            positives = [
+                review.usefulness,
+                review.factuality,
+                review.readability,
+                review.search_intent_match,
+                review.natural_language,
+            ]
+            score = round(
+                sum(positives) / len(positives) * (1.0 - min(review.spam_risk, 1.0) * 0.5),
+                4,
             )
-        if review.overall < self.settings.min_quality_score:
-            errors.append(f"quality {review.overall:.2f} < {self.settings.min_quality_score:.2f}")
+            min_quality = min(min_quality, 0.58)
+            min_fact = min(min_fact, 0.90)
+        if review.factuality < min_fact:
+            errors.append(f"factuality {review.factuality:.2f} < {min_fact:.2f}")
+        if score < min_quality:
+            errors.append(f"quality {score:.2f} < {min_quality:.2f}")
         return GateResult(passed=not errors, errors=errors, warnings=list(review.issues))
 
 

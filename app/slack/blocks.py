@@ -143,6 +143,7 @@ def digest_card(
     coverage: dict[str, CoverageReport],
     published_today: dict[str, int],
     admin_url: str | None = None,
+    editorial_lines: list[str] | None = None,
 ) -> list[dict[str, Any]]:
     del admin_url
     spent_bar = min(1.0, budget.spent_usd / budget.budget_usd) if budget.budget_usd else 0.0
@@ -156,6 +157,8 @@ def digest_card(
         f"*Средняя стоимость статьи:* ${budget.average_article_cost_usd:.4f}",
     ]
 
+    for extra in editorial_lines or []:
+        lines.append(extra)
     for market, report in coverage.items():
         flag = MARKET_FLAG.get(market, market)
         if report.exhausted:

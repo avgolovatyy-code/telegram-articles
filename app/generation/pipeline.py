@@ -135,7 +135,11 @@ class GenerationPipeline:
                 writer_model=self.settings.openai_writer_model,
                 review_model=self.settings.review_model,
                 context_chars=len(str(context.as_payload(self.settings))),
-                expected_output_chars=self.settings.article_target_max_chars,
+                expected_output_chars=(
+                    1400
+                    if topic.entity_type == "editorial"
+                    else self.settings.article_target_max_chars
+                ),
                 web_search_calls=3 if topic.requires_volatile_facts else 1,
             )
             try:
@@ -193,7 +197,7 @@ class GenerationPipeline:
             entity_id=topic.entity_external_id,
         ) as ctx:
             products = self._select_products(topic, market)
-            if not products:
+            if not products and topic.entity_type != "editorial":
                 ctx["status"] = "skipped"
                 return GenerationOutcome(article, "skipped", "no relevant available products")
 
@@ -454,7 +458,8 @@ class GenerationPipeline:
             return False
         if slot is None:
             return True
-        rec = (slot.payload or {}).get("product_recommendation", "optional")
+        payload = slot.payload if isinstance(slot.payload, dict) else {}
+        rec = payload.get("product_recommendation", "optional")
         return not (rec == "required" or slot.format == "product_spotlight")
 
     def _select_products(self, topic: TopicCandidate, market: Market) -> list[RankedProduct]:

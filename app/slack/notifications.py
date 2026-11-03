@@ -69,9 +69,11 @@ class SlackNotifier:
 
     def daily_digest(self) -> None:
         budget = BudgetManager(self.session, self.settings).snapshot()
-        coverage: dict[str, Any] = {
-            market: assess_coverage(self.session, market, self.settings) for market in MARKETS
-        }
+        coverage: dict[str, Any] = {}
+        if not self.settings.editorial_v2_enabled:
+            coverage = {
+                market: assess_coverage(self.session, market, self.settings) for market in MARKETS
+            }
         start = dt.datetime.combine(utcnow().date(), dt.time.min, tzinfo=dt.UTC)
         published: dict[str, int] = {
             market: int(
@@ -86,12 +88,34 @@ class SlackNotifier:
             )
             for market in MARKETS
         }
+        editorial_lines: list[str] = []
+        if self.settings.editorial_v2_enabled:
+            from app.db.models import EditorialPlanSlot
+            from app.db.types import utcnow as _utcnow
+
+            today = _utcnow().astimezone(self.settings.publish_tz).date()
+            for market in MARKETS:
+                pending = int(
+                    self.session.scalar(
+                        select(func.count(EditorialPlanSlot.id)).where(
+                            EditorialPlanSlot.market == market,
+                            EditorialPlanSlot.slot_date >= today,
+                            EditorialPlanSlot.status.in_(("planned", "locked", "needs_review")),
+                            EditorialPlanSlot.article_id.is_(None),
+                        )
+                    )
+                    or 0
+                )
+                editorial_lines.append(
+                    f"{market.upper()} слотов в календаре без черновика: {pending}"
+                )
         self._send(
             sb.digest_card(
                 budget=budget,
                 coverage=coverage,
                 published_today=published,
                 admin_url=self.settings.admin_base_url,
+                editorial_lines=editorial_lines,
             ),
             "Сводка за день",
         )

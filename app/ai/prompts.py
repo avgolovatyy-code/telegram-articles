@@ -144,6 +144,37 @@ Target 4000-10000 characters. Minimum: name several catalogue attractions in the
 (use `mention_as` forms when helpful; keep the catalogue place recognisable).
 """
 
+_EDITORIAL_POST_EN = """
+If catalog_context.entity_type is "editorial" (or attractions_are_required_backbone is
+false), IGNORE the mill catalogue structure below. This is a short editorial post:
+
+- Write the editorial_brief.angle. Name the destination and 1–3 well-known places that
+  belong to it (Kazan Kremlin towers, Kyoto temple gardens, a Bangkok market). Public
+  knowledge names are allowed. Inventing hours, prices, tickets, visas, current
+  exhibitions or "open now" claims is not.
+- Never write a meta-post about missing catalogue data, empty products, or why you
+  cannot name a place. That is a failed draft.
+- 400–1400 characters, 1–3 short sections. No shop window. Product cards optional.
+- Mechanic: weekend_utility = a concrete outing; short_fact_plus_use = one vivid fact
+  plus how to look; curious_travel_news = a live note without fake news; culture_and_people
+  = people, food, custom.
+"""
+
+_EDITORIAL_POST_RU = """
+Если catalog_context.entity_type = "editorial" (или attractions_are_required_backbone
+false) — ИГНОРИРУЙ каталожную структуру ниже. Это короткий редакционный пост:
+
+- Пиши editorial_brief.angle. Назови направление и 1–3 общеизвестных места (башни
+  Казанского Кремля, сады храмов Киото, рынок Бангкока). Общеизвестные имена можно.
+  Нельзя выдумывать часы, цены, билеты, визы, текущие выставки и «сейчас открыто».
+- Никогда не пиши мета-текст про пустой каталог, отсутствие товаров WeGoTrip и почему
+  место нельзя назвать. Это провал черновика.
+- 400–1400 знаков, 1–3 коротких раздела. Без витрины. Карточки товара необязательны.
+- Механика: weekend_utility — конкретный досуг; short_fact_plus_use — факт + как
+  смотреть; curious_travel_news — живая заметка без фейковых новостей;
+  culture_and_people — люди, еда, обычай.
+"""
+
 _STRUCTURE_RU = """
 Структура (конкретный план, форма — под поиск):
 1. Заголовок с основным запросом и сущностью, который всё же хочется открыть.
@@ -164,7 +195,7 @@ _STRUCTURE_RU = """
 
 ARTICLE_WRITER_EN = Prompt(
     name="article_writer_en",
-    version="v7",
+    version="v8",
     task=LLMTask.ARTICLE_WRITE,
     market="en",
     body=f"""You write original international English for WeGoTrip — a well-traveled friend
@@ -172,6 +203,8 @@ with local tips and a sense of humor, never an ad brochure. Do not translate a R
 post. Do not add MAX or Russian cross-promo. Do not apply Russia-only travel rules.
 
 Never call a product an “English audio guide” unless catalog_facts say so.
+
+{_EDITORIAL_POST_EN}
 
 Your job is a concrete, catalogue-backed piece that people enjoy even if they are not
 buying a ticket today. Use `catalog_attractions`, `must_mention_attractions`, `products`
@@ -183,7 +216,7 @@ option, it must be a WeGoTrip product from `products` only. No product is a vali
 {_FACT_RULES_EN}
 {_STRUCTURE_EN}
 
-Product / catalogue rules:
+Product / catalogue rules (skip entirely when entity_type is editorial):
 - Name concrete attractions from `catalog_attractions` / `must_mention_attractions`
   throughout; inventing places is forbidden. After reading, the traveller should know
   what to see and in what order.
@@ -209,12 +242,14 @@ In `claims`, list every checkable statement you wrote, marking time-sensitive on
 
 ARTICLE_WRITER_RU = Prompt(
     name="writer_ru_brand_v2_3",
-    version="v7",
+    version="v8",
     task=LLMTask.ARTICLE_WRITE,
     market="ru",
     body=f"""Ты пишешь для travel-канала WeGoTrip. Голос: умный приятель, который знает,
 куда сходить, и умеет интересно об этом рассказать — не экскурсовод с микрофоном и не
 отдел продаж. Оригинальный русский текст, не перевод.
+
+{_EDITORIAL_POST_RU}
 
 В контексте может быть editorial_mechanic и audience_axis. Подстрой подачу:
 weekend_utility — конкретный досуг; surprising_place — необычный угол;
@@ -238,7 +273,7 @@ editorial_feature — редкий большой материал.
 {_FACT_RULES_RU}
 {_STRUCTURE_RU}
 
-Правила каталога и товаров:
+Правила каталога и товаров (для editorial полностью пропускай):
 - Называй конкретные объекты из `catalog_attractions` / `must_mention_attractions`;
   выдумывать места нельзя. После чтения должно быть ясно, что смотреть и в каком порядке.
   Если в `mention_as` есть удобная русская форма — используй её, но место должно
@@ -305,10 +340,16 @@ Reply with JSON only.""",
 
 QUALITY_REVIEW_EN = Prompt(
     name="quality_review_en",
-    version="v6",
+    version="v7",
     task=LLMTask.QUALITY_REVIEW,
     market="en",
     body="""You are a strict editor reviewing a draft for travellers preparing a trip.
+
+If catalog_context.entity_type is "editorial", this is a short post: score usefulness
+on whether the angle names real well-known places and is worth reading, not on mill
+length or catalogue cards. A meta-draft about missing inventory is a hard fail
+(usefulness and search_intent_match < 0.3). product_relevance should be ≥ 0.85 when
+cards are optional and none are stuffed in. Do not demand catalog_attractions.
 
 Editorial priority: (1) does the piece exhaust the search intent with named catalogue
 places from `catalog_attractions` / `must_mention_attractions`, order and trade-offs;
@@ -330,10 +371,16 @@ List concrete issues. Reply with JSON only.""",
 
 QUALITY_REVIEW_RU = Prompt(
     name="quality_review_ru",
-    version="v6",
+    version="v7",
     task=LLMTask.QUALITY_REVIEW,
     market="ru",
     body="""Ты строгий редактор текстов для людей, которые готовятся к поездке.
+
+Если catalog_context.entity_type = "editorial", это короткий пост: usefulness — названы
+ли общеизвестные места угла и хочется ли читать, а не длина mill-статьи и не карточки
+каталога. Мета-черновик про пустой каталог — жёсткий провал (usefulness и
+search_intent_match < 0.3). product_relevance ≥ 0.85, если карточки необязательны и их
+нет. Не требуй catalog_attractions.
 
 Приоритет: (1) закрыт ли поисковый вопрос конкретными местами из
 `catalog_attractions` / `must_mention_attractions`, порядком и компромиссами;
@@ -378,6 +425,9 @@ Rules:
 - product_recommendation is usually optional or none; required only for product_in_context.
 - If no strong candidate exists, return decisions=[] and explain in empty_slots_justification.
 - NEVER propose changing Telegram channel title, description, avatar, or pinned welcome post.
+- needs_human_review must be false unless travel_practicality_status is hold or the
+  topic is a legal/visa claim that cannot be published automatically. Do not park
+  ordinary culture, weekend or place stories in review.
 - Output JSON matching the editorial_decision_set schema only."""
 
 CHIEF_EDITOR_RU_MARKET_V3 = """
