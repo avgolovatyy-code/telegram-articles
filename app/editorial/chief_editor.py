@@ -64,13 +64,16 @@ class ChiefEditorService:
         dry_run = self.settings.editorial_v2_dry_run
 
         for market in markets:
+            nested = self.session.begin_nested()
             try:
                 run = self._run_market(market, run_date=run_date, dry_run=dry_run)
+                nested.commit()
                 report.details[f"{market}_run_id"] = run.run_id
                 report.details[f"{market}_status"] = run.status
                 report.details[f"{market}_thesis"] = (run.editorial_thesis or "")[:120]
                 report.details[f"{market}_slots"] = (run.diff or {}).get("applied_slots", 0)
             except Exception as exc:
+                nested.rollback()
                 report.ok = False
                 msg = f"{market}: {exc}"
                 if isinstance(exc, LLMError) and exc.payload:
@@ -78,7 +81,19 @@ class ChiefEditorService:
                     msg = f"{msg} — {snippet}"
                 report.errors.append(msg)
                 log.error("chief_editor.failed", market=market, error=str(exc))
-                self._record_failure(market, run_date, msg)
+                try:
+                    fail_sp = self.session.begin_nested()
+                except Exception as record_exc:
+                    log.error("chief_editor.record_failed", market=market, error=str(record_exc))
+                else:
+                    try:
+                        self._record_failure(market, run_date, msg)
+                        fail_sp.commit()
+                    except Exception as record_exc:
+                        fail_sp.rollback()
+                        log.error(
+                            "chief_editor.record_failed", market=market, error=str(record_exc)
+                        )
                 previous = last_valid_run(self.session, market)
                 if previous is not None:
                     report.details[f"{market}_kept_last_plan"] = previous.run_id
