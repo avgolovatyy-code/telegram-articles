@@ -31,6 +31,37 @@ def _product(session, *, external_id: str, title: str, city_id: str, rank: int =
     return row
 
 
+def test_kazan_is_not_resolved_as_kazanlak(session, settings):
+    kazan = _city(session, "551487", "Казань")
+    kazan.country_name = "Россия"
+    kazanlyk = _city(session, "730496", "Казанлык")
+    kazanlyk.country_name = "Болгария"
+    _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+        rank=1,
+    )
+    _product(
+        session,
+        external_id="9",
+        title="Казанлык: розовая долина",
+        city_id=kazanlyk.external_id,
+        rank=1,
+    )
+    picks = match_products(
+        session,
+        article_id="art-kazan",
+        topic_slug="kazan",
+        city_name="Казань",
+        country_code="RU",
+        article_text="Казань на зимний уикенд: Кремль, Баумана, озеро Кабан.",
+        settings=settings,
+    )
+    assert [p.external_id for p in picks] == ["1526"]
+
+
 def test_kazan_article_does_not_get_sviyazhsk(session, settings):
     kazan = _city(session, "551487", "Казань")
     legends = _product(

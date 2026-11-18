@@ -117,10 +117,18 @@ def _destination_city(session: Session, city_name: str | None) -> City | None:
     if not city_name:
         return None
     wanted = fold_place(city_name)
-    for city in session.scalars(select(City).where(City.market == "ru")).all():
-        if fold_place(city.name) == wanted or wanted in fold_place(city.name):
-            return city
-        if city.slug and city_name.casefold() in city.slug.casefold():
+    cities = list(session.scalars(select(City).where(City.market == "ru")))
+    exact = [city for city in cities if fold_place(city.name) == wanted]
+    if len(exact) > 1:
+        ru = [
+            city for city in exact if (city.country_name or "").casefold() in {"russia", "россия"}
+        ]
+        exact = ru or exact
+    if exact:
+        return exact[0]
+    folded_query = city_name.casefold()
+    for city in cities:
+        if city.slug and folded_query == city.slug.casefold():
             return city
     return None
 
