@@ -6,7 +6,7 @@
   <title>{% block title %}WeGoTrip Content Engine{% endblock %}</title>
   <link rel="stylesheet" href="/static/admin.css">
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 <header class="topbar">
   <a class="brand" href="/admin">WeGoTrip <span>Content Engine</span></a>
   <nav>
@@ -14,6 +14,7 @@
     <a href="/admin/topics" class="{{ 'active' if active == 'topics' }}">Topics</a>
     <a href="/admin/articles" class="{{ 'active' if active == 'articles' }}">Articles</a>
     <a href="/admin/editorial" class="{{ 'active' if active == 'editorial' }}">Editorial</a>
+    <a href="/admin/dzen" class="{{ 'active' if active == 'dzen' }}">Дзен</a>
     <a href="/admin/branding" class="{{ 'active' if active == 'branding' }}">Branding</a>
     <a href="/admin/analytics" class="{{ 'active' if active == 'analytics' }}">Analytics</a>
     <a href="/admin/ops" class="{{ 'active' if active == 'ops' }}">Ops</a>

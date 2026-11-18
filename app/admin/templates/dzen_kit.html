@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block title %}{{ article.headline or 'Publishing Kit' }} · Дзен{% endblock %}
+{% block body_class %}dzen-handoff{% endblock %}
+{% block content %}
+{% if stale %}
+<div class="flash flash-error">Старая версия устарела / не публиковать. Возьмите новый пакет из следующей сводки Slack.</div>
+{% endif %}
+
+<article class="dzen-kit">
+  <p class="eyebrow">WeGoTrip → Дзен · Publishing Kit</p>
+  <h1 id="dzen-title">{{ article.headline }}</h1>
+  <p class="subtitle">{{ article.lead }}</p>
+
+  <div class="actions dzen-actions">
+    <button class="btn primary" type="button" data-copy="title">Скопировать заголовок</button>
+    <button class="btn primary" type="button" data-copy="rich">Скопировать форматированный текст</button>
+    <button class="btn" type="button" data-copy="plain">Скопировать простой текст</button>
+    <button class="btn" type="button" id="dzen-select-preview">Выделить предпросмотр</button>
+    {% if kit.zip_asset_path %}
+    <a class="btn" href="{{ '/admin/dzen/publishing-kits/' + article.public_id + '/media.zip' if admin else '/dzen/k/' + kit.access_token + '/media.zip' }}">Скачать все изображения (ZIP)</a>
+    {% endif %}
+    <a class="btn" href="{{ studio_url }}" target="_blank" rel="noopener">Открыть Дзен-студию</a>
+    <a class="btn" href="{{ '/dzen/k/' + kit.access_token + '/article.html' }}">article.html</a>
+    <a class="btn" href="{{ '/dzen/k/' + kit.access_token + '/article.txt' }}">article.txt</a>
+  </div>
+  <p id="copy-status" class="muted small" role="status"></p>
+
+  <ol class="dzen-steps">
+    <li>Скопируйте заголовок, затем форматированный текст (Ctrl+V в статью Дзена).</li>
+    <li>Если ссылки или списки не перенеслись: нажмите «Выделить предпросмотр» или откройте article.html → Ctrl+A → Ctrl+C и вставьте ещё раз. Не переписывайте абзацы вручную.</li>
+    <li>В Дзене: Студия → Создать публикацию → Статья.</li>
+    <li>Загрузите обложку и фото по прямым ссылкам или из ZIP, после указанных разделов.</li>
+    <li>Проверьте ссылки WeGoTrip (<code>coupon={{ referer_id }}</code>) и отсутствие сырой разметки.</li>
+    <li>Опубликуйте и верните ссылку <code>dzen.ru/a/...</code> в Slack-тред или форму ниже.</li>
+  </ol>
+
+  <div class="dzen-preview" id="dzen-preview">{{ preview_html|safe }}</div>
+
+  <h2>Изображения по порядку</h2>
+  <div class="dzen-media-grid">
+    {% for item in media %}
+    <figure>
+      <a href="{{ item.url }}" target="_blank" rel="noopener"><img src="{{ item.url }}" alt="{{ item.caption or 'WeGoTrip' }}"></a>
+      <figcaption>
+        <strong>{{ 'Обложка' if item.role == 'cover' else 'После: ' + (item.after_heading or 'раздела') }}</strong>
+        <span class="muted small">{{ item.caption }}</span>
+        <button class="btn" type="button" data-copy-url="{{ item.url }}">Скопировать ссылку</button>
+      </figcaption>
+    </figure>
+    {% else %}
+    <p class="muted">Подходящих фотографий WeGoTrip нет — не подставляйте чужие.</p>
+    {% endfor %}
+  </div>
+
+  <h2>Товарные рекомендации</h2>
+  <ul class="dzen-products">
+    {% for product in products %}
+    <li>
+      <strong>{{ product.title }}</strong>
+      <div class="muted small">{{ product.pitch or product.title }} · проверено {{ product.verified_at }}</div>
+      <a href="{{ product.url }}" target="_blank" rel="noopener">{{ product.url }}</a>
+      <button class="btn" type="button" data-copy-url="{{ product.url }}">Скопировать ссылку</button>
+    </li>
+    {% else %}
+    <li class="muted">Товары не подобраны — статья самодостаточна без покупки.</li>
+    {% endfor %}
+  </ul>
+
+  <h2>Ссылка на опубликованную статью</h2>
+  <form method="post" action="{{ '/admin/dzen/publishing-kits/' + article.public_id + '/confirm' if admin else '/dzen/k/' + kit.access_token + '/confirm' }}" class="dzen-confirm">
+    <input type="text" name="published_url" placeholder="https://dzen.ru/a/..." required>
+    <button class="btn primary" type="submit">Подтвердить публикацию</button>
+  </form>
+  {% if article.published_url %}
+  <p>Текущий URL: <a href="{{ article.published_url }}" target="_blank" rel="noopener">{{ article.published_url }}</a> · {{ article.status }}</p>
+  {% endif %}
+</article>
+
+<textarea id="dzen-plain" hidden>{{ kit.plain_body }}</textarea>
+<template id="dzen-rich">{{ kit.html_body|safe }}</template>
+
+<script>
+(function () {
+  const status = document.getElementById("copy-status");
+  const title = document.getElementById("dzen-title").innerText;
+  const plain = document.getElementById("dzen-plain").value;
+  const rich = document.getElementById("dzen-rich").innerHTML;
+  function say(msg, ok) {
+    status.textContent = msg;
+    status.style.color = ok ? "var(--ok)" : "var(--err)";
+  }
+  async function copyRich() {
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        const item = new ClipboardItem({
+          "text/html": new Blob([rich], { type: "text/html" }),
+          "text/plain": new Blob([plain], { type: "text/plain" })
+        });
+        await navigator.clipboard.write([item]);
+        say("Форматированный текст скопирован. Дзен может упростить вёрстку — проверьте ссылки.", true);
+        return;
+      }
+      await navigator.clipboard.writeText(plain);
+      say("Скопирован простой текст (браузер не дал text/html). Можно выделить предпросмотр и Ctrl+C.", true);
+    } catch (err) {
+      say("Не скопировалось: выделите предпросмотр вручную. " + err, false);
+    }
+  }
+  document.querySelectorAll("[data-copy]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const kind = btn.getAttribute("data-copy");
+      try {
+        if (kind === "title") { await navigator.clipboard.writeText(title); say("Заголовок скопирован", true); }
+        else if (kind === "plain") { await navigator.clipboard.writeText(plain); say("Простой текст скопирован", true); }
+        else { await copyRich(); }
+      } catch (err) { say("Ошибка копирования: " + err, false); }
+    });
+  });
+  document.querySelectorAll("[data-copy-url]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(btn.getAttribute("data-copy-url"));
+        say("Ссылка скопирована", true);
+      } catch (err) { say("Не скопировалось: " + err, false); }
+    });
+  });
+  const selectBtn = document.getElementById("dzen-select-preview");
+  const preview = document.getElementById("dzen-preview");
+  if (selectBtn && preview) {
+    selectBtn.addEventListener("click", () => {
+      const range = document.createRange();
+      range.selectNodeContents(preview);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      say("Предпросмотр выделен — Ctrl+C, затем Ctrl+V в Дзен.", true);
+    });
+  }
+})();
+</script>
+{% endblock %}

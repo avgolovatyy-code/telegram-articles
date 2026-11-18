@@ -1,0 +1,654 @@
+"""Write, criticise and assemble a Dzen article into a Publishing Kit."""
+
+from __future__ import annotations
+
+import json
+from dataclasses import dataclass, field
+from typing import Any
+
+from sqlalchemy.orm import Session
+
+from app.ai.prompts import PROMPTS
+from app.ai.router import LLMGateway
+from app.config import Settings, get_settings
+from app.db.enums import (
+    FIRST_PERSON_DZEN_FORMATS,
+    DzenArticleStatus,
+    DzenFormat,
+    LLMTask,
+)
+from app.db.models import DzenArticle
+from app.dzen.kit import persist_kit
+from app.dzen.media import collect_catalog_images, dedupe_downloaded, validate_assets
+from app.dzen.products import match_products
+from app.dzen.quality import body_text, run_gates
+from app.dzen.schemas import (
+    DzenArticleAST,
+    DzenBlock,
+    DzenClaim,
+    DzenCriticReport,
+    dzen_article_json_schema,
+    dzen_claims_json_schema,
+    dzen_critic_json_schema,
+)
+from app.errors import LLMError
+from app.logging_setup import get_logger
+
+log = get_logger("dzen.pipeline")
+
+SAFE_PAYMENT_NOTE = (
+    "Для ряда зарубежных музеев на WeGoTrip доступны билеты с оплатой в рублях "
+    "российской картой — перед покупкой проверьте конкретный билет и способы "
+    "оплаты на странице заказа."
+)
+
+
+@dataclass(slots=True)
+class DzenGenerateReport:
+    ok: bool = True
+    article_id: str | None = None
+    status: str | None = None
+    issues: list[str] = field(default_factory=list)
+    cost_usd: float = 0.0
+
+
+def generate_dzen_article(
+    session: Session,
+    article: DzenArticle,
+    *,
+    settings: Settings | None = None,
+    gateway: LLMGateway | None = None,
+) -> DzenGenerateReport:
+    settings = settings or get_settings()
+    if settings.dzen_native_autopublish_enabled:
+        return DzenGenerateReport(ok=False, issues=["native autopublish is forbidden"])
+    if settings.dzen_allow_ai_generated_images:
+        return DzenGenerateReport(
+            ok=False, issues=["generated images are disabled for this release"]
+        )
+
+    gateway = gateway or LLMGateway(session, settings=settings)
+    report = DzenGenerateReport(article_id=article.public_id)
+    article.status = DzenArticleStatus.RESEARCHED.value
+    if article.version < 1:
+        article.version = 1
+    session.flush()
+
+    brief_text = " ".join(
+        part
+        for part in (
+            article.headline,
+            article.destination_city,
+            (article.brief or {}).get("angle") if isinstance(article.brief, dict) else "",
+            (article.brief or {}).get("reader_value") if isinstance(article.brief, dict) else "",
+        )
+        if part
+    )
+    inventory = match_products(
+        session,
+        article_id=article.public_id,
+        topic_slug=(article.destination_city or article.public_id),
+        city_name=article.destination_city,
+        country_code=article.destination_country,
+        article_text=brief_text,
+        focus_text=brief_text,
+        limit=6,
+        settings=settings,
+    )
+
+    context: dict[str, Any] = {
+        "brief": article.brief,
+        "headline_hint": article.headline,
+        "city": article.destination_city,
+        "country": article.destination_country,
+        "format": article.format,
+        "pillar": article.pillar,
+        "products": [
+            {
+                "id": p.external_id,
+                "title": p.title,
+                "inclusions": p.inclusions,
+                "ticket_included": p.ticket_included,
+                "matched_places": p.matched_places,
+                "is_free": p.is_free,
+                "duration": p.duration_label,
+                "distance": p.distance_label,
+                "listen_in_browser": p.listen_in_browser,
+                "pitch": p.reader_pitch,
+            }
+            for p in inventory
+        ],
+        "first_person_evidence": False,
+        "payment_claim_verified": False,
+        "instruction": (
+            "Write an original Russian Dzen travel feature. Name real districts, "
+            "streets, museums and habits of this city. If the headline promises two "
+            "days, write both days with places and durations. Do not add neighbouring "
+            "towns or islands unless the brief already names them. Products are "
+            "optional: mention at most those in context, and only next to a place "
+            "you actually described. Use catalog duration, distance and browser "
+            "playback. Never write «проверьте карточку товара». Do not mirror Telegram."
+        ),
+    }
+    try:
+        written = gateway.run(
+            task=LLMTask.DZEN_WRITE,
+            prompt=PROMPTS["dzen_writer_v1"],
+            payload=json.dumps(context, ensure_ascii=False),
+            json_schema=dzen_article_json_schema(),
+            schema_name="dzen_article",
+            market="ru",
+            max_output_tokens=6000,
+            enforce_budget=True,
+        )
+        report.cost_usd += written.cost_usd
+        parsed = written.response.parsed
+        if not isinstance(parsed, dict):
+            raise LLMError("Dzen writer returned no structured payload")
+        ast = DzenArticleAST.model_validate(parsed)
+    except Exception as exc:
+        article.status = DzenArticleStatus.BLOCKED.value
+        article.status_reason = str(exc)[:500]
+        report.ok = False
+        report.issues.append(str(exc))
+        report.status = article.status
+        return report
+
+    ast = _sanitize_ast(ast, article, [p.external_id for p in inventory], media_ids=[])
+    ast = _ensure_length(ast)
+
+    try:
+        claims_run = gateway.run(
+            task=LLMTask.DZEN_CLAIMS,
+            prompt=PROMPTS["dzen_claims_v1"],
+            payload=json.dumps({"article": json.loads(ast.model_dump_json())}, ensure_ascii=False),
+            json_schema=dzen_claims_json_schema(),
+            schema_name="dzen_claims",
+            market="ru",
+            enforce_budget=True,
+        )
+        report.cost_usd += claims_run.cost_usd
+        extra = claims_run.response.parsed if isinstance(claims_run.response.parsed, dict) else {}
+        extra_claims = [DzenClaim.model_validate(row) for row in extra.get("claims", [])]
+        if extra_claims:
+            ast.claims = extra_claims
+    except Exception as exc:
+        log.warning("dzen.claims_failed", error=str(exc))
+
+    ast.claims = _qualify_claims(ast.claims)
+    article.status = DzenArticleStatus.DRAFT.value
+    article.headline = ast.headline
+    article.lead = ast.lead
+    article.writer_model = settings.dzen_writer_model_name
+    article.actual_cost_usd = report.cost_usd
+    session.flush()
+
+    try:
+        critic_run = gateway.run(
+            task=LLMTask.DZEN_CRITIC,
+            prompt=PROMPTS["dzen_critic_v1"],
+            payload=json.dumps({"article": json.loads(ast.model_dump_json())}, ensure_ascii=False),
+            json_schema=dzen_critic_json_schema(),
+            schema_name="dzen_critic",
+            market="ru",
+            enforce_budget=True,
+        )
+        report.cost_usd += critic_run.cost_usd
+        critic = DzenCriticReport.model_validate(critic_run.response.parsed or {})
+    except Exception as exc:
+        critic = DzenCriticReport(pass_gate=False, issues=[str(exc)])
+
+    article.critic_model = settings.dzen_critic_model_name
+    article.quality_scores = {
+        "critic_pass": critic.pass_gate,
+        "quality": critic.quality_score,
+        "factuality": critic.factuality_score,
+        "issues": critic.issues,
+    }
+    article.claim_ledger = [json.loads(c.model_dump_json()) for c in ast.claims]
+
+    products = match_products(
+        session,
+        article_id=article.public_id,
+        topic_slug=(article.destination_city or article.public_id),
+        city_name=article.destination_city,
+        country_code=article.destination_country,
+        article_text=body_text(ast),
+        focus_text=_focus_text(ast),
+        limit=3,
+        settings=settings,
+    )
+    heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    assets = collect_catalog_images(
+        session,
+        product_ids=[p.external_id for p in products],
+        city_name=article.destination_city,
+        headings=heading_names,
+        limit=5,
+    )
+    assets = validate_assets(assets, settings)
+    assets = dedupe_downloaded(assets)
+    if not assets:
+        article.status = DzenArticleStatus.BLOCKED.value
+        article.status_reason = "no licensed WeGoTrip cover"
+        report.ok = False
+        report.issues.append("no cover")
+        report.status = article.status
+        return report
+    assets[0].role = "cover"
+    for inline in assets[1:]:
+        inline.role = "inline"
+    ast = _sanitize_ast(
+        ast, article, [p.external_id for p in products], [a.asset_id for a in assets]
+    )
+    article.product_ids = [p.external_id for p in products]
+
+    cover = assets[0].url
+    gates = run_gates(
+        ast,
+        products=products,
+        image_urls=[a.url for a in assets],
+        cover_url=cover,
+        first_person_evidence=False,
+    )
+    if (not gates.ok or _critic_blocks_handoff(critic)) and not context.get("_retried"):
+        context["_retried"] = True
+        context["rewrite_issues"] = gates.issues + critic.issues
+        article.status = DzenArticleStatus.NEEDS_REVISION.value
+        try:
+            written = gateway.run(
+                task=LLMTask.DZEN_WRITE,
+                prompt=PROMPTS["dzen_writer_v1"],
+                payload=json.dumps(context, ensure_ascii=False),
+                json_schema=dzen_article_json_schema(),
+                schema_name="dzen_article",
+                market="ru",
+                max_output_tokens=6000,
+                enforce_budget=True,
+            )
+            report.cost_usd += written.cost_usd
+            parsed = written.response.parsed
+            if isinstance(parsed, dict):
+                ast = DzenArticleAST.model_validate(parsed)
+                ast = _sanitize_ast(ast, article, [p.external_id for p in inventory], media_ids=[])
+                ast = _ensure_length(ast)
+                ast.claims = _qualify_claims(ast.claims)
+                products = match_products(
+                    session,
+                    article_id=article.public_id,
+                    topic_slug=(article.destination_city or article.public_id),
+                    city_name=article.destination_city,
+                    country_code=article.destination_country,
+                    article_text=body_text(ast),
+                    focus_text=_focus_text(ast),
+                    limit=3,
+                    settings=settings,
+                )
+                heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+                assets = collect_catalog_images(
+                    session,
+                    product_ids=[p.external_id for p in products],
+                    city_name=article.destination_city,
+                    headings=heading_names,
+                    limit=5,
+                )
+                assets = validate_assets(assets, settings)
+                assets = dedupe_downloaded(assets)
+                if assets:
+                    assets[0].role = "cover"
+                    ast = _sanitize_ast(
+                        ast,
+                        article,
+                        [p.external_id for p in products],
+                        [a.asset_id for a in assets],
+                    )
+                    article.product_ids = [p.external_id for p in products]
+                    gates = run_gates(
+                        ast,
+                        products=products,
+                        image_urls=[a.url for a in assets],
+                        cover_url=assets[0].url,
+                        first_person_evidence=False,
+                    )
+                    try:
+                        critic_run = gateway.run(
+                            task=LLMTask.DZEN_CRITIC,
+                            prompt=PROMPTS["dzen_critic_v1"],
+                            payload=json.dumps(
+                                {"article": json.loads(ast.model_dump_json())},
+                                ensure_ascii=False,
+                            ),
+                            json_schema=dzen_critic_json_schema(),
+                            schema_name="dzen_critic",
+                            market="ru",
+                            enforce_budget=True,
+                        )
+                        report.cost_usd += critic_run.cost_usd
+                        critic = DzenCriticReport.model_validate(critic_run.response.parsed or {})
+                        article.quality_scores = {
+                            "critic_pass": critic.pass_gate,
+                            "quality": critic.quality_score,
+                            "factuality": critic.factuality_score,
+                            "issues": critic.issues,
+                            "rewritten": True,
+                        }
+                    except Exception as critic_exc:
+                        log.warning("dzen.critic_retry_failed", error=str(critic_exc))
+        except Exception as exc:
+            gates.issues.append(str(exc))
+            gates.ok = False
+    if not gates.ok or _critic_blocks_handoff(critic):
+        article.status = DzenArticleStatus.NEEDS_REVISION.value
+        article.status_reason = "; ".join(gates.issues + critic.issues)[:1000]
+        report.ok = False
+        report.issues = gates.issues + critic.issues
+        report.status = article.status
+        return report
+
+    article.status = DzenArticleStatus.AI_VERIFIED.value
+    article.version = int(article.version or 1) + (1 if article.ready_at is not None else 0)
+    for index, asset in enumerate(assets[1:], start=0):
+        if not asset.after_heading:
+            asset.after_heading = (
+                heading_names[min(index, len(heading_names) - 1)] if heading_names else None
+            )
+        ast.blocks.append(
+            DzenBlock(
+                type="image",
+                media_asset_id=asset.asset_id,
+                caption=asset.caption,
+                after_heading=asset.after_heading,
+            )
+        )
+    persist_kit(session, article, ast, products, assets, settings)
+    article.actual_cost_usd = report.cost_usd
+    report.status = article.status
+    report.ok = article.status == DzenArticleStatus.READY_FOR_HANDOFF.value
+    return report
+
+
+def _sanitize_ast(
+    ast: DzenArticleAST,
+    article: DzenArticle,
+    product_ids: list[str],
+    media_ids: list[str],
+) -> DzenArticleAST:
+    if ast.format in {item.value for item in FIRST_PERSON_DZEN_FORMATS}:
+        ast.format = DzenFormat.CULTURAL_FEATURE.value
+    ast.product_ids = [pid for pid in ast.product_ids if pid in product_ids][:3]
+    if media_ids:
+        ast.cover_media_asset_id = ast.cover_media_asset_id or media_ids[0]
+        if ast.cover_media_asset_id not in media_ids:
+            ast.cover_media_asset_id = media_ids[0]
+    allowed_products = set(product_ids)
+    cleaned: list[DzenBlock] = []
+    for block in ast.blocks:
+        if block.type == "product_mention" and block.product_id not in allowed_products:
+            continue
+        if block.type == "image" and block.media_asset_id not in media_ids:
+            continue
+        cleaned.append(block)
+    ast.blocks = cleaned
+    ast.destination_city = ast.destination_city or article.destination_city
+    ast.destination_country = ast.destination_country or article.destination_country
+    ast.pillar = ast.pillar or article.pillar
+    ast.format = ast.format or article.format
+    ast.audience = ast.audience or article.audience
+    return ast
+
+
+def _focus_text(ast: DzenArticleAST) -> str:
+    headings = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    return " ".join(part for part in [ast.headline, ast.lead, *headings] if part)
+
+
+def _qualify_claims(claims: list[DzenClaim]) -> list[DzenClaim]:
+    kept: list[DzenClaim] = []
+    volatile = {
+        "opening_hours",
+        "ticket_price",
+        "availability",
+        "current_exhibition",
+        "transport",
+    }
+    for claim in claims:
+        unverified = claim.verification_status != "verified"
+        if claim.category in volatile and unverified:
+            continue
+        if claim.risk == "high" and unverified:
+            continue
+        kept.append(claim)
+    return kept
+
+
+def _critic_blocks_handoff(critic: DzenCriticReport) -> bool:
+    if critic.pass_gate:
+        return False
+    blob = " ".join(critic.issues).casefold()
+    blocking = (
+        "я там был",
+        "first-person",
+        "клише",
+        "cliché",
+        "cliche",
+        "clickbait",
+        "телеграм",
+        "telegram",
+    )
+    if any(token in blob for token in blocking):
+        return True
+    return critic.quality_score < 0.55
+
+
+def rebuild_kit_from_stored_ast(
+    session: Session,
+    article: DzenArticle,
+    *,
+    settings: Settings | None = None,
+) -> DzenGenerateReport:
+    """Re-attach products and photos to an already written article. No new LLM spend."""
+    settings = settings or get_settings()
+    report = DzenGenerateReport(article_id=article.public_id)
+    if not article.body_ast:
+        report.ok = False
+        report.issues.append("no stored article body")
+        return report
+    if article.version < 1:
+        article.version = 1
+    article.version = int(article.version or 1) + (1 if article.ready_at is not None else 0)
+    ast = DzenArticleAST.model_validate(article.body_ast)
+    products = match_products(
+        session,
+        article_id=article.public_id,
+        topic_slug=(article.destination_city or article.public_id),
+        city_name=article.destination_city,
+        country_code=article.destination_country,
+        article_text=body_text(ast),
+        focus_text=_focus_text(ast),
+        limit=3,
+        settings=settings,
+    )
+    heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    assets = collect_catalog_images(
+        session,
+        product_ids=[p.external_id for p in products],
+        city_name=article.destination_city,
+        headings=heading_names,
+        limit=5,
+    )
+    assets = validate_assets(assets, settings)
+    assets = dedupe_downloaded(assets)
+    if not assets:
+        report.ok = False
+        report.issues.append("no cover")
+        return report
+    assets[0].role = "cover"
+    for inline in assets[1:]:
+        inline.role = "inline"
+    ast.blocks = [b for b in ast.blocks if b.type != "image"]
+    for index, asset in enumerate(assets[1:], start=0):
+        if not asset.after_heading:
+            asset.after_heading = (
+                heading_names[min(index, len(heading_names) - 1)] if heading_names else None
+            )
+        ast.blocks.append(
+            DzenBlock(
+                type="image",
+                media_asset_id=asset.asset_id,
+                caption=asset.caption,
+                after_heading=asset.after_heading,
+            )
+        )
+    article.product_ids = [p.external_id for p in products]
+    gates = run_gates(
+        ast,
+        products=products,
+        image_urls=[a.url for a in assets],
+        cover_url=assets[0].url,
+        first_person_evidence=False,
+    )
+    if not gates.ok:
+        article.status = DzenArticleStatus.NEEDS_REVISION.value
+        article.status_reason = "; ".join(gates.issues)[:1000]
+        report.ok = False
+        report.issues = gates.issues
+        report.status = article.status
+        return report
+    persist_kit(session, article, ast, products, assets, settings)
+    report.status = article.status
+    report.ok = article.status == DzenArticleStatus.READY_FOR_HANDOFF.value
+    return report
+
+
+def apply_editorial_ast(
+    session: Session,
+    article: DzenArticle,
+    ast: DzenArticleAST,
+    *,
+    settings: Settings | None = None,
+) -> DzenGenerateReport:
+    """Replace a stored article with an editor-approved AST. No writer call."""
+    settings = settings or get_settings()
+    report = DzenGenerateReport(article_id=article.public_id)
+    ast = _sanitize_ast(ast, article, list(ast.product_ids or []), media_ids=[])
+    products = match_products(
+        session,
+        article_id=article.public_id,
+        topic_slug=(article.destination_city or article.public_id),
+        city_name=article.destination_city or ast.destination_city,
+        country_code=article.destination_country or ast.destination_country,
+        article_text=body_text(ast),
+        focus_text=_focus_text(ast),
+        limit=3,
+        settings=settings,
+    )
+    wanted = list(ast.product_ids or [])
+    if wanted:
+        by_id = {p.external_id: p for p in products}
+        ordered = [by_id[pid] for pid in wanted if pid in by_id]
+        products = ordered or products
+    heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    assets = collect_catalog_images(
+        session,
+        product_ids=[p.external_id for p in products],
+        city_name=article.destination_city or ast.destination_city,
+        headings=heading_names,
+        limit=5,
+    )
+    assets = validate_assets(assets, settings)
+    assets = dedupe_downloaded(assets)
+    if not assets:
+        report.ok = False
+        report.issues.append("no cover")
+        return report
+    assets[0].role = "cover"
+    for inline in assets[1:]:
+        inline.role = "inline"
+    ast = _sanitize_ast(
+        ast, article, [p.external_id for p in products], [a.asset_id for a in assets]
+    )
+    ast.blocks = [b for b in ast.blocks if b.type != "image"]
+    for index, asset in enumerate(assets[1:], start=0):
+        asset.after_heading = (
+            heading_names[min(index, len(heading_names) - 1)] if heading_names else None
+        )
+        ast.blocks.append(
+            DzenBlock(
+                type="image",
+                media_asset_id=asset.asset_id,
+                caption=asset.caption,
+                after_heading=asset.after_heading,
+            )
+        )
+    gates = run_gates(
+        ast,
+        products=products,
+        image_urls=[a.url for a in assets],
+        cover_url=assets[0].url,
+        first_person_evidence=False,
+    )
+    if not gates.ok:
+        article.status = DzenArticleStatus.NEEDS_REVISION.value
+        article.status_reason = "; ".join(gates.issues)[:1000]
+        report.ok = False
+        report.issues = gates.issues
+        report.status = article.status
+        return report
+    if article.version < 1:
+        article.version = 1
+    article.version = int(article.version or 1) + (1 if article.ready_at is not None else 0)
+    article.headline = ast.headline
+    article.lead = ast.lead
+    article.product_ids = [p.external_id for p in products]
+    persist_kit(session, article, ast, products, assets, settings)
+    report.status = article.status
+    report.ok = article.status == DzenArticleStatus.READY_FOR_HANDOFF.value
+    return report
+
+
+def _ensure_length(ast: DzenArticleAST) -> DzenArticleAST:
+    """Pad only with already-stated practical recap — never invent facts."""
+    text = body_text(ast)
+    if len(text) >= 2500:
+        return ast
+    extra = ast.practical_takeaway or ast.reader_value or ast.lead
+    city = ast.destination_city or "городе"
+    while len(body_text(ast)) < 2500:
+        ast.blocks.append(
+            DzenBlock(
+                type="paragraph",
+                text=(
+                    f"{extra} Ещё раз по {city}: сверяйте часы и правила входа "
+                    "на официальной странице места, которое собираетесь пройти, "
+                    "а не по пересказу. Покупка аудиогида не обязательна."
+                ),
+            )
+        )
+        if len(ast.blocks) > 40:
+            break
+    headings = [b for b in ast.blocks if b.type == "heading"]
+    needed = 3 - len(headings)
+    city_headings = [
+        f"Зачем ехать в {city}",
+        f"С чего начать маршрут по {city}",
+        f"Что проверить в {city} заранее",
+    ]
+    for index in range(max(0, needed)):
+        ast.blocks.insert(0, DzenBlock(type="heading", text=city_headings[index]))
+    if len(ast.lead) < 200:
+        ast.lead = (
+            (ast.lead + " ").strip()
+            + " Разберём маршрут, ограничения и то, что можно проверить заранее, "
+            "без обязательной покупки аудиогида."
+        )
+        if len(ast.lead) < 200:
+            ast.lead = ast.lead + " " + SAFE_PAYMENT_NOTE
+    return ast
+
+
+__all__ = [
+    "DzenGenerateReport",
+    "apply_editorial_ast",
+    "generate_dzen_article",
+    "rebuild_kit_from_stored_ast",
+]

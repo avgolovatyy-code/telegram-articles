@@ -77,6 +77,20 @@ class MockLLMProvider:
             }
         if name == "editorial_decision_set":
             return _editorial_decision_set(context)
+        if name == "dzen_decision_set":
+            return _dzen_decision_set(context)
+        if name == "dzen_article":
+            return _dzen_article(context)
+        if name == "dzen_critic":
+            return {
+                "pass_gate": not self.fail_quality,
+                "quality_score": 0.0 if self.fail_quality else 0.9,
+                "factuality_score": 0.0 if self.fail_quality else 0.95,
+                "issues": ["mock fail"] if self.fail_quality else [],
+                "rewrite_hints": [],
+            }
+        if name == "dzen_claims":
+            return {"claims": []}
         return {}
 
 
@@ -378,6 +392,221 @@ def _review(*, fail: bool) -> dict[str, Any]:
         "product_relevance": 0.91,
         "spam_risk": 0.02,
         "issues": [],
+    }
+
+
+def _dzen_decision_set(context: dict[str, Any]) -> dict[str, Any]:
+    dates = context.get("needed_dates") or [context.get("run_date") or "2026-11-19"]
+    cities = context.get("sample_cities") or ["Стамбул", "Казань"]
+    briefs = []
+    formats = ["dzen_city_guide", "dzen_travel_hack"]
+    pillars = ["city_guides", "travel_hacks"]
+    country_by_index = ["ES", "FR", "GB", "TR", "RU"]
+    for index, day in enumerate(dates[:4]):
+        raw_city = cities[index % len(cities)]
+        if isinstance(raw_city, dict):
+            city = str(raw_city.get("name") or "Стамбул")
+            country = (raw_city.get("country_id") or country_by_index[index % 5])[:2]
+            if not str(country).isalpha():
+                country = country_by_index[index % 5]
+        else:
+            city = str(raw_city)
+            country = country_by_index[index % 5]
+        briefs.append(
+            {
+                "planned_date": day,
+                "format": formats[index % 2],
+                "pillar": pillars[index % 2],
+                "audience": "russian_speaking_global",
+                "destination_country": str(country)[:2].upper(),
+                "destination_city": city,
+                "angle": f"{city}: как провести день без гонки и без выдуманных секретов",
+                "reader_value": "Практичный каркас дня и список того, что нужно сверять на месте",
+                "why_now": "независимый слот журнала Дзена",
+                "supporting_queries": [f"что посмотреть в {city}"],
+                "product_recommendation": "optional",
+                "factual_risk": "low",
+                "intent": "independent_dzen",
+            }
+        )
+    return {
+        "run_date": str(context.get("run_date") or "2026-11-18"),
+        "editorial_thesis": "Независимый русский travel-журнал, не зеркало Telegram",
+        "briefs": briefs,
+        "empty_slots_justification": "",
+    }
+
+
+def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
+    city = context.get("city") or "Стамбул"
+    products = context.get("products") or []
+    media = context.get("media") or []
+    cover = (media[0] or {}).get("id") if media else None
+    product_id = str(products[0]["id"]) if products else None
+    landmarks = {
+        "Казань": ("Кремль", "улица Баумана", "озеро Кабан", "Старо-Татарская слобода"),
+        "Стамбул": ("Галатская башня", "Каракёй", "Султанахмет", "Кадыкёй"),
+        "Барселона": ("Эшампле", "Готический квартал", "Монжуик", "Борн"),
+        "Париж": ("Маре", "набережная Сены", "д'Орсэ", "Пантеон"),
+    }
+    a, b, c, d = landmarks.get(city, ("Центр", "Набережная", "Старый рынок", "Холм"))
+    para = (
+        f"{city} удобно смотреть кусками, а не «всё за сутки». Начните с {a}, "
+        f"перейдите к {b}, оставьте {c} на светлое время, а {d} — запасным "
+        "вечерним маршрутом, если ноги ещё живые. Часы, очереди и правила входа "
+        "меняются — сверяйте их на официальных страницах мест, а не по пересказу. "
+        "Статья не притворяется отчётом «мы там были». Одна городская легенда "
+        "на маршрут полезнее десятка обязательных точек. Аудиогид WeGoTrip — "
+        "необязательное дополнение: если карточка позволяет, его слушают в "
+        "браузере около часа, без отдельной операционной пометки про билет."
+    )
+    blocks: list[dict[str, Any]] = [
+        {
+            "type": "heading",
+            "text": f"{a}: с чего начать в {city}",
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "paragraph",
+            "text": para,
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "heading",
+            "text": f"От {b} к {c} без гонки",
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "paragraph",
+            "text": para,
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "list",
+            "text": None,
+            "level": 2,
+            "items": [
+                f"Утро оставьте {a}, не пытайтесь сразу закрыть {c}.",
+                f"Переход к {b} заложите отдельно, не «по дороге».",
+                f"{d} держите запасной точкой, если свет или ноги кончатся раньше.",
+                "Еду впишите в маршрут, иначе день схлопнется к вечеру.",
+            ],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "heading",
+            "text": f"Что сверять перед {a} и {c}",
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "paragraph",
+            "text": para,
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "heading",
+            "text": f"Если понадобится гид по {city}",
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "paragraph",
+            "text": para,
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+    ]
+    if product_id:
+        blocks.append(
+            {
+                "type": "product_mention",
+                "text": None,
+                "level": 2,
+                "items": [],
+                "media_asset_id": None,
+                "caption": None,
+                "product_id": product_id,
+                "after_heading": f"Если понадобится гид по {city}",
+            }
+        )
+    # Repeat practical paragraphs so the offline mock clears the 2500-char floor.
+    while sum(len(b.get("text") or "") for b in blocks) < 2800:
+        blocks.append(
+            {
+                "type": "paragraph",
+                "text": para,
+                "level": 2,
+                "items": [],
+                "media_asset_id": None,
+                "caption": None,
+                "product_id": None,
+                "after_heading": None,
+            }
+        )
+    return {
+        "headline": f"{city} без спешки: маршрут и то, что стоит проверить заранее",
+        "lead": (
+            f"Если {city} кажется набором обязательных точек, этот текст помогает собрать "
+            "спокойный день: что взять в основу, что оставить запасным и какие факты "
+            "нельзя брать из пересказа — только с официальных страниц."
+        ),
+        "format": context.get("format") or "dzen_city_guide",
+        "pillar": context.get("pillar") or "city_guides",
+        "audience": "russian_speaking_global",
+        "destination_country": context.get("country"),
+        "destination_city": city,
+        "blocks": blocks,
+        "cover_media_asset_id": cover,
+        "product_ids": [str(p.get("id")) for p in products[:3]],
+        "practical_takeaway": (
+            "Один район утром на час-другой, одна большая точка, пауза на еду, "
+            "вечер без новых обязательных музеев. "
+            "Часы работы и оплату сверяйте в день поездки."
+        ),
+        "claims": [],
+        "reader_value": "Каркас дня без обязательной покупки",
+        "originality_angle": "Сначала польза читателя, товары только как опция",
     }
 
 

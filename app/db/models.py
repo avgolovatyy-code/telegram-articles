@@ -936,6 +936,136 @@ class ChannelBrandingHistory(Base):
     created_at: Mapped[dt.datetime] = mapped_column(UTCDateTime, default=utcnow, nullable=False)
 
 
+class DzenArticle(Base, TimestampMixin):
+    """Long-form Russian Dzen article. Isolated from Telegram/MAX Article rows."""
+
+    __tablename__ = "dzen_articles"
+    __table_args__ = (
+        Index("ix_dzen_articles_status_planned", "status", "planned_date"),
+        Index("ix_dzen_articles_content_hash", "content_hash"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    public_id: Mapped[str] = mapped_column(String(32), unique=True, nullable=False, index=True)
+    status: Mapped[str] = mapped_column(
+        String(32), default="topic_candidate", nullable=False, index=True
+    )
+    status_reason: Mapped[str | None] = mapped_column(Text)
+    version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    format: Mapped[str] = mapped_column(String(48), nullable=False)
+    pillar: Mapped[str] = mapped_column(String(48), nullable=False)
+    audience: Mapped[str] = mapped_column(String(48), nullable=False)
+    planned_date: Mapped[dt.date | None] = mapped_column(Date, index=True)
+    destination_country: Mapped[str | None] = mapped_column(String(16))
+    destination_city: Mapped[str | None] = mapped_column(String(128))
+    headline: Mapped[str | None] = mapped_column(Text)
+    lead: Mapped[str | None] = mapped_column(Text)
+    body_ast: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    claim_ledger: Mapped[list[dict[str, Any]]] = mapped_column(JSONColumn, default=list)
+    brief: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    product_ids: Mapped[list[str]] = mapped_column(JSONColumn, default=list)
+    media_manifest: Mapped[list[dict[str, Any]]] = mapped_column(JSONColumn, default=list)
+    content_hash: Mapped[str | None] = mapped_column(String(64))
+    superseded_by_id: Mapped[int | None] = mapped_column(Integer)
+    quality_scores: Mapped[dict[str, Any]] = mapped_column(JSONColumn, default=dict)
+    actual_cost_usd: Mapped[float] = mapped_column(Float, default=0.0)
+    writer_model: Mapped[str | None] = mapped_column(String(64))
+    critic_model: Mapped[str | None] = mapped_column(String(64))
+    ready_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+    handed_off_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+    published_url: Mapped[str | None] = mapped_column(Text)
+    published_confirmed_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+
+    kits: Mapped[list[DzenPublishingKit]] = relationship(
+        back_populates="article", cascade="all, delete-orphan"
+    )
+    handoff_items: Mapped[list[DzenHandoffItem]] = relationship(
+        back_populates="article", cascade="all, delete-orphan"
+    )
+
+
+class DzenPublishingKit(Base, TimestampMixin):
+    __tablename__ = "dzen_publishing_kits"
+    __table_args__ = (Index("ix_dzen_kits_article_version", "article_id", "article_version"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    article_id: Mapped[int] = mapped_column(
+        ForeignKey("dzen_articles.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    article_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    render_version: Mapped[str] = mapped_column(String(32), default="v1", nullable=False)
+    access_token: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    html_body: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    plain_body: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    cover_url: Mapped[str | None] = mapped_column(Text)
+    cover_asset_id: Mapped[str | None] = mapped_column(String(64))
+    media_manifest_json: Mapped[list[dict[str, Any]]] = mapped_column(JSONColumn, default=list)
+    product_links_json: Mapped[list[dict[str, Any]]] = mapped_column(JSONColumn, default=list)
+    zip_asset_path: Mapped[str | None] = mapped_column(Text)
+    zip_sha256: Mapped[str | None] = mapped_column(String(64))
+    content_hash: Mapped[str | None] = mapped_column(String(64))
+    stale: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    ready_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+    expires_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+
+    article: Mapped[DzenArticle] = relationship(back_populates="kits")
+
+
+class DzenHandoffBatch(Base, TimestampMixin):
+    __tablename__ = "dzen_handoff_batches"
+    __table_args__ = (
+        UniqueConstraint(
+            "slack_channel_id",
+            "staff_user_id",
+            "local_work_date",
+            name="uq_dzen_handoff_day",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    public_id: Mapped[str] = mapped_column(String(32), unique=True, nullable=False, index=True)
+    local_work_date: Mapped[dt.date] = mapped_column(Date, nullable=False, index=True)
+    timezone: Mapped[str] = mapped_column(String(64), default="Europe/Moscow", nullable=False)
+    slack_channel_id: Mapped[str] = mapped_column(String(32), nullable=False)
+    staff_user_id: Mapped[str] = mapped_column(String(32), nullable=False)
+    slack_message_ts: Mapped[str | None] = mapped_column(String(32))
+    slack_thread_ts: Mapped[str | None] = mapped_column(String(32))
+    item_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    status: Mapped[str] = mapped_column(String(32), default="pending", nullable=False)
+    sent_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+    error: Mapped[str | None] = mapped_column(Text)
+
+    items: Mapped[list[DzenHandoffItem]] = relationship(
+        back_populates="batch", cascade="all, delete-orphan"
+    )
+
+
+class DzenHandoffItem(Base, TimestampMixin):
+    __tablename__ = "dzen_handoff_items"
+    __table_args__ = (
+        UniqueConstraint("batch_id", "article_id", "article_version", name="uq_dzen_handoff_item"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    batch_id: Mapped[int] = mapped_column(
+        ForeignKey("dzen_handoff_batches.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    article_id: Mapped[int] = mapped_column(
+        ForeignKey("dzen_articles.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    article_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    position: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
+    status: Mapped[str] = mapped_column(String(32), default="handed_off", nullable=False)
+    published_url: Mapped[str | None] = mapped_column(Text)
+    confirmed_by: Mapped[str | None] = mapped_column(String(64))
+    confirmed_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+    verified_at: Mapped[dt.datetime | None] = mapped_column(UTCDateTime)
+    error: Mapped[str | None] = mapped_column(Text)
+
+    batch: Mapped[DzenHandoffBatch] = relationship(back_populates="items")
+    article: Mapped[DzenArticle] = relationship(back_populates="handoff_items")
+
+
 class RussiaDemandObservation(Base, TimestampMixin):
     """Sourced Russia travel demand signal (spec 3.0 §7). Not a prompt constant."""
 
@@ -989,6 +1119,10 @@ __all__ = [
     "ConversionEvent",
     "CostLedgerEntry",
     "Country",
+    "DzenArticle",
+    "DzenHandoffBatch",
+    "DzenHandoffItem",
+    "DzenPublishingKit",
     "EditorialPlanSlot",
     "EditorialPreferenceLog",
     "EditorialRun",

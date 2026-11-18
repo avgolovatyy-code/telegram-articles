@@ -14,6 +14,7 @@ from app.admin.routes import router as admin_router
 from app.api.routes import router as api_router
 from app.api.slack_routes import router as slack_router
 from app.config import get_settings
+from app.dzen.routes import router as dzen_router
 from app.errors import EngineError
 from app.generation.covers import GENERATED_DIR
 from app.logging_setup import configure_logging, get_logger
@@ -64,6 +65,7 @@ def create_app() -> FastAPI:
 
     application.include_router(api_router)
     application.include_router(slack_router)
+    application.include_router(dzen_router)
     application.include_router(admin_router)
 
     static_dir = Path(__file__).parent / "admin" / "static"

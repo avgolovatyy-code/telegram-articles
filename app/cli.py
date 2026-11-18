@@ -105,6 +105,96 @@ def chief_editor(market: Annotated[str | None, typer.Option()] = None) -> None:
         _print(jobs.run_chief_editor(session, markets=_markets(market)))
 
 
+@app.command("dzen-plan")
+def dzen_plan() -> None:
+    """Fill the independent Dzen calendar (does not touch Telegram/MAX)."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.run_dzen_planner(session))
+
+
+@app.command("dzen-generate")
+def dzen_generate(
+    max_articles: Annotated[int | None, typer.Option(help="cap for this run")] = None,
+) -> None:
+    """Write Dzen articles and Publishing Kits. Does not post to Dzen."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.generate_dzen_articles(session, max_articles=max_articles))
+
+
+@app.command("dzen-digest")
+def dzen_digest(
+    force: Annotated[bool, typer.Option(help="ignore notify hour, still never weekends")] = False,
+) -> None:
+    """Send the weekday Slack digest if the policy allows it. Never pings on Sat/Sun."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.send_dzen_digest(session, force_hour=force))
+
+
+@app.command("dzen-apply-kazan-weekend")
+def dzen_apply_kazan_weekend(
+    article_id: Annotated[str, typer.Option(help="public_id of the Dzen article")],
+) -> None:
+    """Replace the Kazan weekend article with the editor-approved AST. No Slack send."""
+    _bootstrap()
+    from sqlalchemy import select
+
+    from app.db.models import DzenArticle
+    from app.dzen.editorial_ast import kazan_winter_weekend_ast
+    from app.dzen.pipeline import apply_editorial_ast
+
+    with session_scope() as session:
+        row = session.scalar(select(DzenArticle).where(DzenArticle.public_id == article_id))
+        if row is None:
+            raise typer.BadParameter(f"unknown dzen article {article_id}")
+        outcome = apply_editorial_ast(session, row, kazan_winter_weekend_ast())
+        typer.echo(
+            json.dumps(
+                {
+                    "ok": outcome.ok,
+                    "status": outcome.status,
+                    "issues": outcome.issues,
+                    "headline": row.headline,
+                    "product_ids": row.product_ids,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+
+
+@app.command("dzen-rebuild-kit")
+def dzen_rebuild_kit(
+    article_id: Annotated[str, typer.Option(help="public_id of the Dzen article")],
+) -> None:
+    """Re-match products and photos on a stored article. Does not call the writer."""
+    _bootstrap()
+    from sqlalchemy import select
+
+    from app.db.models import DzenArticle
+    from app.dzen.pipeline import rebuild_kit_from_stored_ast
+
+    with session_scope() as session:
+        row = session.scalar(select(DzenArticle).where(DzenArticle.public_id == article_id))
+        if row is None:
+            raise typer.BadParameter(f"unknown dzen article {article_id}")
+        outcome = rebuild_kit_from_stored_ast(session, row)
+        typer.echo(
+            json.dumps(
+                {
+                    "ok": outcome.ok,
+                    "status": outcome.status,
+                    "issues": outcome.issues,
+                    "product_ids": row.product_ids,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+
+
 @app.command("russia-demand-refresh")
 def russia_demand_refresh() -> None:
     """Reload dated Russia demand observations; never invent search volumes."""

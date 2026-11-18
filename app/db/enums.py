@@ -144,6 +144,11 @@ class LLMTask(StrEnum):
     IMAGE_GENERATION = "image_generation"
     REWRITE = "rewrite"
     CHIEF_EDITOR = "chief_editor"
+    DZEN_CHIEF_EDITOR = "dzen_chief_editor"
+    DZEN_OUTLINE = "dzen_outline"
+    DZEN_WRITE = "dzen_write"
+    DZEN_CRITIC = "dzen_critic"
+    DZEN_CLAIMS = "dzen_claims"
 
 
 class CostKind(StrEnum):
@@ -152,14 +157,70 @@ class CostKind(StrEnum):
     IMAGE = "image"
 
 
+class DzenArticleStatus(StrEnum):
+    TOPIC_CANDIDATE = "topic_candidate"
+    RESEARCHED = "researched"
+    DRAFT = "draft"
+    AI_VERIFIED = "ai_verified"
+    READY_FOR_HANDOFF = "ready_for_handoff"
+    HANDED_OFF = "handed_off"
+    PUBLISHED_SUBMITTED = "published_submitted"
+    PUBLISHED_CONFIRMED = "published_confirmed"
+    NEEDS_REVISION = "needs_revision"
+    CANCELLED = "cancelled"
+    BLOCKED = "blocked"
+
+
+class DzenFormat(StrEnum):
+    CITY_GUIDE = "dzen_city_guide"
+    WEEKEND_ITINERARY = "dzen_weekend_itinerary"
+    ATTRACTION_GUIDE = "dzen_attraction_guide"
+    MUSEUM_EXHIBITION = "dzen_museum_exhibition"
+    TRAVEL_HACK = "dzen_travel_hack"
+    FACT_STORY = "dzen_fact_story"
+    FIRST_PERSON_REPORT = "dzen_first_person_report"
+    INTERVIEW = "dzen_interview"
+    COMPARISON = "dzen_comparison"
+    CULTURAL_FEATURE = "dzen_cultural_feature"
+    PRODUCT_EXPLAINER = "dzen_product_explainer"
+
+
+class DzenPillar(StrEnum):
+    CITY_GUIDES = "city_guides"
+    MUSEUMS = "museums"
+    TRAVEL_HACKS = "travel_hacks"
+    TRAVEL_STORIES = "travel_stories"
+    WEEKEND_EVENTS = "weekend_events"
+    PERSONAL_EXPERIENCES = "personal_experiences"
+    LISTS_OPINIONS = "lists_opinions"
+
+
+class DzenAudience(StrEnum):
+    RUSSIA_ORIGIN_TRAVELER = "russia_origin_traveler"
+    RUSSIAN_SPEAKING_GLOBAL = "russian_speaking_global"
+    LOCAL_URBAN_EXPLORER = "local_urban_explorer"
+    CULTURE_CURIOUS_READER = "culture_curious_reader"
+
+
+FIRST_PERSON_DZEN_FORMATS = {
+    DzenFormat.FIRST_PERSON_REPORT,
+    DzenFormat.INTERVIEW,
+}
+
+
 __all__ = [
     "CRITICAL_CLAIM_CATEGORIES",
+    "FIRST_PERSON_DZEN_FORMATS",
     "TERMINAL_ARTICLE_STATUSES",
     "ArticleStatus",
     "ClaimCategory",
     "ClaimStatus",
     "ClaimType",
     "CostKind",
+    "DzenArticleStatus",
+    "DzenAudience",
+    "DzenFormat",
+    "DzenPillar",
     "EntityType",
     "LLMTask",
     "MediaKind",
