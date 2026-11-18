@@ -14,6 +14,7 @@ from app.ai.router import LLMGateway
 from app.config import Settings, get_settings
 from app.db.enums import DzenArticleStatus, DzenAudience, DzenFormat, DzenPillar, LLMTask
 from app.db.models import City, DzenArticle, Product
+from app.dzen.genre import genre_from_format
 from app.dzen.policy import local_now, parse_weekdays
 from app.dzen.schemas import DzenBrief, DzenDecisionSet, dzen_decision_json_schema
 from app.logging_setup import get_logger
@@ -153,6 +154,9 @@ def plan_dzen_week(
     created: list[DzenArticle] = []
     for index, day in enumerate(missing):
         brief = _brief_for_day(decision, day, index, mixed)
+        payload = json.loads(brief.model_dump_json())
+        payload["genre"] = brief.genre or genre_from_format(brief.format)
+        payload["reader_promise"] = brief.reader_promise or brief.reader_value
         article = DzenArticle(
             public_id=secrets.token_urlsafe(8),
             status=DzenArticleStatus.TOPIC_CANDIDATE.value,
@@ -163,7 +167,7 @@ def plan_dzen_week(
             destination_country=(brief.destination_country or "")[:16] or None,
             destination_city=(brief.destination_city or "")[:128] or None,
             headline=brief.angle[:200],
-            brief=json.loads(brief.model_dump_json()),
+            brief=payload,
         )
         session.add(article)
         created.append(article)
@@ -182,6 +186,7 @@ def _brief_for_day(
         item.planned_date = day.isoformat()
         return item
     angle, fmt, pillar, city, country = SEED_ANGLES[index % len(SEED_ANGLES)]
+    genre = genre_from_format(fmt.value)
     return DzenBrief(
         planned_date=day.isoformat(),
         format=fmt.value,
@@ -191,6 +196,8 @@ def _brief_for_day(
         destination_country=country,
         angle=angle,
         reader_value="Практическая польза без обязательной покупки",
+        reader_promise="Практическая польза без обязательной покупки",
+        genre=genre,
         why_now="слот независимого плана Дзена",
         intent="independent_dzen",
     )

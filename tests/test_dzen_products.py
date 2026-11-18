@@ -6,6 +6,7 @@ from app.dzen.products import (
     human_duration,
     listen_in_browser,
     match_products,
+    playback_discrepancy,
     product_is_free,
     reader_pitch,
 )
@@ -64,15 +65,48 @@ def test_reader_pitch_prefers_web_player_and_skips_ops_notes(session):
     ]
     session.flush()
     assert product_is_free(product) is True
-    assert listen_in_browser(product) is True
+    assert listen_in_browser(product) is False
+    assert playback_discrepancy(product) is False
     pitch = reader_pitch(product)
     assert "бесплатная аудиоэкскурсия" in pitch
     assert "1,5–2 часа" in pitch
-    assert "браузер" in pitch
+    assert "браузер" not in pitch
     assert "4 км" in pitch
     assert "ч ours" not in pitch
     assert "проверьте карточку" not in pitch.casefold()
     assert "входной билет может быть отдельно" not in pitch.casefold()
+
+
+def test_reader_pitch_web_player_only_when_unambiguous(session):
+    kazan = _city(session, "551487", "Казань")
+    product = _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+    )
+    product.description = "Слушайте в браузере, приложение не обязательно."
+    session.flush()
+    assert listen_in_browser(product) is True
+    assert playback_discrepancy(product) is False
+    assert "браузер" in reader_pitch(product)
+
+
+def test_reader_pitch_omits_browser_when_faq_disagrees(session):
+    kazan = _city(session, "551487", "Казань")
+    product = _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+    )
+    product.description = "Listen online in your browser. No app is required."
+    product.important_info = ["Аудиоэкскурсия доступна только в приложении WeGoTrip."]
+    session.flush()
+    assert listen_in_browser(product) is False
+    assert playback_discrepancy(product) is True
+    assert "браузер" not in reader_pitch(product)
+    assert "ставить не обязательно" not in reader_pitch(product)
 
 
 def test_kazan_is_not_resolved_as_kazanlak(session, settings):

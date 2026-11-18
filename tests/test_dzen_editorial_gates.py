@@ -76,7 +76,7 @@ def test_hollow_two_day_headline_fails_gate():
     )
     result = _gates(ast)
     assert result.ok is False
-    assert any("two days" in issue or "day two" in issue for issue in result.issues)
+    assert any("headline_promise_gap" in issue or "day 2" in issue for issue in result.issues)
 
 
 def test_warming_refrain_and_ops_note_fail():
@@ -97,7 +97,7 @@ def test_warming_refrain_and_ops_note_fail():
             DzenBlock(
                 type="paragraph",
                 text=filler
-                + "Согревайтесь каждые полтора-два часа. Потом снова каждые полтора часа.",
+                + "Мечеть Кул-Шариф здесь как бесплатная комната для согревания туристов.",
             ),
             DzenBlock(type="heading", text="Баумана"),
             DzenBlock(
@@ -112,7 +112,7 @@ def test_warming_refrain_and_ops_note_fail():
     result = _gates(ast, _product())
     assert result.ok is False
     blob = " ".join(result.issues)
-    assert "warming-interval" in blob
+    assert "unsuitable_venue" in blob
     assert "ops note" in blob
 
 
@@ -161,13 +161,13 @@ def test_kazan_weekend_ast_passes_and_matches_live_card():
     assert "Чёрн" in text
     assert "4 км" in text
     assert "1,5–2 часа" in text or "1,5–2" in text
-    assert "браузер" in text
+    assert "ставить не обязательно" not in text
+    assert "это и есть весь первый день" not in text.casefold()
     assert text.casefold().count("полтора-два часа") <= 1
     assert "свияж" not in text.casefold()
     assert "проверьте карточку" not in text.casefold()
     html = clipboard_html(ast, [product])
     assert "бесплатн" in html.casefold()
-    assert "браузер" in html.casefold()
     assert "проверьте карточку" not in html.casefold()
     assert "входной билет может быть отдельно" not in html.casefold()
 

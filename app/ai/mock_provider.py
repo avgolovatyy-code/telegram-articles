@@ -89,6 +89,12 @@ class MockLLMProvider:
                 "issues": ["mock fail"] if self.fail_quality else [],
                 "rewrite_hints": [],
             }
+        if name == "dzen_editorial":
+            return _dzen_editorial(fail=self.fail_quality)
+        if name == "dzen_research":
+            return _dzen_research(context)
+        if name == "dzen_outline":
+            return {"sections": ["контекст", "маршрут", "ограничения"], "notes": "mock outline"}
         if name == "dzen_claims":
             return {"claims": []}
         return {}
@@ -399,8 +405,14 @@ def _dzen_decision_set(context: dict[str, Any]) -> dict[str, Any]:
     dates = context.get("needed_dates") or [context.get("run_date") or "2026-11-19"]
     cities = context.get("sample_cities") or ["Стамбул", "Казань"]
     briefs = []
-    formats = ["dzen_city_guide", "dzen_travel_hack"]
-    pillars = ["city_guides", "travel_hacks"]
+    formats = [
+        "dzen_city_guide",
+        "dzen_travel_hack",
+        "dzen_weekend_itinerary",
+        "dzen_attraction_guide",
+    ]
+    pillars = ["city_guides", "travel_hacks", "weekend_events", "museums"]
+    genres = ["city_guide", "howto", "itinerary", "museum"]
     country_by_index = ["ES", "FR", "GB", "TR", "RU"]
     for index, day in enumerate(dates[:4]):
         raw_city = cities[index % len(cities)]
@@ -422,6 +434,8 @@ def _dzen_decision_set(context: dict[str, Any]) -> dict[str, Any]:
                 "destination_city": city,
                 "angle": f"{city}: как провести день без гонки и без выдуманных секретов",
                 "reader_value": "Практичный каркас дня и список того, что нужно сверять на месте",
+                "reader_promise": f"Собрать полезный день в {city} без универсального каркаса",
+                "genre": genres[index % len(genres)],
                 "why_now": "независимый слот журнала Дзена",
                 "supporting_queries": [f"что посмотреть в {city}"],
                 "product_recommendation": "optional",
@@ -437,161 +451,355 @@ def _dzen_decision_set(context: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def _dzen_editorial(*, fail: bool) -> dict[str, Any]:
+    return {
+        "decision": "revise" if fail else "accept",
+        "blocking_issues": (
+            [
+                {
+                    "code": "unsupported_claim",
+                    "claim_id": None,
+                    "span": "",
+                    "explanation": "mock fail",
+                    "proposed_fix": "rewrite",
+                }
+            ]
+            if fail
+            else []
+        ),
+        "non_blocking_issues": [],
+        "coverage": {
+            "reader_promise_met": not fail,
+            "days_complete": True,
+            "new_information_by_section": True,
+        },
+        "scores": {
+            "reader_value": 0.2 if fail else 0.9,
+            "originality": 0.2 if fail else 0.9,
+            "specificity": 0.2 if fail else 0.9,
+            "clarity": 0.2 if fail else 0.9,
+            "structure": 0.2 if fail else 0.9,
+            "factual_support": 0.1 if fail else 0.95,
+            "commercial_naturalness": 0.8,
+        },
+        "evidence_ids": ["mock"],
+        "prompt_version": "dzen_editorial_quality_v1",
+    }
+
+
+def _dzen_research(context: dict[str, Any]) -> dict[str, Any]:
+    city = context.get("city") or "Стамбул"
+    return {
+        "article_id": str(context.get("article_id") or "mock"),
+        "genre": context.get("genre") or "city_guide",
+        "reader_promise": f"Понять {city} без универсального каркаса",
+        "thesis_and_angle": str(context.get("headline_hint") or city),
+        "facts": [],
+        "unknowns_and_risks": ["не выдумывать часы работы"],
+        "editorial_constraints": [],
+        "product_data_discrepancies": [],
+    }
+
+
+def _b(kind: str, text: str | None = None, items: list[str] | None = None) -> dict[str, Any]:
+    return {
+        "type": kind,
+        "text": text,
+        "level": 2,
+        "items": items or [],
+        "media_asset_id": None,
+        "caption": None,
+        "product_id": None,
+        "after_heading": None,
+    }
+
+
 def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
     city = context.get("city") or "Стамбул"
     products = context.get("products") or []
     media = context.get("media") or []
     cover = (media[0] or {}).get("id") if media else None
     product_id = str(products[0]["id"]) if products else None
+    fmt = context.get("format") or "dzen_city_guide"
     landmarks = {
         "Казань": ("Кремль", "улица Баумана", "озеро Кабан", "Старо-Татарская слобода"),
         "Стамбул": ("Галатская башня", "Каракёй", "Султанахмет", "Кадыкёй"),
         "Барселона": ("Эшампле", "Готический квартал", "Монжуик", "Борн"),
         "Париж": ("Маре", "набережная Сены", "д'Орсэ", "Пантеон"),
+        "Лондон": ("Британский музей", "Саутбанк", "Блумсбери", "Сохо"),
+        "Токио": ("Янака", "Уэно", "Киёсуми", "Сибуя"),
+        "Нижний Новгород": ("Кремль", "Рождественская", "Стрелка", "Чкаловская лестница"),
+        "Санкт-Петербург": ("Эрмитаж", "Васильевский", "Коломна", "Петропавловка"),
     }
     a, b, c, d = landmarks.get(city, ("Центр", "Набережная", "Старый рынок", "Холм"))
-    para = (
-        f"{city} удобно смотреть кусками, а не «всё за сутки». Начните с {a}, "
-        f"перейдите к {b}, оставьте {c} на светлое время, а {d} — запасным "
-        "вечерним маршрутом, если ноги ещё живые. Часы, очереди и правила входа "
-        "меняются — сверяйте их на официальных страницах мест, а не по пересказу. "
-        "Статья не притворяется отчётом «мы там были». Одна городская легенда "
-        "на маршрут полезнее десятка обязательных точек. Аудиогид WeGoTrip — "
-        "необязательное дополнение: если карточка позволяет, его слушают в "
-        "браузере около часа, без отдельной операционной пометки про билет."
-    )
-    blocks: list[dict[str, Any]] = [
-        {
-            "type": "heading",
-            "text": f"{a}: с чего начать в {city}",
-            "level": 2,
-            "items": [],
-            "media_asset_id": None,
-            "caption": None,
-            "product_id": None,
-            "after_heading": None,
-        },
-        {
-            "type": "paragraph",
-            "text": para,
-            "level": 2,
-            "items": [],
-            "media_asset_id": None,
-            "caption": None,
-            "product_id": None,
-            "after_heading": None,
-        },
-        {
-            "type": "heading",
-            "text": f"От {b} к {c} без гонки",
-            "level": 2,
-            "items": [],
-            "media_asset_id": None,
-            "caption": None,
-            "product_id": None,
-            "after_heading": None,
-        },
-        {
-            "type": "paragraph",
-            "text": para,
-            "level": 2,
-            "items": [],
-            "media_asset_id": None,
-            "caption": None,
-            "product_id": None,
-            "after_heading": None,
-        },
-        {
-            "type": "list",
-            "text": None,
-            "level": 2,
-            "items": [
-                f"Утро оставьте {a}, не пытайтесь сразу закрыть {c}.",
-                f"Переход к {b} заложите отдельно, не «по дороге».",
-                f"{d} держите запасной точкой, если свет или ноги кончатся раньше.",
-                "Еду впишите в маршрут, иначе день схлопнется к вечеру.",
-            ],
-            "media_asset_id": None,
-            "caption": None,
-            "product_id": None,
-            "after_heading": None,
-        },
-        {
-            "type": "heading",
-            "text": f"Что сверять перед {a} и {c}",
-            "level": 2,
-            "items": [],
-            "media_asset_id": None,
-            "caption": None,
-            "product_id": None,
-            "after_heading": None,
-        },
-        {
-            "type": "paragraph",
-            "text": para,
-            "level": 2,
-            "items": [],
-            "media_asset_id": None,
-            "caption": None,
-            "product_id": None,
-            "after_heading": None,
-        },
-        {
-            "type": "heading",
-            "text": f"Если понадобится гид по {city}",
-            "level": 2,
-            "items": [],
-            "media_asset_id": None,
-            "caption": None,
-            "product_id": None,
-            "after_heading": None,
-        },
-        {
-            "type": "paragraph",
-            "text": para,
-            "level": 2,
-            "items": [],
-            "media_asset_id": None,
-            "caption": None,
-            "product_id": None,
-            "after_heading": None,
-        },
+    fmt_l = str(fmt)
+    if "itinerary" in fmt_l or "weekend" in fmt_l:
+        headline = f"{city} за два дня: {a}, {b} и другая ось"
+        lead = (
+            f"В {city} легко схлопнуть всё в один круг. Этот текст разделяет два дня: "
+            f"первый держит линию {a} → {b}, второй уводит к {c} и {d}. "
+            "Аудиогид, если он есть, — короткий слой внутри дня, не замена программе."
+        )
+        blocks = [
+            _b("heading", f"День первый: {a} и {b} (утро и день)"),
+            _b(
+                "paragraph",
+                f"Начните с {a}: это якорь {city} с XVIII–XIX века, и его лучше не оставлять "
+                f"на вечерний свет. Заложите 60–90 минут, затем переход к {b} пешком, без "
+                "попытки закрыть весь центр. В 1767 году город уже строился в камне — даты "
+                "здесь для масштаба, не как причина каждого фасада.",
+            ),
+            _b(
+                "paragraph",
+                f"{b} даёт плотный поток и короткие паузы. 40–50 минут хватит, чтобы понять "
+                "ритм улицы и не застрять в сувенирах. Если есть аудиогид на 1,5–2 часа, "
+                "он покрывает эту линию, а не «весь первый день»: еда, интерьеры и фото — "
+                "отдельное время.",
+            ),
+            _b("heading", f"День второй: {c}, {d} и спокойная география"),
+            _b(
+                "paragraph",
+                f"Второй день не повторяет {a}. {c} показывает другой масштаб: вода, дворы, "
+                "университетский шаг. 40 минут на короткий отрезок, затем {d} как панорама "
+                "на полчаса. Легенды здешних мест слушайте как фольклор, не как архив.",
+            ),
+            _b(
+                "paragraph",
+                f"Еду второго дня держите локальной один раз, не как экзамен. Вечером можно "
+                f"вернуться к подсветке {b} на пятнадцать минут и не проходить заново всю "
+                f"линию {a}. Так {city} не схлопывается в одну открытку.",
+            ),
+            _b("heading", "Как не сломать эти два дня"),
+            _b(
+                "list",
+                items=[
+                    f"Не добавляйте дальнюю вылазку к двум дням в {city}.",
+                    "Точные часы входа сверяйте в день поездки, здесь их нет.",
+                    "Аудиогид — опция внутри дня, не расписание целиком.",
+                ],
+            ),
+        ]
+        takeaway = f"День 1 — {a} и {b}. День 2 — {c} и {d}. Аудиогид не заменяет световой день."
+    elif "museum" in fmt_l or "attraction" in fmt_l:
+        headline = f"{a} без гонки: что успеть за визит в {city}"
+        lead = (
+            f"{a} легко превратить в бесконечный коридор. Здесь три опоры: один зал с "
+            "именем, один маршрут без петли и одно ограничение, которое нельзя угадать "
+            "по пересказу. Год основания и состав коллекции — из досье, не из памяти."
+        )
+        blocks = [
+            _b("heading", f"Зачем ехать именно в {a}"),
+            _b(
+                "paragraph",
+                f"{a} в {city} собирает не «шедевры вообще», а конкретную линию: "
+                f"смотрите {b} как вход, затем один именной зал, связанный с {c}. "
+                "В 1852 году музейные здания часто уже стояли — это масштаб, не часы кассы.",
+            ),
+            _b("heading", f"Как пройти {b} и не заблудиться"),
+            _b(
+                "paragraph",
+                f"Держите петлю: {b} → именной зал → выход к {d}. Не обещаем точное время "
+                "сеанса. Билет WeGoTrip, если он в тексте, закрывает вход только когда "
+                "это написано во включениях карточки.",
+            ),
+            _b("heading", "Что нельзя выдумать"),
+            _b(
+                "paragraph",
+                "Текущие выставки, цены и дни закрытия здесь не названы: без даты проверки "
+                "это гадание. Легенда о ночном стороже остаётся легендой.",
+            ),
+            _b("list", items=[f"{b} как вход", "Один именной зал", f"Выход к {d}"]),
+        ]
+        takeaway = f"Одна петля по {a}, без выдуманных часов и без «посмотрите всё»."
+    elif "hack" in fmt_l or "explainer" in fmt_l:
+        headline = f"Как оплатить музей в {city} российской картой — только проверенный путь"
+        lead = (
+            "Универсального «любой зарубежный билет российской картой» нет. Есть конкретный "
+            "сценарий: билет на WeGoTrip, оплата в рублях, если страница заказа это показывает. "
+            "Ниже — шаги и ограничения на сегодняшнюю логику, без обещания на все музеи мира."
+        )
+        blocks = [
+            _b("heading", "Какая проблема"),
+            _b(
+                "paragraph",
+                f"Карта российского банка часто не проходит на кассе {a} в {city}. "
+                "Обход — не «любой билет», а конкретный товар с оплатой у посредника, "
+                "если checkout это подтверждает.",
+            ),
+            _b("heading", "Что сделать"),
+            _b(
+                "list",
+                items=[
+                    "Открыть карточку WeGoTrip нужного музея, locale=ru.",
+                    "Проверить валюту и способ оплаты на странице заказа, не в пересказе.",
+                    "Если карты нет в списке — не выдумывать обход через «любой билет».",
+                ],
+            ),
+            _b("heading", "Ограничения"),
+            _b(
+                "paragraph",
+                "Утверждение действует только для выбранного товара. Выставки, часы и "
+                "въездные правила сюда не входят. Дата актуальности — день, когда вы "
+                "смотрите checkout, а не текст статьи 2026 года как вечную норму.",
+            ),
+            _b(
+                "paragraph",
+                f"{b} и {c} здесь ни при чём: это не маршрут, а платёжный how-to. "
+                "В 2024–2026 схемы оплаты менялись, поэтому без страницы заказа нет факта.",
+            ),
+        ]
+        takeaway = "Только конкретный checkout. Никакого «любой билет российской картой»."
+    elif "comparison" in fmt_l:
+        headline = f"{city} или другой берег: кому какой темп"
+        lead = (
+            f"Сравнивать {a} и {c} по «красоте» бессмысленно. Критерии здесь простые: "
+            "плотность пешком, нужна ли бронь, сколько часов без транспорта. Ниже — "
+            "кому какой вариант, без рейтинга из воздуха."
+        )
+        blocks = [
+            _b("heading", "Критерии"),
+            _b(
+                "paragraph",
+                "Три оси: пешая плотность, плата за вход, запас по времени. Источник — "
+                "каталог и очевидная география, не тайный рейтинг редакции.",
+            ),
+            _b("heading", f"{a} против {c}"),
+            _b(
+                "paragraph",
+                f"{a} выигрывает, если вы уже рядом и готовы к очередям. {c} выигрывает, "
+                f"если нужен воздух и {d} как пауза. {b} — переход, не третья столица.",
+            ),
+            _b("heading", "Кому что"),
+            _b(
+                "list",
+                items=[
+                    f"Короткий слот — {a}.",
+                    f"День без кассы — {c} и {d}.",
+                    "С детьми не тащите оба якоря подряд.",
+                ],
+            ),
+            _b(
+                "paragraph",
+                f"В {city} в 1703 или 1852 году якоря уже стояли по-разному — это фон, "
+                "не аргумент «кто лучше». Trade-off честный: плотность против воздуха.",
+            ),
+        ]
+        takeaway = f"{a} — плотность. {c} — воздух. Рейтинга нет."
+    elif "fact_story" in fmt_l or "cultural" in fmt_l:
+        headline = f"Как {a} в {city} стал легендой — и что из этого факт"
+        lead = (
+            f"Про {a} в {city} рассказывают охотно, и часть историй правда. "
+            f"Ниже отделяем документ от фольклора: дата, связанная с {b}, "
+            f"легенда у {c}, и почему {d} сюда не приплетать."
+        )
+        blocks = [
+            _b("heading", f"Что известно про {a}"),
+            _b(
+                "paragraph",
+                f"Документированная линия: {a} связан с {city} не позже XIX века. "
+                "В 1852 году это уже городская ткань. Точный указ-причина здесь не выдуман.",
+            ),
+            _b("heading", f"Легенда у {c}"),
+            _b(
+                "paragraph",
+                f"История про {c} остаётся легендой: гиды её любят, архив не подтверждает. "
+                f"{b} в этом сюжете только сосед, не доказательство.",
+            ),
+            _b("heading", "Чего нельзя утверждать"),
+            _b(
+                "paragraph",
+                f"{d} не «первый в мире» без источника. Версии помечаем как версии. "
+                "Личного «я там был» нет.",
+            ),
+        ]
+        takeaway = f"Факт про {a} отдельно, легенда про {c} отдельно."
+    else:
+        headline = f"{city} без спешки: {a}, {b} и то, что обычно пропускают"
+        lead = (
+            f"Если {city} кажется набором обязательных точек, соберите день вокруг {a} "
+            f"и {b}, а {c} оставьте светлому часу. Это не универсальный «музей-кафе-прогулка»: "
+            "ниже — зачем именно эти места и чем {d} отличается как запас."
+        )
+        blocks = [
+            _b("heading", f"{a}: с чего начать в {city}"),
+            _b(
+                "paragraph",
+                f"{a} стоит первым, потому что задаёт масштаб {city}, а не потому что так "
+                "пишут все гиды. Заложите спокойный час. Год вроде 1767 или 1852 здесь "
+                "про возраст ткани города, не про кассу.",
+            ),
+            _b("heading", f"От {b} к {c} без гонки"),
+            _b(
+                "paragraph",
+                f"{b} — плотная ось. Не отдавайте ей сутки. Переход к {c} меняет скорость: "
+                "вода, дворы, другой шаг. Легенда района остаётся легендой.",
+            ),
+            _b("heading", f"{d} как запас, не как галочка"),
+            _b(
+                "paragraph",
+                f"{d} имеет смысл, если свет и ноги ещё есть. Это не «обязательно посетите», "
+                "а развилка. Аудиогид WeGoTrip — опция рядом с местом, которое вы уже описали.",
+            ),
+            _b(
+                "list",
+                items=[
+                    f"Утро — {a}.",
+                    f"{b} коротко, без сувенирной ямы.",
+                    f"{c} на свет, {d} по остатку сил.",
+                ],
+            ),
+        ]
+        takeaway = f"{a} утром, {b} коротко, {c} на свет. Без выдуманных часов."
+
+    if len(lead) < 210:
+        lead = (
+            lead + " Читатель получает конкретный порядок мест и одно ограничение, "
+            "которое нельзя угадать по пересказу."
+        )
+    extra = [
+        f"{city}: {a} в разные годы звучал по-разному, и это видно по кладке, не по слогану.",
+        f"Отдельный факт про {b}: поток туристов не отменяет жилой ткани вокруг.",
+        f"{c} чаще фотографируют издалека; подойти имеет смысл, только если это ваш темп.",
+        f"{d} в {city} работает как пауза, а не как третья обязательная касса.",
+        "Редакция не была «там лично»: это собранный гид по открытым фактам и каталогу.",
+        "Покупка не обязательна. Если товара нет в тексте — так и задумано.",
     ]
+    for sentence in extra:
+        blocks.append(_b("paragraph", sentence))
+    flavors = (
+        "купеческий",
+        "ярмарочный",
+        "университетский",
+        "набережный",
+        "крепостной",
+        "трамвайный",
+        "монастырский",
+        "театральный",
+        "аптечный",
+        "садовый",
+        "рыночный",
+        "портовый",
+    )
+    pad = 0
+    while sum(len(block.get("text") or "") for block in blocks) + len(lead) < 2600:
+        flavor = flavors[pad % len(flavors)]
+        pad += 1
+        blocks.append(
+            _b(
+                "paragraph",
+                f"{flavor.capitalize()} слой {pad} в {city}: {a} рядом с {flavor} тканью, "
+                f"{b} звучит иначе, {c} держит паузу, {d} остаётся развилкой номер {pad}.",
+            )
+        )
+        if pad > 12:
+            break
     if product_id:
-        blocks.append(
-            {
-                "type": "product_mention",
-                "text": None,
-                "level": 2,
-                "items": [],
-                "media_asset_id": None,
-                "caption": None,
-                "product_id": product_id,
-                "after_heading": f"Если понадобится гид по {city}",
-            }
-        )
-    # Repeat practical paragraphs so the offline mock clears the 2500-char floor.
-    while sum(len(b.get("text") or "") for b in blocks) < 2800:
-        blocks.append(
-            {
-                "type": "paragraph",
-                "text": para,
-                "level": 2,
-                "items": [],
-                "media_asset_id": None,
-                "caption": None,
-                "product_id": None,
-                "after_heading": None,
-            }
-        )
+        blocks.append(_b("product_mention"))
+        blocks[-1]["product_id"] = product_id
     return {
-        "headline": f"{city} без спешки: маршрут и то, что стоит проверить заранее",
-        "lead": (
-            f"Если {city} кажется набором обязательных точек, этот текст помогает собрать "
-            "спокойный день: что взять в основу, что оставить запасным и какие факты "
-            "нельзя брать из пересказа — только с официальных страниц."
-        ),
-        "format": context.get("format") or "dzen_city_guide",
+        "headline": headline,
+        "lead": lead,
+        "format": fmt,
         "pillar": context.get("pillar") or "city_guides",
         "audience": "russian_speaking_global",
         "destination_country": context.get("country"),
@@ -599,14 +807,10 @@ def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
         "blocks": blocks,
         "cover_media_asset_id": cover,
         "product_ids": [str(p.get("id")) for p in products[:3]],
-        "practical_takeaway": (
-            "Один район утром на час-другой, одна большая точка, пауза на еду, "
-            "вечер без новых обязательных музеев. "
-            "Часы работы и оплату сверяйте в день поездки."
-        ),
+        "practical_takeaway": takeaway,
         "claims": [],
-        "reader_value": "Каркас дня без обязательной покупки",
-        "originality_angle": "Сначала польза читателя, товары только как опция",
+        "reader_value": "Польза читателя без обязательной покупки",
+        "originality_angle": "Жанровый контракт, не универсальный каркас",
     }
 
 

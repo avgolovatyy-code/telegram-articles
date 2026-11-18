@@ -149,6 +149,7 @@ class LLMTask(StrEnum):
     DZEN_WRITE = "dzen_write"
     DZEN_CRITIC = "dzen_critic"
     DZEN_CLAIMS = "dzen_claims"
+    DZEN_RESEARCH = "dzen_research"
 
 
 class CostKind(StrEnum):

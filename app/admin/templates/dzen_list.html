@@ -11,7 +11,7 @@
 <table>
   <thead>
     <tr>
-      <th>Дата</th><th>Статус</th><th>Заголовок</th><th>Город</th><th>Kit</th>
+      <th>Дата</th><th>Статус</th><th>Качество</th><th>Заголовок</th><th>Город</th><th>Kit</th>
     </tr>
   </thead>
   <tbody>
@@ -19,6 +19,7 @@
     <tr>
       <td class="nowrap muted small">{{ row.planned_date or '—' }}</td>
       <td><span class="badge {{ status_class(row.status) }}">{{ row.status }}</span></td>
+      <td class="muted small">{{ (row.quality_scores or {}).get('editorial_decision') or '—' }}{% if (row.brief or {}).get('genre') %} · {{ (row.brief or {}).get('genre') }}{% endif %}{% if row.status_reason %}<div>{{ row.status_reason }}</div>{% endif %}</td>
       <td>{{ row.headline or (row.brief or {}).get('angle', row.public_id) }}</td>
       <td class="muted small">{{ row.destination_city or '—' }}</td>
       <td>
@@ -28,7 +29,7 @@
       </td>
     </tr>
   {% else %}
-    <tr><td colspan="5" class="muted">Пока нет статей Дзена.</td></tr>
+    <tr><td colspan="6" class="muted">Пока нет статей Дзена.</td></tr>
   {% endfor %}
   </tbody>
 </table>
