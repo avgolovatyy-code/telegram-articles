@@ -68,6 +68,11 @@ class DzenProductPick:
     snapshot: dict[str, Any]
     score: int = 0
     matched_places: list[str] | None = None
+    is_free: bool = False
+    duration_label: str | None = None
+    distance_label: str | None = None
+    listen_in_browser: bool = False
+    reader_pitch: str = ""
 
 
 def fold_place(word: str) -> str:
@@ -103,6 +108,79 @@ def _ticket_included(product: Product) -> bool | None:
     if not blob:
         return None
     return "билет" in blob or "вход" in blob or "ticket" in blob
+
+
+def _catalog_blob(product: Product) -> str:
+    parts = [
+        product.title,
+        product.description,
+        product.short_description,
+        " ".join(product.inclusions or []),
+        " ".join(product.important_info or []),
+    ]
+    return " ".join(part for part in parts if part).casefold()
+
+
+def product_is_free(product: Product) -> bool:
+    if product.price == 0:
+        return True
+    blob = _catalog_blob(product)
+    return "бесплат" in blob or "free" in blob
+
+
+def listen_in_browser(product: Product) -> bool:
+    """Prefer how-it-works (web player) over the leftover FAQ that still says 'app only'."""
+    blob = _catalog_blob(product)
+    return any(
+        marker in blob
+        for marker in (
+            "в браузере",
+            "listen online in your browser",
+            "no app is required",
+            "приложение не обязательно",
+            "устанавливать приложение не обязательно",
+        )
+    )
+
+
+def human_duration(text: str | None) -> str | None:
+    if not text:
+        return None
+    raw = text.strip()
+    raw = re.sub(r"(\d)\s*h\s*", r"\1 ч ", raw, flags=re.I)
+    raw = re.sub(r"(\d)\s*ч\s*", r"\1 ч ", raw, flags=re.I)
+    raw = re.sub(r"(\d)\s*min\b", r"\1 мин", raw, flags=re.I)
+    raw = re.sub(r"(\d)\s*мин", r"\1 мин", raw, flags=re.I)
+    raw = re.sub(r"\s+", " ", raw).strip(" -–")
+    return raw.replace(" - ", "–").replace(" – ", "–")
+
+
+def human_distance(text: str | None) -> str | None:
+    if not text:
+        return None
+    return re.sub(r"\bkm\b", "км", text.strip(), flags=re.I)
+
+
+def reader_pitch(product: Product) -> str:
+    """One human sentence for the article. No ops notes, no 'check the card'."""
+    bits: list[str] = []
+    if product_is_free(product):
+        bits.append("бесплатная аудиоэкскурсия")
+    duration = human_duration(product.duration_text)
+    if not duration and product.duration_min and product.duration_max:
+        duration = f"{product.duration_min}–{product.duration_max} мин"
+    elif not duration and product.duration_min:
+        duration = f"около {product.duration_min} мин"
+    if duration:
+        bits.append(duration)
+    distance = human_distance(product.distance)
+    if distance:
+        bits.append(f"маршрут около {distance}")
+    if listen_in_browser(product):
+        bits.append("слушать можно в браузере, приложение ставить не обязательно")
+    if not bits:
+        return product.title
+    return f"{product.title} — {', '.join(bits)}"
 
 
 def _city_for(session: Session, product: Product) -> City | None:
@@ -269,12 +347,21 @@ def match_products(
                 city_name=city.name if city else None,
                 score=score,
                 matched_places=matched,
+                is_free=product_is_free(product),
+                duration_label=human_duration(product.duration_text) or product.duration_text,
+                distance_label=human_distance(product.distance) or product.distance,
+                listen_in_browser=listen_in_browser(product),
+                reader_pitch=reader_pitch(product),
                 snapshot={
                     "title": product.title,
                     "price": product.price,
                     "currency": product.currency_code,
                     "inclusions": product.inclusions,
                     "exclusions": product.exclusions,
+                    "duration_text": product.duration_text,
+                    "distance": product.distance,
+                    "is_free": product_is_free(product),
+                    "listen_in_browser": listen_in_browser(product),
                     "score": score,
                     "matched_places": matched,
                 },
@@ -288,8 +375,13 @@ def match_products(
 __all__ = [
     "DzenProductPick",
     "fold_place",
+    "human_distance",
+    "human_duration",
+    "listen_in_browser",
     "looks_russian",
     "match_products",
     "place_tokens",
+    "product_is_free",
+    "reader_pitch",
     "score_product",
 ]

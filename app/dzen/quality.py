@@ -58,6 +58,58 @@ def body_text(ast: DzenArticleAST) -> str:
     return "\n".join(parts)
 
 
+OPS_LEAKS = (
+    "проверьте карточку",
+    "карточка товара",
+    "уточните, входит ли входной билет",
+    "входной билет может быть отдельно",
+    "product_id",
+    "media_asset_id",
+)
+WARM_INTERVAL = (
+    "полтора-два часа",
+    "каждые полтора",
+    "тепловые интервалы",
+    "точками восстановления",
+    "блоками по 1,5",
+    "блоками по 1,5–2",
+)
+SIDE_TRIPS = ("свияж", "петергоф", "иннополис")
+TWO_DAY = re.compile(r"два(?:\s+\w+){0,2}\s+дн|двухдневн|2\s*дн|уикенд|выходн", re.I)
+DAY_ONE = re.compile(r"день первый|первый день", re.I)
+DAY_TWO = re.compile(r"день второй|второй день", re.I)
+APP_ONLY = re.compile(r"только в приложении|нужно приложение|обязательно.+приложени", re.I)
+STORY_HINTS = (
+    "легенд",
+    "сююмбик",
+    "привид",
+    "алабрыс",
+    "джек",
+    "екатерин",
+    "марджан",
+    "кул-шариф",
+    "кул шариф",
+    "юнусов",
+)
+
+
+def _sections(ast: DzenArticleAST) -> list[tuple[str, str]]:
+    sections: list[tuple[str, str]] = []
+    current = ast.headline
+    buf: list[str] = [ast.lead]
+    for block in ast.blocks:
+        if block.type == "heading" and block.text:
+            sections.append((current, "\n".join(buf)))
+            current = block.text
+            buf = []
+            continue
+        if block.text:
+            buf.append(block.text)
+        buf.extend(block.items)
+    sections.append((current, "\n".join(buf)))
+    return sections
+
+
 def run_gates(
     ast: DzenArticleAST,
     *,
@@ -118,6 +170,42 @@ def run_gates(
     ]
     if len(specific_headings) < 2:
         result.fail("headings must name real places or problems, not generic labels")
+    for leak in OPS_LEAKS:
+        if leak in folded:
+            result.fail(f"ops note leaked into copy: {leak}")
+    warm_hits = sum(folded.count(phrase) for phrase in WARM_INTERVAL)
+    if warm_hits > 1:
+        result.fail("repeated warming-interval advice")
+    dest = (ast.destination_city or "").casefold()
+    for stem in SIDE_TRIPS:
+        if stem in folded and stem not in dest and stem not in ast.headline.casefold():
+            result.fail(f"side-trip {stem} stuffed into {ast.destination_city or 'article'}")
+    if TWO_DAY.search(ast.headline):
+        if not DAY_ONE.search(text) or not DAY_TWO.search(text):
+            result.fail("headline promises two days but the days are not both written")
+        day_two_places = 0
+        for title, body in _sections(ast):
+            if DAY_TWO.search(title) or DAY_TWO.search(body[:80]):
+                day_two_places = len(place_tokens(title, body))
+                break
+        if day_two_places < 2:
+            result.fail("day two needs named places, not a vague leftover slot")
+    if not any(hint in folded for hint in STORY_HINTS) and len(named) < 6:
+        result.fail("needs a local story or unusual detail, not only tourist advice")
+    for product in products:
+        pitch_space = folded + " " + (product.reader_pitch or "").casefold()
+        if product.duration_label and not any(token in folded for token in ("час", "мин", "км")):
+            result.fail(f"product {product.external_id} duration missing from article")
+        if (
+            product.distance_label
+            and product.distance_label.casefold() not in folded
+            and "км" not in folded
+        ):
+            result.fail(f"product {product.external_id} distance missing from article")
+        if product.listen_in_browser and APP_ONLY.search(text) and "браузер" not in folded:
+            result.fail("web player exists; do not describe the tour as app-only")
+        if product.is_free and "проверьте карточку" in pitch_space:
+            result.fail("free product described with a checkout ops note")
     return result
 
 

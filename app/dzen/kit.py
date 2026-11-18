@@ -59,10 +59,7 @@ def render_plain(ast: DzenArticleAST, products: list[DzenProductPick]) -> str:
     if products:
         parts.append("\nПодходящие варианты:\n")
         for product in products:
-            ticket = (
-                "билет включён" if product.ticket_included else "уточните, входит ли входной билет"
-            )
-            parts.append(f"— {product.title} ({ticket}): {product.affiliate_url}")
+            parts.append(f"— {product.reader_pitch or product.title}: {product.affiliate_url}")
     return "\n".join(parts).strip() + "\n"
 
 
@@ -122,14 +119,14 @@ def render_html(
 
 
 def _product_html(product: DzenProductPick) -> str:
-    ticket = (
-        "входной билет включён"
-        if product.ticket_included
-        else "входной билет может быть отдельно — проверьте карточку товара"
-    )
+    pitch = product.reader_pitch or product.title
+    label = product.title
+    rest = pitch
+    if pitch.startswith(product.title):
+        rest = pitch[len(product.title) :].lstrip(" —-,.")
+    suffix = f" — {html.escape(rest)}" if rest and rest != label else ""
     return (
-        f'<p><a href="{html.escape(product.affiliate_url)}">'
-        f"{html.escape(product.title)}</a> — {html.escape(ticket)}.</p>"
+        f'<p><a href="{html.escape(product.affiliate_url)}">{html.escape(label)}</a>{suffix}.</p>'
     )
 
 
@@ -253,6 +250,11 @@ def persist_kit(
                 "url": p.affiliate_url,
                 "ticket_included": p.ticket_included,
                 "inclusions": p.inclusions,
+                "pitch": p.reader_pitch,
+                "is_free": p.is_free,
+                "duration": p.duration_label,
+                "distance": p.distance_label,
+                "listen_in_browser": p.listen_in_browser,
                 "verified_at": utcnow().date().isoformat(),
             }
             for p in products

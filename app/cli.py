@@ -133,6 +133,38 @@ def dzen_digest(
         _print(jobs.send_dzen_digest(session, force_hour=force))
 
 
+@app.command("dzen-apply-kazan-weekend")
+def dzen_apply_kazan_weekend(
+    article_id: Annotated[str, typer.Option(help="public_id of the Dzen article")],
+) -> None:
+    """Replace the Kazan weekend article with the editor-approved AST. No Slack send."""
+    _bootstrap()
+    from sqlalchemy import select
+
+    from app.db.models import DzenArticle
+    from app.dzen.editorial_ast import kazan_winter_weekend_ast
+    from app.dzen.pipeline import apply_editorial_ast
+
+    with session_scope() as session:
+        row = session.scalar(select(DzenArticle).where(DzenArticle.public_id == article_id))
+        if row is None:
+            raise typer.BadParameter(f"unknown dzen article {article_id}")
+        outcome = apply_editorial_ast(session, row, kazan_winter_weekend_ast())
+        typer.echo(
+            json.dumps(
+                {
+                    "ok": outcome.ok,
+                    "status": outcome.status,
+                    "issues": outcome.issues,
+                    "headline": row.headline,
+                    "product_ids": row.product_ids,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+
+
 @app.command("dzen-rebuild-kit")
 def dzen_rebuild_kit(
     article_id: Annotated[str, typer.Option(help="public_id of the Dzen article")],

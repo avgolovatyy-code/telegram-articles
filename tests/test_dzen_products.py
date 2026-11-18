@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from app.db.models import City, Product
 from app.dzen.media import collect_catalog_images, image_fingerprint
-from app.dzen.products import match_products
+from app.dzen.products import listen_in_browser, match_products, product_is_free, reader_pitch
 
 
 def _city(session, external_id: str, name: str) -> City:
@@ -29,6 +29,36 @@ def _product(session, *, external_id: str, title: str, city_id: str, rank: int =
     session.add(row)
     session.flush()
     return row
+
+
+def test_reader_pitch_prefers_web_player_and_skips_ops_notes(session):
+    kazan = _city(session, "551487", "Казань")
+    product = _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+    )
+    product.price = 0
+    product.duration_text = "1ч 30мин - 2ч"
+    product.distance = "4 км"
+    product.description = (
+        "После покупки откройте экскурсию по полученной ссылке. "
+        "Устанавливать приложение не обязательно. Слушайте в браузере."
+    )
+    product.important_info = [
+        "Аудиоэкскурсия доступна только в приложении WeGoTrip.",
+        "входной билет может быть отдельно — проверьте карточку товара",
+    ]
+    session.flush()
+    assert product_is_free(product) is True
+    assert listen_in_browser(product) is True
+    pitch = reader_pitch(product)
+    assert "бесплатная аудиоэкскурсия" in pitch
+    assert "браузер" in pitch
+    assert "4 км" in pitch
+    assert "проверьте карточку" not in pitch.casefold()
+    assert "входной билет может быть отдельно" not in pitch.casefold()
 
 
 def test_kazan_is_not_resolved_as_kazanlak(session, settings):

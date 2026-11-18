@@ -21,6 +21,9 @@ from app.dzen.policy import (
     mention_markup,
     resolved_slack_channel,
 )
+from app.dzen.products import DzenProductPick
+from app.dzen.quality import GateResult, run_gates
+from app.dzen.schemas import DzenArticleAST
 from app.logging_setup import get_logger
 from app.slack.client import SlackError, SlackMessage, build_slack_client
 
@@ -63,8 +66,72 @@ def _ready_kits(session: Session, now: dt.datetime) -> list[tuple[DzenArticle, D
         )
         if already is not None:
             continue
+        gates = _kit_editorial_gates(article, kit)
+        if not gates.ok:
+            article.status = DzenArticleStatus.NEEDS_REVISION.value
+            article.status_reason = "; ".join(gates.issues)[:1000]
+            log.warning(
+                "dzen.digest.held_for_revision",
+                article_id=article.public_id,
+                issues=gates.issues[:6],
+            )
+            continue
         result.append((article, kit))
     return result
+
+
+def _picks_from_kit(kit: DzenPublishingKit) -> list[DzenProductPick]:
+    picks: list[DzenProductPick] = []
+    for row in kit.product_links_json or []:
+        if not isinstance(row, dict):
+            continue
+        picks.append(
+            DzenProductPick(
+                external_id=str(row.get("product_id") or ""),
+                title=str(row.get("title") or ""),
+                slug="",
+                affiliate_url=str(row.get("url") or ""),
+                inclusions=list(row.get("inclusions") or []),
+                exclusions=[],
+                ticket_included=row.get("ticket_included"),
+                cover=None,
+                city_name=None,
+                snapshot={},
+                is_free=bool(row.get("is_free")),
+                duration_label=row.get("duration"),
+                distance_label=row.get("distance"),
+                listen_in_browser=bool(row.get("listen_in_browser")),
+                reader_pitch=str(row.get("pitch") or ""),
+            )
+        )
+    return picks
+
+
+def _kit_editorial_gates(article: DzenArticle, kit: DzenPublishingKit) -> GateResult:
+    if not article.body_ast:
+        failed = GateResult(ok=False)
+        failed.fail("missing article body")
+        return failed
+    try:
+        ast = DzenArticleAST.model_validate(article.body_ast)
+    except Exception:
+        failed = GateResult(ok=False)
+        failed.fail("stored article body is not a valid AST")
+        return failed
+    urls = [
+        str(item.get("url"))
+        for item in (kit.media_manifest_json or [])
+        if isinstance(item, dict) and item.get("url")
+    ]
+    if kit.cover_url:
+        urls = [kit.cover_url, *[url for url in urls if url != kit.cover_url]]
+    return run_gates(
+        ast,
+        products=_picks_from_kit(kit),
+        image_urls=urls,
+        cover_url=kit.cover_url,
+        first_person_evidence=False,
+    )
 
 
 def _pings_today(session: Session, local_date: dt.date, staff_user_id: str, channel: str) -> int:

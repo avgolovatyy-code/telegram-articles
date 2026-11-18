@@ -39,6 +39,14 @@ def _product() -> DzenProductPick:
         cover=None,
         city_name="Казань",
         snapshot={},
+        is_free=True,
+        duration_label="1 ч 30 мин–2 ч",
+        distance_label="4 км",
+        listen_in_browser=True,
+        reader_pitch=(
+            "Городские легенды Казани — бесплатная аудиоэкскурсия, 1 ч 30 мин–2 ч, "
+            "маршрут около 4 км, слушать можно в браузере, приложение ставить не обязательно"
+        ),
     )
 
 
@@ -52,6 +60,9 @@ def test_dzen_sanitizer_keeps_headings_lists_and_https_links():
     assert "coupon=435" in cleaned
     assert "<script" not in cleaned
     assert "<img" not in cleaned
+    assert "бесплатн" in cleaned.casefold()
+    assert "браузер" in cleaned.casefold()
+    assert "проверьте карточку" not in cleaned.casefold()
 
 
 def test_clipboard_wraps_start_fragment_for_editors():

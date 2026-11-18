@@ -57,9 +57,19 @@ DZEN_WRITER_BODY = """Напиши оригинальную русскоязыч
 
 Структура: headline (55–100 символов), lead (300–450), 3–7 подзаголовков с именами
 мест или задач, practical_takeaway.
+Если заголовок обещает два дня / уикенд — распиши ОБА дня: места, порядок,
+ориентировочную длительность. Не оставляй второй день фразой «выберите что-нибудь».
+Каждый практический совет — один раз, без рефрена про «согреваться каждые полтора часа».
+
 Объём тела примерно 4000–9000 символов, без воды. Статья самодостаточна без покупки.
 Товары WeGoTrip — по желанию, 0–3, только product_id из контекста и только рядом
-с местом, которое вы описали. Честно напишите, входит ли билет.
+с местом, которое вы описали. Берите из карточки: бесплатно/цена, длительность,
+километраж, старт и финиш маршрута, слушать в браузере (приложение не обязательно).
+Не пишите «проверьте карточку товара» и не ограничивайте описание только приложением,
+если в карточке есть web player.
+Если в контексте есть rewrite_issues — это причины провала редакционного контроля.
+Перепишите статью так, чтобы они исчезли: лучше задержать материал, чем закрыть дыры
+общими фразами.
 Не копируй посты Telegram/MAX.
 Не утверждай, что любой зарубежный музей на WeGoTrip оплачивается российской картой.
 """
@@ -70,8 +80,11 @@ AI clichés, clickbait, Telegram-post clone, product dump, missing reader value,
 a stroll-museum-cafe outline that would fit any city, neighbouring towns stuffed
 in to sell extra products, or a claim that any foreign museum ticket can be paid
 with a Russian card.
+Fail if a two-day headline has a hollow second day, if the same warming-interval
+advice is repeated, if product duration/route/price contradict the copy, or if
+ops notes like «проверьте карточку товара» leak into the article.
 Pass only if the piece is a specific travel feature: named places, useful detail,
-safe facts, optional products that match those places.
+a local story, safe facts, optional products that match those places.
 Do not fail solely because hours, tickets or exhibitions are omitted and the
 reader is told to check the official page.
 """

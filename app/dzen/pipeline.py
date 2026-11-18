@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -95,7 +96,7 @@ def generate_dzen_article(
         settings=settings,
     )
 
-    context = {
+    context: dict[str, Any] = {
         "brief": article.brief,
         "headline_hint": article.headline,
         "city": article.destination_city,
@@ -109,6 +110,11 @@ def generate_dzen_article(
                 "inclusions": p.inclusions,
                 "ticket_included": p.ticket_included,
                 "matched_places": p.matched_places,
+                "is_free": p.is_free,
+                "duration": p.duration_label,
+                "distance": p.distance_label,
+                "listen_in_browser": p.listen_in_browser,
+                "pitch": p.reader_pitch,
             }
             for p in inventory
         ],
@@ -116,10 +122,12 @@ def generate_dzen_article(
         "payment_claim_verified": False,
         "instruction": (
             "Write an original Russian Dzen travel feature. Name real districts, "
-            "streets, museums and habits of this city. Do not add neighbouring "
+            "streets, museums and habits of this city. If the headline promises two "
+            "days, write both days with places and durations. Do not add neighbouring "
             "towns or islands unless the brief already names them. Products are "
             "optional: mention at most those in context, and only next to a place "
-            "you actually described. Do not mirror Telegram."
+            "you actually described. Use catalog duration, distance and browser "
+            "playback. Never write «проверьте карточку товара». Do not mirror Telegram."
         ),
     }
     try:
@@ -243,6 +251,92 @@ def generate_dzen_article(
         cover_url=cover,
         first_person_evidence=False,
     )
+    if (not gates.ok or _critic_blocks_handoff(critic)) and not context.get("_retried"):
+        context["_retried"] = True
+        context["rewrite_issues"] = gates.issues + critic.issues
+        article.status = DzenArticleStatus.NEEDS_REVISION.value
+        try:
+            written = gateway.run(
+                task=LLMTask.DZEN_WRITE,
+                prompt=PROMPTS["dzen_writer_v1"],
+                payload=json.dumps(context, ensure_ascii=False),
+                json_schema=dzen_article_json_schema(),
+                schema_name="dzen_article",
+                market="ru",
+                max_output_tokens=6000,
+                enforce_budget=True,
+            )
+            report.cost_usd += written.cost_usd
+            parsed = written.response.parsed
+            if isinstance(parsed, dict):
+                ast = DzenArticleAST.model_validate(parsed)
+                ast = _sanitize_ast(ast, article, [p.external_id for p in inventory], media_ids=[])
+                ast = _ensure_length(ast)
+                ast.claims = _qualify_claims(ast.claims)
+                products = match_products(
+                    session,
+                    article_id=article.public_id,
+                    topic_slug=(article.destination_city or article.public_id),
+                    city_name=article.destination_city,
+                    country_code=article.destination_country,
+                    article_text=body_text(ast),
+                    focus_text=_focus_text(ast),
+                    limit=3,
+                    settings=settings,
+                )
+                heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+                assets = collect_catalog_images(
+                    session,
+                    product_ids=[p.external_id for p in products],
+                    city_name=article.destination_city,
+                    headings=heading_names,
+                    limit=5,
+                )
+                assets = validate_assets(assets, settings)
+                assets = dedupe_downloaded(assets)
+                if assets:
+                    assets[0].role = "cover"
+                    ast = _sanitize_ast(
+                        ast,
+                        article,
+                        [p.external_id for p in products],
+                        [a.asset_id for a in assets],
+                    )
+                    article.product_ids = [p.external_id for p in products]
+                    gates = run_gates(
+                        ast,
+                        products=products,
+                        image_urls=[a.url for a in assets],
+                        cover_url=assets[0].url,
+                        first_person_evidence=False,
+                    )
+                    try:
+                        critic_run = gateway.run(
+                            task=LLMTask.DZEN_CRITIC,
+                            prompt=PROMPTS["dzen_critic_v1"],
+                            payload=json.dumps(
+                                {"article": json.loads(ast.model_dump_json())},
+                                ensure_ascii=False,
+                            ),
+                            json_schema=dzen_critic_json_schema(),
+                            schema_name="dzen_critic",
+                            market="ru",
+                            enforce_budget=True,
+                        )
+                        report.cost_usd += critic_run.cost_usd
+                        critic = DzenCriticReport.model_validate(critic_run.response.parsed or {})
+                        article.quality_scores = {
+                            "critic_pass": critic.pass_gate,
+                            "quality": critic.quality_score,
+                            "factuality": critic.factuality_score,
+                            "issues": critic.issues,
+                            "rewritten": True,
+                        }
+                    except Exception as critic_exc:
+                        log.warning("dzen.critic_retry_failed", error=str(critic_exc))
+        except Exception as exc:
+            gates.issues.append(str(exc))
+            gates.ok = False
     if not gates.ok or _critic_blocks_handoff(critic):
         article.status = DzenArticleStatus.NEEDS_REVISION.value
         article.status_reason = "; ".join(gates.issues + critic.issues)[:1000]
@@ -406,6 +500,106 @@ def rebuild_kit_from_stored_ast(
             )
         )
     article.product_ids = [p.external_id for p in products]
+    gates = run_gates(
+        ast,
+        products=products,
+        image_urls=[a.url for a in assets],
+        cover_url=assets[0].url,
+        first_person_evidence=False,
+    )
+    if not gates.ok:
+        article.status = DzenArticleStatus.NEEDS_REVISION.value
+        article.status_reason = "; ".join(gates.issues)[:1000]
+        report.ok = False
+        report.issues = gates.issues
+        report.status = article.status
+        return report
+    persist_kit(session, article, ast, products, assets, settings)
+    report.status = article.status
+    report.ok = article.status == DzenArticleStatus.READY_FOR_HANDOFF.value
+    return report
+
+
+def apply_editorial_ast(
+    session: Session,
+    article: DzenArticle,
+    ast: DzenArticleAST,
+    *,
+    settings: Settings | None = None,
+) -> DzenGenerateReport:
+    """Replace a stored article with an editor-approved AST. No writer call."""
+    settings = settings or get_settings()
+    report = DzenGenerateReport(article_id=article.public_id)
+    ast = _sanitize_ast(ast, article, list(ast.product_ids or []), media_ids=[])
+    products = match_products(
+        session,
+        article_id=article.public_id,
+        topic_slug=(article.destination_city or article.public_id),
+        city_name=article.destination_city or ast.destination_city,
+        country_code=article.destination_country or ast.destination_country,
+        article_text=body_text(ast),
+        focus_text=_focus_text(ast),
+        limit=3,
+        settings=settings,
+    )
+    wanted = list(ast.product_ids or [])
+    if wanted:
+        by_id = {p.external_id: p for p in products}
+        ordered = [by_id[pid] for pid in wanted if pid in by_id]
+        products = ordered or products
+    heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    assets = collect_catalog_images(
+        session,
+        product_ids=[p.external_id for p in products],
+        city_name=article.destination_city or ast.destination_city,
+        headings=heading_names,
+        limit=5,
+    )
+    assets = validate_assets(assets, settings)
+    assets = dedupe_downloaded(assets)
+    if not assets:
+        report.ok = False
+        report.issues.append("no cover")
+        return report
+    assets[0].role = "cover"
+    for inline in assets[1:]:
+        inline.role = "inline"
+    ast = _sanitize_ast(
+        ast, article, [p.external_id for p in products], [a.asset_id for a in assets]
+    )
+    ast.blocks = [b for b in ast.blocks if b.type != "image"]
+    for index, asset in enumerate(assets[1:], start=0):
+        asset.after_heading = (
+            heading_names[min(index, len(heading_names) - 1)] if heading_names else None
+        )
+        ast.blocks.append(
+            DzenBlock(
+                type="image",
+                media_asset_id=asset.asset_id,
+                caption=asset.caption,
+                after_heading=asset.after_heading,
+            )
+        )
+    gates = run_gates(
+        ast,
+        products=products,
+        image_urls=[a.url for a in assets],
+        cover_url=assets[0].url,
+        first_person_evidence=False,
+    )
+    if not gates.ok:
+        article.status = DzenArticleStatus.NEEDS_REVISION.value
+        article.status_reason = "; ".join(gates.issues)[:1000]
+        report.ok = False
+        report.issues = gates.issues
+        report.status = article.status
+        return report
+    if article.version < 1:
+        article.version = 1
+    article.version = int(article.version or 1) + (1 if article.ready_at is not None else 0)
+    article.headline = ast.headline
+    article.lead = ast.lead
+    article.product_ids = [p.external_id for p in products]
     persist_kit(session, article, ast, products, assets, settings)
     report.status = article.status
     report.ok = article.status == DzenArticleStatus.READY_FOR_HANDOFF.value
@@ -452,4 +646,9 @@ def _ensure_length(ast: DzenArticleAST) -> DzenArticleAST:
     return ast
 
 
-__all__ = ["DzenGenerateReport", "generate_dzen_article", "rebuild_kit_from_stored_ast"]
+__all__ = [
+    "DzenGenerateReport",
+    "apply_editorial_ast",
+    "generate_dzen_article",
+    "rebuild_kit_from_stored_ast",
+]

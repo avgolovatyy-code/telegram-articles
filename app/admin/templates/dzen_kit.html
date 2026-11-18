@@ -57,7 +57,7 @@
     {% for product in products %}
     <li>
       <strong>{{ product.title }}</strong>
-      <div class="muted small">{{ 'билет включён' if product.ticket_included else 'уточните, входит ли входной билет' }} · проверено {{ product.verified_at }}</div>
+      <div class="muted small">{{ product.pitch or product.title }} · проверено {{ product.verified_at }}</div>
       <a href="{{ product.url }}" target="_blank" rel="noopener">{{ product.url }}</a>
       <button class="btn" type="button" data-copy-url="{{ product.url }}">Скопировать ссылку</button>
     </li>
