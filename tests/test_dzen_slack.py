@@ -40,6 +40,8 @@ def test_tuesday_digest_one_mention_two_kits(synced_session, settings, monkeypat
     assert "@U03AE1ATKDJ" not in text.replace("<@U03AE1ATKDJ>", "")
     assert "/dzen/k/" in text
     assert "Открыть готовую статью" in text or "dzen/k" in text
+    assert "не страница Дзена" in text
+    assert "не для поиска" in text
 
     again = send_dzen_digest(
         synced_session, settings=settings, client=client, now=_now(17), force_hour=True

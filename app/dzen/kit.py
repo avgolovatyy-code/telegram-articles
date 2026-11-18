@@ -32,6 +32,9 @@ FORBIDDEN_COPY_MARKERS = (
     "media_asset_id",
     "/admin/",
     "internal-source",
+    "Это не страница Дзена",
+    "Служебный пакет",
+    "dzen-howto",
 )
 
 
