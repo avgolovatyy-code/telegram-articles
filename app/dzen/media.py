@@ -132,11 +132,7 @@ def collect_catalog_images(
     if city_name and not product_ids:
         folded = fold_place(city_name)
         city_rows = list(session.scalars(select(City).where(City.market == "ru")))
-        city_ids = [
-            row.external_id
-            for row in city_rows
-            if folded == fold_place(row.name) or folded in fold_place(row.name)
-        ]
+        city_ids = [row.external_id for row in city_rows if folded == fold_place(row.name)]
         extra = list(
             session.scalars(
                 select(Product).where(
@@ -156,6 +152,15 @@ def collect_catalog_images(
             if distinctive and not (distinctive & heading_tokens):
                 continue
             products.append(product)
+
+    if city_name:
+        dest_ids = {
+            row.external_id
+            for row in session.scalars(select(City).where(City.market == "ru"))
+            if fold_place(row.name) == fold_place(city_name)
+        }
+        if dest_ids:
+            products = [p for p in products if p.city_external_id in dest_ids]
 
     used_headings: set[int] = set()
     for product in products:

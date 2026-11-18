@@ -76,6 +76,41 @@ def test_kazan_article_does_not_get_sviyazhsk(session, settings):
     assert all("utm_source=dzen" in p.affiliate_url for p in picks)
 
 
+def test_passing_mention_does_not_attach_other_city(session, settings):
+    kazan = _city(session, "551487", "Казань")
+    spb = _city(session, "498817", "Санкт-Петербург")
+    _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+        rank=1,
+    )
+    _product(
+        session,
+        external_id="2702",
+        title="Петербургский крафт: тур по барам местных пивоварен",
+        city_id=spb.external_id,
+        rank=1,
+    )
+    article = (
+        "Казань на зимний уикенд: Кремль, Баумана и слобода. "
+        "Это не Петербург и не его бары — остаёмся в Казани."
+    )
+    picks = match_products(
+        session,
+        article_id="art-mix",
+        topic_slug="kazan",
+        city_name="Казань",
+        country_code="RU",
+        article_text=article,
+        settings=settings,
+    )
+    titles = [p.title for p in picks]
+    assert titles == ["Городские легенды Казани"]
+    assert all("Петербург" not in title for title in titles)
+
+
 def test_zero_products_when_nothing_matches(session, settings):
     _city(session, "1", "Казань")
     _product(
@@ -143,6 +178,33 @@ def test_catalog_images_stay_with_matched_products(session):
     )
     assert assets
     assert all("25427" not in (asset.url or "") for asset in assets)
+    assert all("1526" in (asset.url or "") for asset in assets)
+
+
+def test_images_ignore_other_city_product_ids(session):
+    kazan = _city(session, "551487", "Казань")
+    spb = _city(session, "498817", "Санкт-Петербург")
+    _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+    )
+    _product(
+        session,
+        external_id="2702",
+        title="Петербургский крафт: тур по барам местных пивоварен",
+        city_id=spb.external_id,
+    )
+    assets = collect_catalog_images(
+        session,
+        product_ids=["2702", "1526"],
+        city_name="Казань",
+        headings=["Кремль"],
+        limit=5,
+    )
+    assert assets
+    assert all("2702" not in (asset.url or "") for asset in assets)
     assert all("1526" in (asset.url or "") for asset in assets)
 
 

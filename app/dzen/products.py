@@ -172,6 +172,10 @@ def score_product(
             or fold_place(city.name) == fold_place(destination.name)
         )
     )
+    # A named destination city is a hard filter: mentioning another city in
+    # passing must not attach that city's catalogue (SPb beer on a Kazan weekend).
+    if destination is not None and not same_city:
+        return 0, []
     if same_city:
         score += 8
         matched.append(city.name if city else "city")
