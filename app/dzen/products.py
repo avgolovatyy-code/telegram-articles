@@ -129,9 +129,9 @@ def product_is_free(product: Product) -> bool:
 
 
 def listen_in_browser(product: Product) -> bool:
-    """Prefer how-it-works (web player) over the leftover FAQ that still says 'app only'."""
+    """Prefer the public web player over leftover FAQ copy that still says 'app only'."""
     blob = _catalog_blob(product)
-    return any(
+    if any(
         marker in blob
         for marker in (
             "в браузере",
@@ -140,19 +140,31 @@ def listen_in_browser(product: Product) -> bool:
             "приложение не обязательно",
             "устанавливать приложение не обязательно",
         )
+    ):
+        return True
+    audio = any(
+        token in blob
+        for token in ("аудиоэкскурсия", "аудиогид", "аудиотур", "audio tour", "audio guide")
     )
+    return audio
 
 
 def human_duration(text: str | None) -> str | None:
     if not text:
         return None
     raw = text.strip()
-    raw = re.sub(r"(\d)\s*h\s*", r"\1 ч ", raw, flags=re.I)
-    raw = re.sub(r"(\d)\s*ч\s*", r"\1 ч ", raw, flags=re.I)
-    raw = re.sub(r"(\d)\s*min\b", r"\1 мин", raw, flags=re.I)
+    raw = re.sub(r"(\d)\.(\d)", r"\1,\2", raw)
+    raw = re.sub(r"(?i)\bhours?\b", "ч", raw)
+    raw = re.sub(r"(?i)\bminutes?\b", "мин", raw)
+    raw = re.sub(r"(\d)\s*mins?\b", r"\1 мин", raw, flags=re.I)
+    raw = re.sub(r"(\d)\s*h\b", r"\1 ч", raw, flags=re.I)
+    raw = re.sub(r"(\d)\s*ч\b", r"\1 ч", raw, flags=re.I)
     raw = re.sub(r"(\d)\s*мин", r"\1 мин", raw, flags=re.I)
     raw = re.sub(r"\s+", " ", raw).strip(" -–")
-    return raw.replace(" - ", "–").replace(" – ", "–")
+    raw = raw.replace(" - ", "–").replace(" – ", "–")
+    if re.fullmatch(r"[\d,]+\s*[–-]\s*[\d,]+\s*ч", raw):
+        return raw.replace(" ч", " часа")
+    return raw
 
 
 def human_distance(text: str | None) -> str | None:

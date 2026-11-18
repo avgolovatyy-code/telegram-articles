@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from app.db.models import City, Product
 from app.dzen.media import collect_catalog_images, image_fingerprint
-from app.dzen.products import listen_in_browser, match_products, product_is_free, reader_pitch
+from app.dzen.products import (
+    human_duration,
+    listen_in_browser,
+    match_products,
+    product_is_free,
+    reader_pitch,
+)
 
 
 def _city(session, external_id: str, name: str) -> City:
@@ -31,6 +37,12 @@ def _product(session, *, external_id: str, title: str, city_id: str, rank: int =
     return row
 
 
+def test_human_duration_does_not_split_hours():
+    assert human_duration("1.5 – 2 hours") == "1,5–2 часа"
+    assert human_duration("1h 30min - 2h") == "1 ч 30 мин–2 ч"
+    assert human_duration("1ч 30мин - 2ч") == "1 ч 30 мин–2 ч"
+
+
 def test_reader_pitch_prefers_web_player_and_skips_ops_notes(session):
     kazan = _city(session, "551487", "Казань")
     product = _product(
@@ -40,12 +52,12 @@ def test_reader_pitch_prefers_web_player_and_skips_ops_notes(session):
         city_id=kazan.external_id,
     )
     product.price = 0
-    product.duration_text = "1ч 30мин - 2ч"
+    product.duration_text = "1.5 – 2 hours"
     product.distance = "4 км"
     product.description = (
-        "После покупки откройте экскурсию по полученной ссылке. "
-        "Устанавливать приложение не обязательно. Слушайте в браузере."
+        "Экскурсия начнется с посещения старо-татарской слободы, затем улица Баумана."
     )
+    product.inclusions = ["Аудиоэкскурсия для вашего смартфона в приложении WeGoTrip"]
     product.important_info = [
         "Аудиоэкскурсия доступна только в приложении WeGoTrip.",
         "входной билет может быть отдельно — проверьте карточку товара",
@@ -55,8 +67,10 @@ def test_reader_pitch_prefers_web_player_and_skips_ops_notes(session):
     assert listen_in_browser(product) is True
     pitch = reader_pitch(product)
     assert "бесплатная аудиоэкскурсия" in pitch
+    assert "1,5–2 часа" in pitch
     assert "браузер" in pitch
     assert "4 км" in pitch
+    assert "ч ours" not in pitch
     assert "проверьте карточку" not in pitch.casefold()
     assert "входной билет может быть отдельно" not in pitch.casefold()
 
