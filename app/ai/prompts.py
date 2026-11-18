@@ -422,6 +422,8 @@ Rules:
 - Choose pillar and format from the allowed catalog in the brief context.
 - Assign audience: local | traveler | both.
 - Assign editorial_mechanic (one of the competitor-inspired mechanisms) and audience_axis.
+- destination_country MUST be ISO 3166-1 alpha-2 (AE, JP, RU, FR). Never a full name
+  like "United Arab Emirates" — that overflows the database column.
 - product_recommendation is usually optional or none; required only for product_in_context.
 - If no strong candidate exists, return decisions=[] and explain in empty_slots_justification.
 - NEVER propose changing Telegram channel title, description, avatar, or pinned welcome post.
@@ -462,7 +464,7 @@ guide without evidence in the brief.
 
 CHIEF_EDITOR_RU = Prompt(
     name="chief_editor_ru_market_v2_3",
-    version="v3",
+    version="v4",
     task=LLMTask.CHIEF_EDITOR,
     market="ru",
     body=CHIEF_EDITOR_SHARED
@@ -474,7 +476,7 @@ Write editorial_thesis and daily_summary in Russian. Angles and reader_value in 
 
 CHIEF_EDITOR_EN = Prompt(
     name="chief_editor_en",
-    version="v3",
+    version="v4",
     task=LLMTask.CHIEF_EDITOR,
     market="en",
     body=CHIEF_EDITOR_SHARED

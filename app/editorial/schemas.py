@@ -7,6 +7,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, Field, field_validator
 
+from app.editorial.countries import normalize_destination_country
 from app.editorial.mechanics import (
     AUDIENCE_AXES,
     CHANNEL_IDS,
@@ -103,6 +104,19 @@ class EditorialDecision(BaseModel):
     def _channels(cls, value: list[str]) -> list[str]:
         cleaned = [item for item in value if item in CHANNEL_IDS]
         return cleaned
+
+    @field_validator("destination_country", mode="before")
+    @classmethod
+    def _country(cls, value: str | None) -> str | None:
+        return normalize_destination_country(value)
+
+    @field_validator("destination_city", mode="before")
+    @classmethod
+    def _city(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        text = str(value).strip()
+        return text[:128] if text else None
 
     def fill_defaults(self, market: str) -> EditorialDecision:
         updates: dict[str, Any] = {}

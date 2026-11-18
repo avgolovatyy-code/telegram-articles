@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.config import Market, Settings
 from app.db.models import EditorialPlanSlot, EditorialRun, TopicCandidate
 from app.db.types import utcnow
+from app.editorial.countries import normalize_destination_country
 from app.editorial.diversity import reject_reason
 from app.editorial.schemas import EditorialDecision, EditorialDecisionSet
 
@@ -107,8 +108,8 @@ def apply_decision_set(
                 reader_value=filled.reader_value,
                 editorial_mechanic=filled.editorial_mechanic,
                 audience_axis=filled.audience_axis,
-                destination_country=filled.destination_country,
-                destination_city=filled.destination_city,
+                destination_country=normalize_destination_country(filled.destination_country),
+                destination_city=(filled.destination_city or "")[:128] or None,
                 channel_targets=list(filled.channel_targets),
                 priority=filled.priority,
                 status="needs_review" if filled.needs_human_review else "planned",
