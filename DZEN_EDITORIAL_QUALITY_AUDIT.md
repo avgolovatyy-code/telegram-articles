@@ -2,9 +2,8 @@
 
 **Дата:** 18 ноября 2026, Europe/Moscow  
 **Ветка:** `cursor/dzen-editorial-quality-01af`  
-**Коммит:** `fed7385`  
 **PR:** https://github.com/avgolovatyy-code/telegram-articles/pull/17 (stack on #16)  
-**Production SHA:** `fed7385` на `/opt/wegotrip-content-engine`  
+**Production SHA:** `fed7385` на `/opt/wegotrip-content-engine` (pipeline). Докат качества — этот коммит после зелёного CI.  
 **Спецификация:** `WEGOTRIP_DZEN_UNIVERSAL_EDITORIAL_QUALITY_CURSOR.md`  
 **Вердикт:** `GO_WITH_CONDITIONS`
 
@@ -72,7 +71,7 @@ Telegram RU/EN, MAX, Slack-расписание, `DAILY_AI_BUDGET_USD` и авт
 - [`audit/dzen_quality/samples/itinerary.html`](audit/dzen_quality/samples/itinerary.html) — Нижний Новгород, два дня
 - [`audit/dzen_quality/samples/museum.html`](audit/dzen_quality/samples/museum.html) — Лондон, музейный гид
 
-Зачины и каркас различаются: маршрут держит «День первый/второй», how-to — проблему/шаги/ограничения, музей — петлю залов.
+Зачины и каркас различаются: маршрут держит «День первый/второй», how-to — проблему/шаги/ограничения, музей — петлю залов. Нумерованные «слои» и `{d}`-плейсхолдеры убраны: короткий текст больше не добивается водой, а падает в length gate / revise.
 
 ## 5. Backlog по данным каталога
 
@@ -93,10 +92,10 @@ Telegram RU/EN, MAX, Slack-расписание, `DAILY_AI_BUDGET_USD` и авт
 
 **`GO_WITH_CONDITIONS`**
 
-Новые материалы Дзена проходят жанровый контракт и детерминированные hard blockers до handoff. Условия:
+Новые материалы Дзена проходят жанровый контракт и детерминированные hard blockers до handoff. CI на HEAD PR #17 зелёный. Условия, которые остаются:
 
-1. Дождаться зелёного CI на PR #17.
-2. Live OpenAI-writer по-прежнему зависит от бюджета $3/день: при hold календарь не заполняется выдумкой.
-3. Расхождение FAQ/how-it-works у карточки 1526 остаётся backlog владельца данных.
+1. Live OpenAI-writer по-прежнему зависит от бюджета $3/день: при hold календарь не заполняется выдумкой.
+2. Расхождение FAQ/how-it-works у карточки 1526 остаётся backlog владельца данных.
+3. Merge после родителя [#16](https://github.com/avgolovatyy-code/telegram-articles/pull/16).
 
 Успех этой работы — качество следующих публикаций, а не бесконечная правка одной казанской статьи.

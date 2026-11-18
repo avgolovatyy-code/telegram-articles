@@ -706,6 +706,8 @@ def dzen_list(
     _: str = Depends(require_admin),
 ) -> HTMLResponse:
     articles = list(session.scalars(select(DzenArticle).order_by(DzenArticle.id.desc()).limit(80)))
+    from app.dzen.portfolio import portfolio_report
+
     return templates.TemplateResponse(
         request,
         "dzen_list.html",
@@ -716,6 +718,7 @@ def dzen_list(
             "dzen_hour": settings.dzen_slack_notify_hour,
             "mention": settings.dzen_slack_mention_user_id,
             "autopublish": settings.dzen_native_autopublish_enabled,
+            "portfolio": portfolio_report(session),
         },
     )
 

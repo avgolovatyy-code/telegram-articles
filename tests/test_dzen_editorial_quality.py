@@ -576,16 +576,55 @@ def test_four_sample_kits_are_genre_distinct():
     ]
     saved: dict[str, str] = {}
     for fmt, genre, city in specs:
-        payload = _dzen_article({"city": city, "format": fmt, "country": "RU"})
+        payload = _dzen_article({"city": city, "format": fmt, "country": "RU", "genre": genre})
         ast = DzenArticleAST.model_validate(payload)
         result = _gates(ast)
         assert result.ok, (genre, result.issues)
         html = clipboard_html(ast, [])
         (SAMPLES / f"{genre}.html").write_text(html, encoding="utf-8")
         saved[genre] = html
+        assert "{d}" not in html
+        assert "слой 1" not in html
+        assert "рядом с купеческий тканью" not in html
     assert len({text[:180] for text in saved.values()}) == 4
     assert "день первый" in saved["itinerary"].casefold()
     assert "checkout" in saved["howto"].casefold() or "карт" in saved["howto"].casefold()
+    assert "именной зал" in saved["museum"].casefold() or "зал" in saved["museum"].casefold()
+    assert saved["city_guide"].casefold().count("день первый") == 0
+
+
+def test_format_placeholder_is_hard_fail():
+    ast = _ast(
+        headline="Стамбул без спешки: Каракёй, Галата и другой берег",
+        city="Стамбул",
+        fmt="dzen_city_guide",
+        headings=["Каракёй", "Галата", "Кадыкёй"],
+        paras=[
+            _fill("Каракёй", "Галата", "Пера", "Золотой", city="Стамбул")
+            + " Затем {d} как панорама на полчаса.",
+            _fill("Галата", "Каракёй", "Султанахмет", "Кадыкёй", city="Стамбул"),
+            _fill("Кадыкёй", "Султанахмет", "Галата", "Пера", city="Стамбул"),
+        ],
+    )
+    result = _gates(ast)
+    assert result.ok is False
+    assert any("placeholder" in item for item in result.issues)
+
+
+def test_numbered_filler_layers_are_repetition():
+    ast = _ast(
+        headline="Казань без спешки: слобода, Баумана и озеро Кабан",
+        city="Казань",
+        fmt="dzen_city_guide",
+        headings=["Слобода", "Баумана", "Кабан"],
+        paras=[
+            "Купеческий слой 1 в Казани: Кремль рядом с тканью.",
+            "Ярмарочный слой 2 в Казани: Баумана рядом с тканью.",
+            "Университетский слой 3 в Казани: Кабан рядом с тканью. " + _fill("Кремль", "Баумана"),
+        ],
+    )
+    report = redundancy_report(ast)
+    assert any("filler" in item or "слой" in item for item in report.issues)
 
 
 def test_portfolio_counts_genres(synced_session, settings):
@@ -593,6 +632,8 @@ def test_portfolio_counts_genres(synced_session, settings):
     report = portfolio_report(synced_session)
     assert report["article_count"] >= 1
     assert report["genres"]
+    assert "cost_usd" in report
+    assert "heavy_genre" in report
 
 
 def test_write_scenarios_table():

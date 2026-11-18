@@ -106,6 +106,9 @@ def redundancy_report(ast: DzenArticleAST) -> SemanticRedundancyReport:
             for window in found:
                 counts[window] = counts.get(window, 0) + 1
         shared = sum(1 for count in counts.values() if count >= 3)
+    numbered = re.findall(r"слой\s+\d+", _body(ast).casefold())
+    if len(numbered) >= 3:
+        report.issues.append("repetition: numbered filler layers restating the same places")
     if report.repeats or shared:
         report.issues.append("repetition: the same idea is restated in several sections")
     return report

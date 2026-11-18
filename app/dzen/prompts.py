@@ -25,8 +25,9 @@ context contains real notes.
 For every brief set genre (itinerary|city_guide|museum|story|howto|news|
 comparison|interview|culture) and reader_promise: what the reader will be able
 to do after reading. Vary genres across the week. Do not plan six identical
-«city in two days» itineraries. If facts would be too thin for the genre,
-pick another genre or city.
+«city in two days» itineraries. Use the rolling 30-day portfolio snapshot:
+do not put the heavy_genre on consecutive dates. If facts would be too thin
+for the genre, pick another genre or city.
 
 Geography: mix Russia AND abroad (Istanbul, Barcelona, Paris, London, etc.)
 when locale=ru WeGoTrip products exist. Lifehacks for Russians paying abroad,
@@ -96,6 +97,8 @@ how-it-works канал воспроизведения не утверждай.
 Не пишите «проверьте карточку товара».
 Если в контексте есть rewrite_issues — это причины провала редакционного контроля.
 Исправь ИМЕННО их. Лучше задержать материал, чем закрыть дыры общими фразами.
+Не добивай объём нумерованными «слоями» и пересказом тех же мест другими
+прилагательными. Если проверенных фактов мало — короче и hold, не вода.
 Не копируй посты Telegram/MAX.
 Не утверждай, что любой зарубежный музей на WeGoTrip оплачивается российской картой.
 """

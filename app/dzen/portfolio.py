@@ -30,9 +30,11 @@ def portfolio_report(session: Session, *, now: dt.datetime | None = None) -> dic
     )
     genres: Counter[str] = Counter()
     countries: Counter[str] = Counter()
+    reasons: Counter[str] = Counter()
     first_pass = 0
     holds = 0
     with_products = 0
+    cost_usd = 0.0
     for article in rows:
         brief = article.brief if isinstance(article.brief, dict) else {}
         genre = brief.get("genre") or genre_from_format(article.format)
@@ -46,6 +48,10 @@ def portfolio_report(session: Session, *, now: dt.datetime | None = None) -> dic
             holds += 1
         if article.product_ids:
             with_products += 1
+        if article.status_reason:
+            reasons[article.status_reason[:80]] += 1
+        cost_usd += float(article.actual_cost_usd or 0)
+    heavy_genre = genres.most_common(1)[0][0] if genres else ""
     return {
         "window_days": 30,
         "article_count": len(rows),
@@ -55,6 +61,9 @@ def portfolio_report(session: Session, *, now: dt.datetime | None = None) -> dic
         "holds": holds,
         "with_products": with_products,
         "zero_product_share": (len(rows) - with_products) / len(rows) if rows else 0.0,
+        "cost_usd": round(cost_usd, 4),
+        "hold_reasons": dict(reasons),
+        "heavy_genre": heavy_genre,
     }
 
 

@@ -7,6 +7,20 @@
   Slack: {{ dzen_days }} в {{ dzen_hour }}:00 Europe/Moscow, упоминание &lt;@{{ mention }}&gt; не чаще раза в рабочий день.
   Автопубликация: {{ 'включена — это ошибка' if autopublish else 'выключена' }}.
 </p>
+{% if portfolio %}
+<p class="muted small">
+  30 дней: {{ portfolio.article_count }} статей
+  · жанры:
+  {% for name, count in (portfolio.genres or {}).items() %}{{ name }} {{ count }}{% if not loop.last %}, {% endif %}{% endfor %}
+  {% if not portfolio.genres %}—{% endif %}
+  · страны:
+  {% for name, count in (portfolio.countries or {}).items() %}{{ name }} {{ count }}{% if not loop.last %}, {% endif %}{% endfor %}
+  {% if not portfolio.countries %}—{% endif %}
+  · first-pass {{ portfolio.first_pass_accept }}
+  · hold {{ portfolio.holds }}
+  · без товара {{ '%.0f'|format((portfolio.zero_product_share or 0) * 100) }}%
+</p>
+{% endif %}
 
 <table>
   <thead>

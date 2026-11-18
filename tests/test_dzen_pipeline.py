@@ -26,6 +26,8 @@ def test_planner_creates_independent_slots(synced_session, settings):
         assert row.planned_date.weekday() in {1, 3}  # TU/TH
     assert countries
     assert countries != {"RU"}
+    genres = [(row.brief or {}).get("genre") or row.format for row in created]
+    assert len(set(genres)) >= min(2, len(genres))
 
 
 def test_generate_builds_kit_with_coupon_and_images(

@@ -50,12 +50,6 @@ from app.logging_setup import get_logger
 
 log = get_logger("dzen.pipeline")
 
-SAFE_PAYMENT_NOTE = (
-    "Для ряда зарубежных музеев на WeGoTrip доступны билеты с оплатой в рублях "
-    "российской картой — перед покупкой проверьте конкретный билет и способы "
-    "оплаты на странице заказа."
-)
-
 
 @dataclass(slots=True)
 class DzenGenerateReport:
@@ -782,44 +776,12 @@ def apply_editorial_ast(
 
 
 def _ensure_length(ast: DzenArticleAST) -> DzenArticleAST:
-    """Pad only with unique recap lines — never invent facts or repeat a paragraph."""
-    headings = [b.text for b in ast.blocks if b.type == "heading" and b.text]
-    city = ast.destination_city or "городе"
-    templates = (
-        "Про «{place}» в {city}: это не повтор раздела, а напоминание сверять правила "
-        "входа на официальной странице именно этого места ({n}).",
-        "Отдельная оговорка по «{place}»: часы и цены в текст не выдуманы. "
-        "Их нет, пока нет даты проверки ({n}).",
-        "Ещё иначе: «{place}» уже назван, покупка рядом с ним не обязательна ({n}).",
-    )
-    idx = 0
-    while len(body_text(ast)) < 2500:
-        place = headings[idx % len(headings)] if headings else city
-        ast.blocks.append(
-            DzenBlock(
-                type="paragraph",
-                text=templates[idx % len(templates)].format(place=place, city=city, n=idx + 1),
-            )
-        )
-        idx += 1
-        if len(ast.blocks) > 40:
-            break
-    needed = 3 - len(headings)
-    city_headings = [
-        f"Зачем ехать в {city}",
-        f"С чего начать маршрут по {city}",
-        f"Что проверить в {city} заранее",
-    ]
-    for index in range(max(0, needed)):
-        ast.blocks.insert(0, DzenBlock(type="heading", text=city_headings[index]))
+    """Do not invent filler. A short draft fails the length gate and can be revised."""
     if len(ast.lead) < 200:
         ast.lead = (
-            (ast.lead + " ").strip()
-            + " Разберём маршрут, ограничения и то, что можно проверить заранее, "
-            "без обязательной покупки аудиогида."
+            (ast.lead + " ").strip() + " Разберём, что именно получит читатель и какие утверждения "
+            "сюда намеренно не входят."
         )
-        if len(ast.lead) < 200:
-            ast.lead = ast.lead + " " + SAFE_PAYMENT_NOTE
     return ast
 
 

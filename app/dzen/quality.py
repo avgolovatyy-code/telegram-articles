@@ -145,7 +145,7 @@ def run_gates(
     high_risk = [c for c in ast.claims if c.risk == "high" and c.verification_status != "verified"]
     if high_risk:
         result.fail("unverified high-risk claims must be omitted")
-    if re.search(r"\{\{|\}\}", text):
+    if re.search(r"\{\{|\}\}", text) or re.search(r"\{[A-Za-z_][A-Za-z0-9_]*\}", text):
         result.fail("template placeholders in article text")
     fluff_hits = [phrase for phrase in GENERIC_FLUFF if phrase in folded]
     if len(fluff_hits) >= 2:
