@@ -6,7 +6,7 @@
   <title>{% block title %}WeGoTrip Content Engine{% endblock %}</title>
   <link rel="stylesheet" href="/static/admin.css">
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 <header class="topbar">
   <a class="brand" href="/admin">WeGoTrip <span>Content Engine</span></a>
   <nav>

@@ -18,11 +18,14 @@ from app.scheduler import jobs
 def test_planner_creates_independent_slots(synced_session, settings):
     created = plan_dzen_week(synced_session, settings=settings, run_date=dt.date(2026, 11, 18))
     assert created
+    countries = {row.destination_country for row in created if row.destination_country}
     for row in created:
         assert row.status == DzenArticleStatus.TOPIC_CANDIDATE.value
         assert row.format.startswith("dzen_")
         assert row.planned_date is not None
         assert row.planned_date.weekday() in {1, 3}  # TU/TH
+    assert countries
+    assert countries != {"RU"}
 
 
 def test_generate_builds_kit_with_coupon_and_images(

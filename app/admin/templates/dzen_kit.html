@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ article.headline or 'Publishing Kit' }} · Дзен{% endblock %}
+{% block body_class %}dzen-handoff{% endblock %}
 {% block content %}
 {% if stale %}
 <div class="flash flash-error">Старая версия устарела / не публиковать. Возьмите новый пакет из следующей сводки Slack.</div>
@@ -14,6 +15,7 @@
     <button class="btn primary" type="button" data-copy="title">Скопировать заголовок</button>
     <button class="btn primary" type="button" data-copy="rich">Скопировать форматированный текст</button>
     <button class="btn" type="button" data-copy="plain">Скопировать простой текст</button>
+    <button class="btn" type="button" id="dzen-select-preview">Выделить предпросмотр</button>
     {% if kit.zip_asset_path %}
     <a class="btn" href="{{ '/admin/dzen/publishing-kits/' + article.public_id + '/media.zip' if admin else '/dzen/k/' + kit.access_token + '/media.zip' }}">Скачать все изображения (ZIP)</a>
     {% endif %}
@@ -24,14 +26,15 @@
   <p id="copy-status" class="muted small" role="status"></p>
 
   <ol class="dzen-steps">
-    <li>Скопируйте заголовок, затем форматированный текст.</li>
-    <li>В своём аккаунте Дзена: Студия → Создать публикацию → Статья. Вставьте заголовок и текст.</li>
+    <li>Скопируйте заголовок, затем форматированный текст (Ctrl+V в статью Дзена).</li>
+    <li>Если ссылки или списки не перенеслись: нажмите «Выделить предпросмотр» или откройте article.html → Ctrl+A → Ctrl+C и вставьте ещё раз. Не переписывайте абзацы вручную.</li>
+    <li>В Дзене: Студия → Создать публикацию → Статья.</li>
     <li>Загрузите обложку и фото по прямым ссылкам или из ZIP, после указанных разделов.</li>
     <li>Проверьте ссылки WeGoTrip (<code>coupon={{ referer_id }}</code>) и отсутствие сырой разметки.</li>
     <li>Опубликуйте и верните ссылку <code>dzen.ru/a/...</code> в Slack-тред или форму ниже.</li>
   </ol>
 
-  <div class="dzen-preview">{{ preview_html|safe }}</div>
+  <div class="dzen-preview" id="dzen-preview">{{ preview_html|safe }}</div>
 
   <h2>Изображения по порядку</h2>
   <div class="dzen-media-grid">
@@ -121,6 +124,18 @@
       } catch (err) { say("Не скопировалось: " + err, false); }
     });
   });
+  const selectBtn = document.getElementById("dzen-select-preview");
+  const preview = document.getElementById("dzen-preview");
+  if (selectBtn && preview) {
+    selectBtn.addEventListener("click", () => {
+      const range = document.createRange();
+      range.selectNodeContents(preview);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      say("Предпросмотр выделен — Ctrl+C, затем Ctrl+V в Дзен.", true);
+    });
+  }
 })();
 </script>
 {% endblock %}

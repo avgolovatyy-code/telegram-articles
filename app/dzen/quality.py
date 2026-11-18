@@ -6,7 +6,7 @@ import re
 from dataclasses import dataclass, field
 
 from app.dzen.links import coupon_count, image_url_is_clean
-from app.dzen.products import DzenProductPick
+from app.dzen.products import DzenProductPick, place_tokens
 from app.dzen.schemas import DzenArticleAST
 
 AI_CLICHES = (
@@ -15,6 +15,19 @@ AI_CLICHES = (
     "незабываемое путешествие",
     "скрытые жемчужины",
 )
+GENERIC_FLUFF = (
+    "погуляйте",
+    "посетите музей",
+    "зайдите в кафе",
+    "прогуляйтесь по центру",
+    "обязательно посетите",
+    "откройте для себя",
+)
+GENERIC_HEADINGS = {
+    "зачем это читать",
+    "как спланировать день",
+    "на что смотреть",
+}
 FIRST_PERSON = (
     "я там был",
     "мы проверили на месте",
@@ -92,6 +105,19 @@ def run_gates(
         result.fail("unverified high-risk claims must be omitted")
     if re.search(r"\{\{|\}\}", text):
         result.fail("template placeholders in article text")
+    fluff_hits = [phrase for phrase in GENERIC_FLUFF if phrase in folded]
+    if len(fluff_hits) >= 2:
+        result.fail("generic any-city fluff")
+    named = place_tokens(text)
+    if ast.destination_city:
+        named.add(ast.destination_city.casefold())
+    if len(named) < 4:
+        result.fail("need named places, not a universal stroll-museum-cafe outline")
+    specific_headings = [
+        b.text for b in headings if b.text and b.text.strip().casefold() not in GENERIC_HEADINGS
+    ]
+    if len(specific_headings) < 2:
+        result.fail("headings must name real places or problems, not generic labels")
     return result
 
 

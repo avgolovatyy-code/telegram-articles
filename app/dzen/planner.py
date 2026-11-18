@@ -27,22 +27,36 @@ SEED_ANGLES = [
         "Как российской картой оплатить билет в музей за границей: что проверить",
         DzenFormat.TRAVEL_HACK,
         DzenPillar.TRAVEL_HACKS,
+        "Париж",
+        "FR",
     ),
     (
         "Стамбул без гонки: маршрут между знакомыми местами и тихими кварталами",
         DzenFormat.CITY_GUIDE,
         DzenPillar.CITY_GUIDES,
+        "Стамбул",
+        "TR",
     ),
-    ("Что посмотреть в Эрмитаже за два часа", DzenFormat.ATTRACTION_GUIDE, DzenPillar.MUSEUMS),
+    (
+        "Что посмотреть в Эрмитаже за два часа",
+        DzenFormat.ATTRACTION_GUIDE,
+        DzenPillar.MUSEUMS,
+        "Санкт-Петербург",
+        "RU",
+    ),
     (
         "Барселона глазами архитекторов: Гауди и неожиданные альтернативы",
         DzenFormat.CULTURAL_FEATURE,
         DzenPillar.CITY_GUIDES,
+        "Барселона",
+        "ES",
     ),
     (
-        "Выходные в Казани: музей и маршрут без машины",
+        "Выходные в Казани: кремль, слобода и вечер без обязательного Свияжска",
         DzenFormat.WEEKEND_ITINERARY,
         DzenPillar.WEEKEND_EVENTS,
+        "Казань",
+        "RU",
     ),
 ]
 
@@ -93,9 +107,12 @@ def plan_dzen_week(
 
     cities = list(
         session.scalars(
-            select(City).where(City.market == "ru").order_by(City.popularity_rank).limit(20)
+            select(City).where(City.market == "ru").order_by(City.popularity_rank).limit(40)
         )
     )
+    foreign = [c for c in cities if (c.country_name or "").casefold() not in {"russia", "россия"}]
+    domestic = [c for c in cities if c not in foreign]
+    mixed = (foreign[:8] + domestic[:8]) or cities
     ru_products = session.scalar(
         select(func.count())
         .select_from(Product)
@@ -105,8 +122,14 @@ def plan_dzen_week(
         "run_date": run_date.isoformat(),
         "needed_dates": [d.isoformat() for d in missing],
         "ru_product_count": int(ru_products or 0),
-        "sample_cities": [c.name for c in cities[:12]],
-        "rule": "independent Dzen magazine, do not copy Telegram",
+        "sample_cities": [
+            {"name": c.name, "country": c.country_name, "country_id": c.country_external_id}
+            for c in mixed[:16]
+        ],
+        "rule": (
+            "independent Dzen magazine; mix Russia and abroad; vary formats; "
+            "do not copy Telegram; do not plan neighbouring side-trip cities"
+        ),
     }
     gateway = gateway or LLMGateway(session, settings=settings)
     parsed: dict = {}
@@ -129,7 +152,7 @@ def plan_dzen_week(
     )
     created: list[DzenArticle] = []
     for index, day in enumerate(missing):
-        brief = _brief_for_day(decision, day, index, cities)
+        brief = _brief_for_day(decision, day, index, mixed)
         article = DzenArticle(
             public_id=secrets.token_urlsafe(8),
             status=DzenArticleStatus.TOPIC_CANDIDATE.value,
@@ -158,14 +181,14 @@ def _brief_for_day(
         item = decision.briefs[index]
         item.planned_date = day.isoformat()
         return item
-    angle, fmt, pillar = SEED_ANGLES[index % len(SEED_ANGLES)]
-    city = cities[index % len(cities)].name if cities else None
+    angle, fmt, pillar, city, country = SEED_ANGLES[index % len(SEED_ANGLES)]
     return DzenBrief(
         planned_date=day.isoformat(),
         format=fmt.value,
         pillar=pillar.value,
         audience=DzenAudience.RUSSIAN_SPEAKING_GLOBAL.value,
         destination_city=city,
+        destination_country=country,
         angle=angle,
         reader_value="Практическая польза без обязательной покупки",
         why_now="слот независимого плана Дзена",

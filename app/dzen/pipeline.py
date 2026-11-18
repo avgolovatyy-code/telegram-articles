@@ -18,7 +18,7 @@ from app.db.enums import (
 )
 from app.db.models import DzenArticle
 from app.dzen.kit import persist_kit
-from app.dzen.media import collect_catalog_images, validate_assets
+from app.dzen.media import collect_catalog_images, dedupe_downloaded, validate_assets
 from app.dzen.products import match_products
 from app.dzen.quality import body_text, run_gates
 from app.dzen.schemas import (
@@ -69,33 +69,30 @@ def generate_dzen_article(
     gateway = gateway or LLMGateway(session, settings=settings)
     report = DzenGenerateReport(article_id=article.public_id)
     article.status = DzenArticleStatus.RESEARCHED.value
+    if article.version < 1:
+        article.version = 1
     session.flush()
 
-    products = match_products(
+    brief_text = " ".join(
+        part
+        for part in (
+            article.headline,
+            article.destination_city,
+            (article.brief or {}).get("angle") if isinstance(article.brief, dict) else "",
+            (article.brief or {}).get("reader_value") if isinstance(article.brief, dict) else "",
+        )
+        if part
+    )
+    inventory = match_products(
         session,
         article_id=article.public_id,
         topic_slug=(article.destination_city or article.public_id),
         city_name=article.destination_city,
         country_code=article.destination_country,
+        article_text=brief_text,
+        limit=6,
         settings=settings,
     )
-    assets = collect_catalog_images(
-        session,
-        product_ids=[p.external_id for p in products],
-        city_name=article.destination_city,
-        limit=5,
-    )
-    assets = validate_assets(assets, settings)
-    if not assets:
-        article.status = DzenArticleStatus.BLOCKED.value
-        article.status_reason = "no licensed WeGoTrip cover"
-        report.ok = False
-        report.issues.append("no cover")
-        report.status = article.status
-        return report
-    assets[0].role = "cover"
-    for inline in assets[1:]:
-        inline.role = "inline"
 
     context = {
         "brief": article.brief,
@@ -110,13 +107,19 @@ def generate_dzen_article(
                 "title": p.title,
                 "inclusions": p.inclusions,
                 "ticket_included": p.ticket_included,
+                "matched_places": p.matched_places,
             }
-            for p in products
+            for p in inventory
         ],
-        "media": [{"id": a.asset_id, "caption": a.caption, "role": a.role} for a in assets],
         "first_person_evidence": False,
         "payment_claim_verified": False,
-        "instruction": "Write original Russian Dzen article. Do not mirror Telegram.",
+        "instruction": (
+            "Write an original Russian Dzen travel feature. Name real districts, "
+            "streets, museums and habits of this city. Do not add neighbouring "
+            "towns or islands unless the brief already names them. Products are "
+            "optional: mention at most those in context, and only next to a place "
+            "you actually described. Do not mirror Telegram."
+        ),
     }
     try:
         written = gateway.run(
@@ -142,9 +145,7 @@ def generate_dzen_article(
         report.status = article.status
         return report
 
-    ast = _sanitize_ast(
-        ast, article, [p.external_id for p in products], [a.asset_id for a in assets]
-    )
+    ast = _sanitize_ast(ast, article, [p.external_id for p in inventory], media_ids=[])
     ast = _ensure_length(ast)
 
     try:
@@ -196,6 +197,40 @@ def generate_dzen_article(
         "issues": critic.issues,
     }
     article.claim_ledger = [json.loads(c.model_dump_json()) for c in ast.claims]
+
+    products = match_products(
+        session,
+        article_id=article.public_id,
+        topic_slug=(article.destination_city or article.public_id),
+        city_name=article.destination_city,
+        country_code=article.destination_country,
+        article_text=body_text(ast),
+        limit=3,
+        settings=settings,
+    )
+    heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    assets = collect_catalog_images(
+        session,
+        product_ids=[p.external_id for p in products],
+        city_name=article.destination_city,
+        headings=heading_names,
+        limit=5,
+    )
+    assets = validate_assets(assets, settings)
+    assets = dedupe_downloaded(assets)
+    if not assets:
+        article.status = DzenArticleStatus.BLOCKED.value
+        article.status_reason = "no licensed WeGoTrip cover"
+        report.ok = False
+        report.issues.append("no cover")
+        report.status = article.status
+        return report
+    assets[0].role = "cover"
+    for inline in assets[1:]:
+        inline.role = "inline"
+    ast = _sanitize_ast(
+        ast, article, [p.external_id for p in products], [a.asset_id for a in assets]
+    )
     article.product_ids = [p.external_id for p in products]
 
     cover = assets[0].url
@@ -215,11 +250,12 @@ def generate_dzen_article(
         return report
 
     article.status = DzenArticleStatus.AI_VERIFIED.value
-    heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    article.version = int(article.version or 1) + (1 if article.ready_at is not None else 0)
     for index, asset in enumerate(assets[1:], start=0):
-        asset.after_heading = (
-            heading_names[min(index, len(heading_names) - 1)] if heading_names else None
-        )
+        if not asset.after_heading:
+            asset.after_heading = (
+                heading_names[min(index, len(heading_names) - 1)] if heading_names else None
+            )
         ast.blocks.append(
             DzenBlock(
                 type="image",
@@ -289,20 +325,16 @@ def _ensure_length(ast: DzenArticleAST) -> DzenArticleAST:
     text = body_text(ast)
     if len(text) >= 2500:
         return ast
-    extra = (
-        ast.practical_takeaway
-        or ast.reader_value
-        or "Перед поездкой сверьте часы работы и правила входа на официальном сайте."
-    )
+    extra = ast.practical_takeaway or ast.reader_value or ast.lead
+    city = ast.destination_city or "городе"
     while len(body_text(ast)) < 2500:
         ast.blocks.append(
             DzenBlock(
                 type="paragraph",
                 text=(
-                    f"{extra} Это не заменяет сверку на месте: условия меняются, "
-                    "поэтому в статье нет выдуманных часов работы "
-                    "и обещаний про оплату любой картой. "
-                    f"{SAFE_PAYMENT_NOTE}"
+                    f"{extra} Ещё раз по {city}: сверяйте часы и правила входа "
+                    "на официальной странице места, которое собираетесь пройти, "
+                    "а не по пересказу. Покупка аудиогида не обязательна."
                 ),
             )
         )
@@ -310,14 +342,13 @@ def _ensure_length(ast: DzenArticleAST) -> DzenArticleAST:
             break
     headings = [b for b in ast.blocks if b.type == "heading"]
     needed = 3 - len(headings)
+    city_headings = [
+        f"Зачем ехать в {city}",
+        f"С чего начать маршрут по {city}",
+        f"Что проверить в {city} заранее",
+    ]
     for index in range(max(0, needed)):
-        ast.blocks.insert(
-            0,
-            DzenBlock(
-                type="heading",
-                text=["Зачем это читать", "Как спланировать день", "На что смотреть"][index],
-            ),
-        )
+        ast.blocks.insert(0, DzenBlock(type="heading", text=city_headings[index]))
     if len(ast.lead) < 200:
         ast.lead = (
             (ast.lead + " ").strip()

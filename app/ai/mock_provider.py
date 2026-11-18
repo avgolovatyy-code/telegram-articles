@@ -401,15 +401,24 @@ def _dzen_decision_set(context: dict[str, Any]) -> dict[str, Any]:
     briefs = []
     formats = ["dzen_city_guide", "dzen_travel_hack"]
     pillars = ["city_guides", "travel_hacks"]
+    country_by_index = ["ES", "FR", "GB", "TR", "RU"]
     for index, day in enumerate(dates[:4]):
-        city = cities[index % len(cities)]
+        raw_city = cities[index % len(cities)]
+        if isinstance(raw_city, dict):
+            city = str(raw_city.get("name") or "Стамбул")
+            country = (raw_city.get("country_id") or country_by_index[index % 5])[:2]
+            if not str(country).isalpha():
+                country = country_by_index[index % 5]
+        else:
+            city = str(raw_city)
+            country = country_by_index[index % 5]
         briefs.append(
             {
                 "planned_date": day,
                 "format": formats[index % 2],
                 "pillar": pillars[index % 2],
                 "audience": "russian_speaking_global",
-                "destination_country": "TR" if index % 2 == 0 else "RU",
+                "destination_country": str(country)[:2].upper(),
                 "destination_city": city,
                 "angle": f"{city}: как провести день без гонки и без выдуманных секретов",
                 "reader_value": "Практичный каркас дня и список того, что нужно сверять на месте",
@@ -434,19 +443,26 @@ def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
     media = context.get("media") or []
     cover = (media[0] or {}).get("id") if media else None
     product_id = str(products[0]["id"]) if products else None
+    landmarks = {
+        "Казань": ("Кремль", "улица Баумана", "озеро Кабан", "Старо-Татарская слобода"),
+        "Стамбул": ("Галатская башня", "Каракёй", "Султанахмет", "Кадыкёй"),
+        "Барселона": ("Эшампле", "Готический квартал", "Монжуик", "Борн"),
+        "Париж": ("Маре", "набережная Сены", "д'Орсэ", "Пантеон"),
+    }
+    a, b, c, d = landmarks.get(city, ("Центр", "Набережная", "Старый рынок", "Холм"))
     para = (
-        f"{city} удобно смотреть кусками, а не «всё за сутки». Ниже — каркас дня, "
-        "который можно ужать или растянуть, и список вещей, которые стоит сверять "
-        "на официальных страницах, потому что часы, очереди и правила входа меняются. "
-        "Статья не заменяет живую сверку и не притворяется отчётом «мы там были». "
-        "Аудиогид или билет WeGoTrip — необязательное дополнение, если захотите идти "
-        "своим темпом. Перед покупкой смотрите, входит ли входной билет и какие есть "
-        "способы оплаты именно у этого товара."
+        f"{city} удобно смотреть кусками, а не «всё за сутки». Начните с {a}, "
+        f"перейдите к {b}, оставьте {c} на светлое время, а {d} — запасным "
+        "вечерним маршрутом, если ноги ещё живые. Часы, очереди и правила входа "
+        "меняются — сверяйте их на официальных страницах мест, а не по пересказу. "
+        "Статья не притворяется отчётом «мы там были». Аудиогид WeGoTrip — "
+        "необязательное дополнение. Перед покупкой смотрите, входит ли входной "
+        "билет и какие есть способы оплаты именно у этого товара."
     )
     blocks: list[dict[str, Any]] = [
         {
             "type": "heading",
-            "text": "Зачем читать именно это",
+            "text": f"{a}: с чего начать в {city}",
             "level": 2,
             "items": [],
             "media_asset_id": None,
@@ -466,7 +482,7 @@ def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
         },
         {
             "type": "heading",
-            "text": "Как собрать день без гонки",
+            "text": f"От {b} к {c} без гонки",
             "level": 2,
             "items": [],
             "media_asset_id": None,
@@ -489,10 +505,10 @@ def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
             "text": None,
             "level": 2,
             "items": [
-                "Выберите один район на утро и один на вторую половину дня.",
-                "Заложите переход пешком или на транспорте отдельно, не «по дороге».",
-                "Один музей или большая точка — достаточно; вторая пусть будет запасной.",
-                "Еду и паузу впишите в маршрут, иначе день схлопнется к вечеру.",
+                f"Утро оставьте {a}, не пытайтесь сразу закрыть {c}.",
+                f"Переход к {b} заложите отдельно, не «по дороге».",
+                f"{d} держите запасной точкой, если свет или ноги кончатся раньше.",
+                "Еду впишите в маршрут, иначе день схлопнется к вечеру.",
             ],
             "media_asset_id": None,
             "caption": None,
@@ -501,7 +517,7 @@ def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
         },
         {
             "type": "heading",
-            "text": "Что сверять перед выходом",
+            "text": f"Что сверять перед {a} и {c}",
             "level": 2,
             "items": [],
             "media_asset_id": None,
@@ -521,7 +537,7 @@ def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
         },
         {
             "type": "heading",
-            "text": "Если захотите аудиогид",
+            "text": f"Если понадобится гид по {city}",
             "level": 2,
             "items": [],
             "media_asset_id": None,
@@ -550,7 +566,7 @@ def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
                 "media_asset_id": None,
                 "caption": None,
                 "product_id": product_id,
-                "after_heading": "Если захотите аудиогид",
+                "after_heading": f"Если понадобится гид по {city}",
             }
         )
     # Repeat practical paragraphs so the offline mock clears the 2500-char floor.

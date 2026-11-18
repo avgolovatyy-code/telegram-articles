@@ -142,11 +142,11 @@ textarea { width: 100%; min-height: 320px; font-family: ui-monospace, Menlo, mon
 .right { text-align: right; }
 .empty { color: var(--muted); padding: 30px; text-align: center; }
 
-.dzen-kit { max-width: 820px; }
+.dzen-kit { max-width: 820px; width: 100%; }
 .dzen-kit .eyebrow { color: var(--muted); letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
 .dzen-actions { margin: 16px 0 8px; }
 .dzen-steps { color: var(--muted); padding-left: 20px; }
-.dzen-preview { background: #f6f1e8; color: #1b1712; border-radius: 12px; padding: 28px 32px; margin: 24px 0; }
+.dzen-preview { background: #f6f1e8; color: #1b1712; border-radius: 12px; padding: 28px 32px; margin: 24px 0; overflow-wrap: anywhere; }
 .dzen-preview h2 { font-size: 28px; margin: 0 0 12px; color: #1b1712; }
 .dzen-preview h3 { font-size: 18px; margin: 22px 0 8px; color: #1b1712; }
 .dzen-preview p, .dzen-preview li { color: #1b1712; }
@@ -157,9 +157,24 @@ textarea { width: 100%; min-height: 320px; font-family: ui-monospace, Menlo, mon
 .dzen-media-grid figcaption { padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
 .dzen-products { list-style: none; padding: 0; }
 .dzen-products li { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+.dzen-products a { overflow-wrap: anywhere; word-break: break-word; }
 .dzen-confirm { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 24px; }
 .dzen-confirm input { flex: 1; min-width: 240px; }
+body.dzen-handoff .topbar nav,
+body.dzen-handoff .budget-chip,
+body.dzen-handoff .footer { display: none; }
+body.dzen-handoff .topbar { gap: 12px; }
+body.dzen-handoff main { max-width: 900px; }
 @media (max-width: 640px) {
-  .dzen-preview { padding: 18px 16px; }
+  main { padding: 12px; }
+  .dzen-kit { max-width: none; }
+  .dzen-preview { padding: 16px 14px; }
+  .dzen-preview h2 { font-size: 22px; }
+  .dzen-actions { display: flex; flex-direction: column; }
+  .dzen-actions .btn { width: 100%; text-align: center; }
+  .dzen-media-grid { grid-template-columns: 1fr; }
+  .dzen-confirm { flex-direction: column; }
+  .dzen-confirm input { min-width: 0; width: 100%; }
+  .topbar { flex-wrap: wrap; padding: 10px 12px; }
   .topbar nav { flex-wrap: wrap; gap: 10px; }
 }

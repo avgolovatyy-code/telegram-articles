@@ -8,13 +8,20 @@ import html
 import json
 import secrets
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
 from app.db.enums import DzenArticleStatus
 from app.db.models import DzenArticle, DzenPublishingKit
 from app.db.types import utcnow
-from app.dzen.media import DzenMediaAsset, build_zip, download_asset, staging_dir
+from app.dzen.media import (
+    DzenMediaAsset,
+    build_zip,
+    dedupe_downloaded,
+    download_asset,
+    staging_dir,
+)
 from app.dzen.products import DzenProductPick
 from app.dzen.schemas import DzenArticleAST, DzenBlock
 
@@ -126,9 +133,56 @@ def _product_html(product: DzenProductPick) -> str:
     )
 
 
+ALLOWED_DZEN_TAGS = {"h2", "h3", "p", "ul", "ol", "li", "a", "strong", "em", "br"}
+
+
+def sanitize_for_dzen_editor(raw_html: str) -> str:
+    """Keep the tags Dzen's article editor typically preserves on paste."""
+    from html.parser import HTMLParser
+
+    class _Strip(HTMLParser):
+        def __init__(self) -> None:
+            super().__init__(convert_charrefs=True)
+            self.out: list[str] = []
+            self._anchor = False
+
+        def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+            if tag not in ALLOWED_DZEN_TAGS:
+                return
+            if tag == "br":
+                self.out.append("<br>")
+                return
+            if tag == "a":
+                href = next((value or "" for name, value in attrs if name == "href"), "")
+                if href.startswith("https://"):
+                    self.out.append(f'<a href="{html.escape(href, quote=True)}">')
+                    self._anchor = True
+                return
+            self.out.append(f"<{tag}>")
+
+        def handle_endtag(self, tag: str) -> None:
+            if tag == "br" or tag not in ALLOWED_DZEN_TAGS:
+                return
+            if tag == "a":
+                if self._anchor:
+                    self.out.append("</a>")
+                    self._anchor = False
+                return
+            self.out.append(f"</{tag}>")
+
+        def handle_data(self, data: str) -> None:
+            self.out.append(html.escape(data, quote=False))
+
+    parser = _Strip()
+    parser.feed(raw_html or "")
+    parser.close()
+    return "".join(parser.out)
+
+
 def clipboard_html(ast: DzenArticleAST, products: list[DzenProductPick]) -> str:
     """Rich text for Dzen paste: basic tags only, no images (staff uploads them)."""
-    return render_html(ast, products, assets=[], include_images=False)
+    inner = sanitize_for_dzen_editor(render_html(ast, products, assets=[], include_images=False))
+    return f"<!--StartFragment-->{inner}<!--EndFragment-->"
 
 
 def content_hash(html_body: str, plain_body: str) -> str:
@@ -158,9 +212,18 @@ def persist_kit(
                 staged.append(download_asset(asset, settings))
             except Exception:
                 continue
+        staged = dedupe_downloaded(staged)
         if staged:
             path, zip_sha = build_zip(staged, staging_dir(article.public_id) / "media.zip")
             zip_path = str(path)
+    previous = session.scalars(
+        select(DzenPublishingKit).where(
+            DzenPublishingKit.article_id == article.id,
+            DzenPublishingKit.stale.is_(False),
+        )
+    )
+    for row in previous:
+        row.stale = True
     cover = next((a for a in assets if a.role == "cover"), assets[0] if assets else None)
     kit = DzenPublishingKit(
         article_id=article.id,
@@ -238,4 +301,5 @@ __all__ = [
     "public_kit_path",
     "render_html",
     "render_plain",
+    "sanitize_for_dzen_editor",
 ]
