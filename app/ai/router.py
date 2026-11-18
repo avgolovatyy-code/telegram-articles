@@ -29,7 +29,7 @@ from app.logging_setup import get_logger
 log = get_logger("ai.router")
 
 #: Tasks that must use the high-quality writer model.
-WRITER_TASKS = {LLMTask.ARTICLE_WRITE, LLMTask.OUTLINE}
+WRITER_TASKS = {LLMTask.ARTICLE_WRITE, LLMTask.OUTLINE, LLMTask.DZEN_WRITE, LLMTask.DZEN_OUTLINE}
 
 #: Everything else runs on the cheap utility model (spec §12.1, §48).
 UTILITY_TASKS = {
@@ -42,6 +42,8 @@ UTILITY_TASKS = {
     LLMTask.QUALITY_REVIEW,
     LLMTask.REWRITE,
     LLMTask.CHIEF_EDITOR,
+    LLMTask.DZEN_CHIEF_EDITOR,
+    LLMTask.DZEN_CLAIMS,
 }
 
 
@@ -52,11 +54,15 @@ class ModelRouter:
     def model_for(self, task: LLMTask, *, escalate: bool = False) -> str:
         if escalate:
             return self.settings.openai_fallback_model
+        if task == LLMTask.DZEN_WRITE:
+            return self.settings.dzen_writer_model_name
+        if task == LLMTask.DZEN_CRITIC:
+            return self.settings.dzen_critic_model_name
         if task in WRITER_TASKS:
             return self.settings.openai_writer_model
         if task == LLMTask.QUALITY_REVIEW:
             return self.settings.review_model
-        if task == LLMTask.CHIEF_EDITOR:
+        if task in {LLMTask.CHIEF_EDITOR, LLMTask.DZEN_CHIEF_EDITOR}:
             return self.settings.editor_model
         return self.settings.openai_utility_model
 

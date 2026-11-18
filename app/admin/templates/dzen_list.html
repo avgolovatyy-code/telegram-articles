@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Дзен · WeGoTrip{% endblock %}
+{% block content %}
+<h1>Дзен</h1>
+<p class="subtitle">
+  Независимый журнал для ручного переноса в Дзен-студию.
+  Slack: {{ dzen_days }} в {{ dzen_hour }}:00 Europe/Moscow, упоминание &lt;@{{ mention }}&gt; не чаще раза в рабочий день.
+  Автопубликация: {{ 'включена — это ошибка' if autopublish else 'выключена' }}.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Дата</th><th>Статус</th><th>Заголовок</th><th>Город</th><th>Kit</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for row in articles %}
+    <tr>
+      <td class="nowrap muted small">{{ row.planned_date or '—' }}</td>
+      <td><span class="badge {{ status_class(row.status) }}">{{ row.status }}</span></td>
+      <td>{{ row.headline or (row.brief or {}).get('angle', row.public_id) }}</td>
+      <td class="muted small">{{ row.destination_city or '—' }}</td>
+      <td>
+        {% if row.status in ['ready_for_handoff', 'handed_off', 'published_submitted', 'published_confirmed'] %}
+        <a href="/admin/dzen/publishing-kits/{{ row.public_id }}">открыть</a>
+        {% else %}—{% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5" class="muted">Пока нет статей Дзена.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

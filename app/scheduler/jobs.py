@@ -884,6 +884,109 @@ def archive_legacy_backlog(session: Session, *, settings: Settings | None = None
     return report
 
 
+def run_dzen_planner(session: Session, *, settings: Settings | None = None) -> JobReport:
+    """Fill the independent Dzen calendar. Does not touch Telegram slots."""
+    settings = settings or get_settings()
+    report = JobReport("run_dzen_planner")
+    if not settings.dzen_enabled:
+        report.details["skipped"] = "DZEN_ENABLED=false"
+        return report
+    from app.dzen.planner import plan_dzen_week
+
+    created = plan_dzen_week(session, settings=settings)
+    report.details["created"] = len(created)
+    report.details["ids"] = [row.public_id for row in created]
+    return report
+
+
+def generate_dzen_articles(
+    session: Session,
+    *,
+    settings: Settings | None = None,
+    max_articles: int | None = None,
+) -> JobReport:
+    settings = settings or get_settings()
+    report = JobReport("generate_dzen_articles")
+    if not settings.dzen_enabled:
+        report.details["skipped"] = "DZEN_ENABLED=false"
+        return report
+    from app.db.enums import DzenArticleStatus
+    from app.db.models import DzenArticle
+    from app.dzen.pipeline import generate_dzen_article
+
+    cap = max_articles if max_articles is not None else max(1, int(settings.dzen_articles_per_week))
+    rows = list(
+        session.scalars(
+            select(DzenArticle)
+            .where(
+                DzenArticle.status.in_(
+                    [
+                        DzenArticleStatus.TOPIC_CANDIDATE.value,
+                        DzenArticleStatus.RESEARCHED.value,
+                        DzenArticleStatus.NEEDS_REVISION.value,
+                    ]
+                )
+            )
+            .order_by(DzenArticle.planned_date)
+            .limit(cap)
+        )
+    )
+    outcomes = []
+    for article in rows:
+        outcome = generate_dzen_article(session, article, settings=settings)
+        outcomes.append(
+            {
+                "id": article.public_id,
+                "ok": outcome.ok,
+                "status": outcome.status,
+                "issues": outcome.issues[:4],
+            }
+        )
+        if not outcome.ok:
+            report.errors.extend(outcome.issues[:2])
+    report.details["generated"] = outcomes
+    report.ok = all(item["ok"] for item in outcomes) if outcomes else True
+    if not outcomes:
+        report.details["skipped"] = "no dzen candidates"
+    return report
+
+
+def send_dzen_digest(
+    session: Session,
+    *,
+    settings: Settings | None = None,
+    now: dt.datetime | None = None,
+    force_hour: bool = False,
+    client=None,
+) -> JobReport:
+    """Weekday-only staff digest. Never mentions the employee on Saturday/Sunday."""
+    settings = settings or get_settings()
+    report = JobReport("send_dzen_digest")
+    from app.dzen.slack_digest import send_dzen_digest as _send
+
+    outcome = _send(session, settings=settings, client=client, now=now, force_hour=force_hour)
+    report.ok = outcome.ok
+    report.details = {
+        "sent": outcome.sent,
+        "reason": outcome.reason,
+        "item_count": outcome.item_count,
+        "mentioned": outcome.mentioned,
+        "slack_ts": outcome.slack_ts,
+    }
+    if not outcome.ok and outcome.reason not in {
+        "weekend",
+        "not_delivery_day",
+        "empty_queue",
+        "already_sent_today",
+        "before_notify_hour",
+        "dzen_disabled",
+        "channel_unresolved",
+        "mention_budget_exhausted",
+    }:
+        report.errors.append(outcome.reason)
+    return report
+
+
 def run_daily_cycle(settings: Settings | None = None) -> list[JobReport]:
     """Sync → discover → generate → schedule, in one transaction per step."""
     settings = settings or get_settings()
@@ -901,12 +1004,15 @@ __all__ = [
     "coverage_report",
     "discover_topics",
     "generate_daily_articles",
+    "generate_dzen_articles",
     "process_publication_queue",
     "refresh_article_products",
     "remaining_same_day_publish_slots",
     "run_daily_cycle",
+    "run_dzen_planner",
     "schedule_publications",
     "seed_reference_data",
     "send_daily_digest",
+    "send_dzen_digest",
     "sync_catalog",
 ]

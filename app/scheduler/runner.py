@@ -7,6 +7,7 @@ Celery/Kafka/Kubernetes for a workload of a few dozen articles a day.
 from __future__ import annotations
 
 from collections.abc import Callable
+from zoneinfo import ZoneInfo
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -131,6 +132,35 @@ class SchedulerRunner:
             _wrap(jobs.send_daily_digest, "slack_digest", settings),
             CronTrigger(hour=settings.slack_digest_hour, minute=0),
             id="slack_digest",
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+        dzen_tz = ZoneInfo(settings.dzen_slack_timezone or "Europe/Moscow")
+        add(
+            _wrap(jobs.run_dzen_planner, "dzen_planner", settings),
+            CronTrigger(hour=3, minute=45, timezone=dzen_tz),
+            id="dzen_planner",
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+        add(
+            _wrap(jobs.generate_dzen_articles, "dzen_generate", settings),
+            CronTrigger(hour=4, minute=30, timezone=dzen_tz),
+            id="dzen_generate",
+            replace_existing=True,
+            max_instances=1,
+            coalesce=True,
+        )
+        add(
+            _wrap(jobs.send_dzen_digest, "dzen_slack_digest", settings),
+            CronTrigger(
+                hour=settings.dzen_slack_notify_hour,
+                minute=settings.dzen_slack_notify_minute,
+                timezone=dzen_tz,
+            ),
+            id="dzen_slack_digest",
             replace_existing=True,
             max_instances=1,
             coalesce=True,

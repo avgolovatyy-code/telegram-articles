@@ -77,6 +77,20 @@ class MockLLMProvider:
             }
         if name == "editorial_decision_set":
             return _editorial_decision_set(context)
+        if name == "dzen_decision_set":
+            return _dzen_decision_set(context)
+        if name == "dzen_article":
+            return _dzen_article(context)
+        if name == "dzen_critic":
+            return {
+                "pass_gate": not self.fail_quality,
+                "quality_score": 0.0 if self.fail_quality else 0.9,
+                "factuality_score": 0.0 if self.fail_quality else 0.95,
+                "issues": ["mock fail"] if self.fail_quality else [],
+                "rewrite_hints": [],
+            }
+        if name == "dzen_claims":
+            return {"claims": []}
         return {}
 
 
@@ -378,6 +392,204 @@ def _review(*, fail: bool) -> dict[str, Any]:
         "product_relevance": 0.91,
         "spam_risk": 0.02,
         "issues": [],
+    }
+
+
+def _dzen_decision_set(context: dict[str, Any]) -> dict[str, Any]:
+    dates = context.get("needed_dates") or [context.get("run_date") or "2026-11-19"]
+    cities = context.get("sample_cities") or ["Стамбул", "Казань"]
+    briefs = []
+    formats = ["dzen_city_guide", "dzen_travel_hack"]
+    pillars = ["city_guides", "travel_hacks"]
+    for index, day in enumerate(dates[:4]):
+        city = cities[index % len(cities)]
+        briefs.append(
+            {
+                "planned_date": day,
+                "format": formats[index % 2],
+                "pillar": pillars[index % 2],
+                "audience": "russian_speaking_global",
+                "destination_country": "TR" if index % 2 == 0 else "RU",
+                "destination_city": city,
+                "angle": f"{city}: как провести день без гонки и без выдуманных секретов",
+                "reader_value": "Практичный каркас дня и список того, что нужно сверять на месте",
+                "why_now": "независимый слот журнала Дзена",
+                "supporting_queries": [f"что посмотреть в {city}"],
+                "product_recommendation": "optional",
+                "factual_risk": "low",
+                "intent": "independent_dzen",
+            }
+        )
+    return {
+        "run_date": str(context.get("run_date") or "2026-11-18"),
+        "editorial_thesis": "Независимый русский travel-журнал, не зеркало Telegram",
+        "briefs": briefs,
+        "empty_slots_justification": "",
+    }
+
+
+def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
+    city = context.get("city") or "Стамбул"
+    products = context.get("products") or []
+    media = context.get("media") or []
+    cover = (media[0] or {}).get("id") if media else None
+    product_id = str(products[0]["id"]) if products else None
+    para = (
+        f"{city} удобно смотреть кусками, а не «всё за сутки». Ниже — каркас дня, "
+        "который можно ужать или растянуть, и список вещей, которые стоит сверять "
+        "на официальных страницах, потому что часы, очереди и правила входа меняются. "
+        "Статья не заменяет живую сверку и не притворяется отчётом «мы там были». "
+        "Аудиогид или билет WeGoTrip — необязательное дополнение, если захотите идти "
+        "своим темпом. Перед покупкой смотрите, входит ли входной билет и какие есть "
+        "способы оплаты именно у этого товара."
+    )
+    blocks = [
+        {
+            "type": "heading",
+            "text": "Зачем читать именно это",
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "paragraph",
+            "text": para,
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "heading",
+            "text": "Как собрать день без гонки",
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "paragraph",
+            "text": para,
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "list",
+            "text": None,
+            "level": 2,
+            "items": [
+                "Выберите один район на утро и один на вторую половину дня.",
+                "Заложите переход пешком или на транспорте отдельно, не «по дороге».",
+                "Один музей или большая точка — достаточно; вторая пусть будет запасной.",
+                "Еду и паузу впишите в маршрут, иначе день схлопнется к вечеру.",
+            ],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "heading",
+            "text": "Что сверять перед выходом",
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "paragraph",
+            "text": para,
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "heading",
+            "text": "Если захотите аудиогид",
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+        {
+            "type": "paragraph",
+            "text": para,
+            "level": 2,
+            "items": [],
+            "media_asset_id": None,
+            "caption": None,
+            "product_id": None,
+            "after_heading": None,
+        },
+    ]
+    if product_id:
+        blocks.append(
+            {
+                "type": "product_mention",
+                "text": None,
+                "level": 2,
+                "items": [],
+                "media_asset_id": None,
+                "caption": None,
+                "product_id": product_id,
+                "after_heading": "Если захотите аудиогид",
+            }
+        )
+    # Repeat practical paragraphs so the offline mock clears the 2500-char floor.
+    while sum(len(b.get("text") or "") for b in blocks) < 2800:
+        blocks.append(
+            {
+                "type": "paragraph",
+                "text": para,
+                "level": 2,
+                "items": [],
+                "media_asset_id": None,
+                "caption": None,
+                "product_id": None,
+                "after_heading": None,
+            }
+        )
+    return {
+        "headline": f"{city} без спешки: маршрут и то, что стоит проверить заранее",
+        "lead": (
+            f"Если {city} кажется набором обязательных точек, этот текст помогает собрать "
+            "спокойный день: что взять в основу, что оставить запасным и какие факты "
+            "нельзя брать из пересказа — только с официальных страниц."
+        ),
+        "format": context.get("format") or "dzen_city_guide",
+        "pillar": context.get("pillar") or "city_guides",
+        "audience": "russian_speaking_global",
+        "destination_country": context.get("country"),
+        "destination_city": city,
+        "blocks": blocks,
+        "cover_media_asset_id": cover,
+        "product_ids": [str(p.get("id")) for p in products[:3]],
+        "practical_takeaway": (
+            "Один район утром, одна большая точка, пауза на еду, "
+            "вечер без новых обязательных музеев. "
+            "Часы работы и оплату сверяйте в день поездки."
+        ),
+        "claims": [],
+        "reader_value": "Каркас дня без обязательной покупки",
+        "originality_angle": "Сначала польза читателя, товары только как опция",
     }
 
 

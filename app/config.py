@@ -241,6 +241,36 @@ class Settings(BaseSettings):
     #: Hour (UTC) at which the daily digest is posted.
     slack_digest_hour: int = 18
 
+    # -------------------------------------------------------------- Dzen RU
+    #: Independent long-form magazine contour. Does not publish to Telegram/MAX.
+    dzen_enabled: bool = True
+    dzen_delivery_mode: str = "slack_manual_handoff"
+    #: Hard lock: the engine never logs into Dzen Studio or posts via API/browser.
+    dzen_native_autopublish_enabled: bool = False
+    dzen_articles_per_week: int = 2
+    dzen_schedule_publish_days: str = "TU,TH"
+    #: Existing Slack articles channel id (C…). Empty → reuse a C… SLACK_CHANNEL.
+    dzen_slack_channel_id: str | None = None
+    dzen_slack_mention_user_id: str = "U03AE1ATKDJ"
+    dzen_slack_timezone: str = "Europe/Moscow"
+    dzen_slack_notify_hour: int = 11
+    dzen_slack_notify_minute: int = 0
+    dzen_slack_delivery_days: str = "TU,TH"
+    dzen_slack_weekdays_only: bool = True
+    dzen_slack_max_ping_per_workday: int = 1
+    #: fixed_weekdays | weekdays_if_ready | every_2_workdays
+    dzen_slack_batch_mode: str = "fixed_weekdays"
+    dzen_slack_thread_reply_capture: bool = True
+    dzen_retry_mention_outside_schedule: bool = False
+    dzen_asset_zip_enabled: bool = True
+    dzen_render_rich_clipboard: bool = True
+    dzen_allow_ai_generated_images: bool = False
+    dzen_kit_ttl_days: int = 30
+    dzen_media_ttl_days: int = 21
+    dzen_writer_model: str | None = None
+    dzen_critic_model: str | None = None
+    dzen_studio_url: str = "https://dzen.ru"
+
     # ------------------------------------------------------------------ admin
     admin_username: str = "admin"
     admin_password: str | None = None
@@ -277,6 +307,14 @@ class Settings(BaseSettings):
     @property
     def editor_model(self) -> str:
         return self.openai_editor_model or self.openai_utility_model
+
+    @property
+    def dzen_writer_model_name(self) -> str:
+        return (self.dzen_writer_model or self.openai_writer_model).strip()
+
+    @property
+    def dzen_critic_model_name(self) -> str:
+        return (self.dzen_critic_model or self.review_model).strip()
 
     @property
     def fast_model(self) -> str:

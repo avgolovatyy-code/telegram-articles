@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.db.enums import LLMTask
 from app.db.models import PromptVersion
+from app.dzen.prompts import bind_prompt_type, build_dzen_prompts
 
 
 @dataclass(frozen=True, slots=True)
@@ -498,6 +499,9 @@ TOPIC_DISCOVERY_RU = Prompt(
 )
 
 
+bind_prompt_type(Prompt)
+DZEN_PROMPTS = build_dzen_prompts(Prompt)
+
 PROMPTS: dict[str, Prompt] = {
     prompt.name: prompt
     for prompt in (
@@ -511,6 +515,7 @@ PROMPTS: dict[str, Prompt] = {
         TOPIC_DISCOVERY_RU,
         CHIEF_EDITOR_EN,
         CHIEF_EDITOR_RU,
+        *DZEN_PROMPTS,
     )
 }
 

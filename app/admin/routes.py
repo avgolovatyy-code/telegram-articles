@@ -10,11 +10,12 @@ import datetime as dt
 import json
 import secrets
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request, status
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import or_, select
@@ -29,6 +30,8 @@ from app.db.base import get_db
 from app.db.enums import ArticleStatus, EntityType, TopicStatus
 from app.db.models import (
     Article,
+    DzenArticle,
+    DzenPublishingKit,
     EditorialPlanSlot,
     EditorialRun,
     PublicationQueueItem,
@@ -50,7 +53,16 @@ templates = Jinja2Templates(
 )
 security = HTTPBasic(auto_error=False)
 
-_OK_STATUSES = {"published", "approved", "ok", "verified", "used"}
+_OK_STATUSES = {
+    "published",
+    "approved",
+    "ok",
+    "verified",
+    "used",
+    "ready_for_handoff",
+    "handed_off",
+    "published_confirmed",
+}
 _WARN_STATUSES = {
     "needs_review",
     "draft",
@@ -61,6 +73,10 @@ _WARN_STATUSES = {
     "researching",
     "candidate",
     "queued",
+    "topic_candidate",
+    "researched",
+    "ai_verified",
+    "published_submitted",
 }
 _ERR_STATUSES = {
     "failed",
@@ -682,6 +698,97 @@ def ops_page(
 
 
 @router.post("/ops/run")
+@router.get("/dzen", response_class=HTMLResponse)
+def dzen_list(
+    request: Request,
+    session: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    _: str = Depends(require_admin),
+) -> HTMLResponse:
+    articles = list(session.scalars(select(DzenArticle).order_by(DzenArticle.id.desc()).limit(80)))
+    return templates.TemplateResponse(
+        request,
+        "dzen_list.html",
+        {
+            **_base_context(request, session, settings, "dzen"),
+            "articles": articles,
+            "dzen_days": settings.dzen_slack_delivery_days,
+            "dzen_hour": settings.dzen_slack_notify_hour,
+            "mention": settings.dzen_slack_mention_user_id,
+            "autopublish": settings.dzen_native_autopublish_enabled,
+        },
+    )
+
+
+@router.get("/dzen/publishing-kits/{public_id}", response_class=HTMLResponse)
+def dzen_kit_admin(
+    public_id: str,
+    request: Request,
+    session: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    _: str = Depends(require_admin),
+) -> HTMLResponse:
+    article = session.scalar(select(DzenArticle).where(DzenArticle.public_id == public_id))
+    if article is None:
+        raise HTTPException(404, "dzen article not found")
+    kit = session.scalar(
+        select(DzenPublishingKit)
+        .where(DzenPublishingKit.article_id == article.id)
+        .order_by(DzenPublishingKit.id.desc())
+    )
+    if kit is None:
+        raise HTTPException(404, "publishing kit not found")
+    from app.dzen.routes import kit_context
+
+    ctx = kit_context(request, kit, article, settings, admin=True)
+    ctx.update(_base_context(request, session, settings, "dzen"))
+    return templates.TemplateResponse(request, "dzen_kit.html", ctx)
+
+
+@router.get("/dzen/publishing-kits/{public_id}/media.zip")
+def dzen_kit_zip_admin(
+    public_id: str,
+    session: Session = Depends(get_db),
+    _: str = Depends(require_admin),
+) -> FileResponse:
+    article = session.scalar(select(DzenArticle).where(DzenArticle.public_id == public_id))
+    if article is None:
+        raise HTTPException(404, "dzen article not found")
+    kit = session.scalar(
+        select(DzenPublishingKit)
+        .where(DzenPublishingKit.article_id == article.id)
+        .order_by(DzenPublishingKit.id.desc())
+    )
+    if kit is None or not kit.zip_asset_path or not Path(kit.zip_asset_path).is_file():
+        raise HTTPException(404, "zip not ready")
+    return FileResponse(kit.zip_asset_path, media_type="application/zip", filename="dzen_media.zip")
+
+
+@router.post("/dzen/publishing-kits/{public_id}/confirm")
+def dzen_kit_confirm_admin(
+    public_id: str,
+    published_url: str = Form(...),
+    session: Session = Depends(get_db),
+    settings: Settings = Depends(get_settings),
+    _: str = Depends(require_admin),
+) -> RedirectResponse:
+    from app.dzen.confirm import verify_and_confirm
+
+    article = session.scalar(select(DzenArticle).where(DzenArticle.public_id == public_id))
+    if article is None:
+        raise HTTPException(404, "dzen article not found")
+    result = verify_and_confirm(
+        session,
+        article,
+        published_url,
+        confirmed_by="admin_kit",
+        network=settings.validate_media_over_network,
+    )
+    level = "ok" if result.ok else "error"
+    msg = "Публикация подтверждена" if result.ok else (result.reason or "не подтверждено")
+    return _redirect(f"/admin/dzen/publishing-kits/{public_id}", msg, level)
+
+
 def ops_run(
     job: str = Form(...),
     session: Session = Depends(get_db),
@@ -697,6 +804,9 @@ def ops_run(
         "schedule": jobs.schedule_publications,
         "publish_queue": jobs.process_publication_queue,
         "cleanup": jobs.cleanup_expired,
+        "dzen_planner": jobs.run_dzen_planner,
+        "dzen_generate": jobs.generate_dzen_articles,
+        "dzen_digest": jobs.send_dzen_digest,
     }
     handler = handlers.get(job)
     if handler is None:

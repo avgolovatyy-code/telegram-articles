@@ -105,6 +105,34 @@ def chief_editor(market: Annotated[str | None, typer.Option()] = None) -> None:
         _print(jobs.run_chief_editor(session, markets=_markets(market)))
 
 
+@app.command("dzen-plan")
+def dzen_plan() -> None:
+    """Fill the independent Dzen calendar (does not touch Telegram/MAX)."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.run_dzen_planner(session))
+
+
+@app.command("dzen-generate")
+def dzen_generate(
+    max_articles: Annotated[int | None, typer.Option(help="cap for this run")] = None,
+) -> None:
+    """Write Dzen articles and Publishing Kits. Does not post to Dzen."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.generate_dzen_articles(session, max_articles=max_articles))
+
+
+@app.command("dzen-digest")
+def dzen_digest(
+    force: Annotated[bool, typer.Option(help="ignore notify hour, still never weekends")] = False,
+) -> None:
+    """Send the weekday Slack digest if the policy allows it. Never pings on Sat/Sun."""
+    _bootstrap()
+    with session_scope() as session:
+        _print(jobs.send_dzen_digest(session, force_hour=force))
+
+
 @app.command("russia-demand-refresh")
 def russia_demand_refresh() -> None:
     """Reload dated Russia demand observations; never invent search volumes."""
