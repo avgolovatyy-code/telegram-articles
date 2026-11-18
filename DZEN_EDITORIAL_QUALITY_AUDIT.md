@@ -2,6 +2,9 @@
 
 **Дата:** 18 ноября 2026, Europe/Moscow  
 **Ветка:** `cursor/dzen-editorial-quality-01af`  
+**Коммит:** `fed7385`  
+**PR:** https://github.com/avgolovatyy-code/telegram-articles/pull/17 (stack on #16)  
+**Production SHA:** `fed7385` на `/opt/wegotrip-content-engine`  
 **Спецификация:** `WEGOTRIP_DZEN_UNIVERSAL_EDITORIAL_QUALITY_CURSOR.md`  
 **Вердикт:** `GO_WITH_CONDITIONS`
 
@@ -79,6 +82,9 @@ Telegram RU/EN, MAX, Slack-расписание, `DAILY_AI_BUDGET_USD` и авт
 ## 6. Health / Slack / бюджет
 
 - Полный `pytest` зелёный локально (offline mock LLM).
+- Деплой: `DEPLOY_BRANCH=cursor/dzen-editorial-quality-01af bash deploy/from-agent.sh`.
+- `GET /healthz` и `/readyz` → `{"status":"ok"}` (Europe/Moscow, после деплоя).
+- Казань `MQ5kQ398DFQ`: `wgt dzen-apply-kazan-weekend` → `ready_for_handoff`, product `1526`. Slack digest не вызывался.
 - Slack-тесты: вторник одно упоминание, четверг без старых карточек, выходные `weekend`, слабый copy → `empty_queue` без пинга.
 - Extra-ping `<@U03AE1ATKDJ>` не отправлялся.
 - `DAILY_AI_BUDGET_USD` не повышался. Extra stages идут на utility; при исчерпании бюджета research деградирует в catalog-only.
@@ -89,9 +95,8 @@ Telegram RU/EN, MAX, Slack-расписание, `DAILY_AI_BUDGET_USD` и авт
 
 Новые материалы Дзена проходят жанровый контракт и детерминированные hard blockers до handoff. Условия:
 
-1. CI на PR должен быть зелёным.
-2. Safe deploy через `deploy/from-agent.sh` без `dzen-digest`.
-3. Живую Казань обновить только фактическим AST (Марджани / длительность / playback), без косметики и без внепланового Slack.
-4. Live OpenAI-writer по-прежнему зависит от бюджета $3/день: при hold календарь не заполняется выдумкой.
+1. Дождаться зелёного CI на PR #17.
+2. Live OpenAI-writer по-прежнему зависит от бюджета $3/день: при hold календарь не заполняется выдумкой.
+3. Расхождение FAQ/how-it-works у карточки 1526 остаётся backlog владельца данных.
 
 Успех этой работы — качество следующих публикаций, а не бесконечная правка одной казанской статьи.
