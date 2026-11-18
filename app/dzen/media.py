@@ -22,6 +22,14 @@ from app.telegram.media import MediaValidator
 SAFE_NAME = re.compile(r"[^a-zA-Z0-9._-]+")
 PRODUCT_DIR = re.compile(r"/product/(\d+)/", re.I)
 CACHE_DIR = re.compile(r"/cache/images/", re.I)
+# Latin filename stems for nearby places that must not illustrate another city.
+NEARBY_FILENAME = (
+    ("sviyazh", "свияж"),
+    ("peterhof", "петергоф"),
+    ("petergof", "петергоф"),
+    ("tsarskoe", "царск"),
+    ("pavlovsk", "павловск"),
+)
 
 
 @dataclass(slots=True)
@@ -93,6 +101,12 @@ def _caption_for(product: Product, heading: str | None) -> str:
     return "Фотография из каталога WeGoTrip"
 
 
+def _url_conflicts_with_article(url: str, headings: list[str], city_name: str | None) -> bool:
+    blob = " ".join([*headings, city_name or ""]).casefold()
+    path = urlsplit(url or "").path.lower()
+    return any(latin in path and rus not in blob for latin, rus in NEARBY_FILENAME)
+
+
 def _heading_score(url: str, product: Product, heading: str | None) -> int:
     if not heading:
         return 0
@@ -120,38 +134,20 @@ def collect_catalog_images(
         )
     )
     if not products and city_name:
-        folded = city_name.casefold()
-        titled = [
-            row
-            for row in session.scalars(
-                select(Product).where(Product.market == "ru", Product.available.is_(True))
-            )
-            if folded in (row.title or "").casefold()
-        ]
-        products.extend(titled[:8])
-    if city_name and not product_ids:
-        folded = fold_place(city_name)
-        city_rows = list(session.scalars(select(City).where(City.market == "ru")))
-        city_ids = [row.external_id for row in city_rows if folded == fold_place(row.name)]
-        extra = list(
-            session.scalars(
-                select(Product).where(
-                    Product.market == "ru",
-                    Product.available.is_(True),
-                    Product.city_external_id.in_(city_ids or ["__none__"]),
-                )
-            )
-        )
         heading_tokens = place_tokens(*(headings or []), city_name)
         dest_tokens = place_tokens(city_name)
-        for product in extra:
-            if product in products:
+        titled = []
+        for row in session.scalars(
+            select(Product).where(Product.market == "ru", Product.available.is_(True))
+        ):
+            title_tokens = place_tokens(row.title)
+            if not (title_tokens & dest_tokens):
                 continue
-            title_tokens = place_tokens(product.title)
             distinctive = title_tokens - dest_tokens
             if distinctive and not (distinctive & heading_tokens):
                 continue
-            products.append(product)
+            titled.append(row)
+        products.extend(titled[:8])
 
     if city_name:
         dest_ids = {
@@ -168,6 +164,8 @@ def collect_catalog_images(
             if not image_url_is_clean(url):
                 continue
             if not urlsplit(url).path.lower().endswith((".jpg", ".jpeg", ".png", ".webp")):
+                continue
+            if _url_conflicts_with_article(url, headings, city_name):
                 continue
             fingerprint = image_fingerprint(url)
             if fingerprint in seen_fp:

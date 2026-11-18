@@ -148,11 +148,12 @@ def score_product(
     if locale and locale not in {"ru", "ru-ru"}:
         return 0, []
 
-    title_tokens = place_tokens(product.title, *_attraction_names(product))
+    title_tokens = place_tokens(product.title)
     hay_tokens = title_tokens | place_tokens(
         product.description,
         product.short_description,
         city.name if city else "",
+        *_attraction_names(product),
     )
     dest_token = fold_place(destination.name) if destination else ""
     # Only the product title / attraction names may hard-reject: a Kazan tour

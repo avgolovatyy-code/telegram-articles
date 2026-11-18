@@ -208,6 +208,54 @@ def test_images_ignore_other_city_product_ids(session):
     assert all("1526" in (asset.url or "") for asset in assets)
 
 
+def test_fallback_images_skip_nearby_city_in_title(session):
+    kazan = _city(session, "551487", "Казань")
+    _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+    )
+    _product(
+        session,
+        external_id="25427",
+        title="Свияжск из Казани: обзорная аудиоэкскурсия",
+        city_id=kazan.external_id,
+    )
+    assets = collect_catalog_images(
+        session,
+        product_ids=[],
+        city_name="Казань",
+        headings=["Кремль", "Баумана", "Слобода"],
+        limit=5,
+    )
+    assert assets
+    assert all("25427" not in (asset.url or "") for asset in assets)
+    assert all("1526" in (asset.url or "") for asset in assets)
+
+
+def test_sviyazhsk_filename_skipped_for_kazan_article(session):
+    kazan = _city(session, "551487", "Казань")
+    product = _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+    )
+    product.cover = "https://cdn.example/product/1526/sviyazhskfirelookouttower.jpg"
+    product.images = ["https://cdn.example/product/1526/kremlin-kazan.jpg"]
+    assets = collect_catalog_images(
+        session,
+        product_ids=["1526"],
+        city_name="Казань",
+        headings=["Кремль"],
+        limit=5,
+    )
+    assert assets
+    assert all("sviyazh" not in (asset.url or "").lower() for asset in assets)
+    assert any("kremlin-kazan" in (asset.url or "") for asset in assets)
+
+
 def test_image_fingerprint_collapses_cdn_cache_variants():
     a = "https://wgt-prod-storage.s3.amazonaws.com/media/products/product/1526/d09ad0b0.jpg"
     b = (
