@@ -90,6 +90,7 @@ def generate_dzen_article(
         city_name=article.destination_city,
         country_code=article.destination_country,
         article_text=brief_text,
+        focus_text=brief_text,
         limit=6,
         settings=settings,
     )
@@ -205,6 +206,7 @@ def generate_dzen_article(
         city_name=article.destination_city,
         country_code=article.destination_country,
         article_text=body_text(ast),
+        focus_text=_focus_text(ast),
         limit=3,
         settings=settings,
     )
@@ -301,6 +303,11 @@ def _sanitize_ast(
     return ast
 
 
+def _focus_text(ast: DzenArticleAST) -> str:
+    headings = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    return " ".join(part for part in [ast.headline, ast.lead, *headings] if part)
+
+
 def _qualify_claims(claims: list[DzenClaim]) -> list[DzenClaim]:
     kept: list[DzenClaim] = []
     volatile = {
@@ -363,6 +370,7 @@ def rebuild_kit_from_stored_ast(
         city_name=article.destination_city,
         country_code=article.destination_country,
         article_text=body_text(ast),
+        focus_text=_focus_text(ast),
         limit=3,
         settings=settings,
     )

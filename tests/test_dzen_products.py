@@ -162,6 +162,35 @@ def test_zero_products_when_nothing_matches(session, settings):
     assert picks == []
 
 
+def test_negated_sviyazhsk_aside_does_not_attach_products(session, settings):
+    kazan = _city(session, "551487", "Казань")
+    _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+        rank=1,
+    )
+    _product(
+        session,
+        external_id="25427",
+        title="Свияжск: обзорная аудиоэкскурсия по острову-граду",
+        city_id=kazan.external_id,
+        rank=2,
+    )
+    picks = match_products(
+        session,
+        article_id="art-neg",
+        topic_slug="kazan",
+        city_name="Казань",
+        country_code="RU",
+        article_text=("Казань на зимний уикенд: Кремль и слобода. В этот раз не едем в Свияжск."),
+        focus_text="Казань на зимний уикенд Кремль Слобода Баумана",
+        settings=settings,
+    )
+    assert [p.title for p in picks] == ["Городские легенды Казани"]
+
+
 def test_sviyazhsk_allowed_when_article_names_it(session, settings):
     _city(session, "1", "Казань")
     _product(

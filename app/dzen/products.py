@@ -145,6 +145,7 @@ def score_product(
     product: Product,
     *,
     article_tokens: set[str],
+    focus_tokens: set[str] | None = None,
     destination: City | None,
     city: City | None,
 ) -> tuple[int, list[str]]:
@@ -164,10 +165,11 @@ def score_product(
         *_attraction_names(product),
     )
     dest_token = fold_place(destination.name) if destination else ""
-    # Only the product title / attraction names may hard-reject: a Kazan tour
-    # whose long description mentions a nearby island must still be eligible.
+    # Distinctive title places must be in the focus (headline/lead/headings).
+    # A "не едем в Свияжск" aside in the body is not an invitation to sell it.
+    focus = focus_tokens if focus_tokens is not None else article_tokens
     distinctive = title_tokens - ({dest_token} if dest_token else set())
-    unmatched = distinctive - article_tokens
+    unmatched = distinctive - focus
     if unmatched:
         return 0, []
 
@@ -207,12 +209,14 @@ def match_products(
     city_name: str | None,
     country_code: str | None,
     article_text: str | None = None,
+    focus_text: str | None = None,
     limit: int = 3,
     settings: Settings | None = None,
 ) -> list[DzenProductPick]:
     settings = settings or get_settings()
     destination = _destination_city(session, city_name)
     article_tokens = place_tokens(article_text or "", city_name)
+    focus_tokens = place_tokens(focus_text or article_text or "", city_name)
     query = select(Product).where(
         Product.market == "ru",
         Product.available.is_(True),
@@ -225,6 +229,7 @@ def match_products(
         score, matched = score_product(
             product,
             article_tokens=article_tokens,
+            focus_tokens=focus_tokens,
             destination=destination,
             city=city,
         )
