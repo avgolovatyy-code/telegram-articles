@@ -443,7 +443,7 @@ def _dzen_article(context: dict[str, Any]) -> dict[str, Any]:
         "своим темпом. Перед покупкой смотрите, входит ли входной билет и какие есть "
         "способы оплаты именно у этого товара."
     )
-    blocks = [
+    blocks: list[dict[str, Any]] = [
         {
             "type": "heading",
             "text": "Зачем читать именно это",
