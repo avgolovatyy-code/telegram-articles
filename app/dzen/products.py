@@ -148,16 +148,17 @@ def score_product(
     if locale and locale not in {"ru", "ru-ru"}:
         return 0, []
 
-    hay_tokens = place_tokens(
-        product.title,
+    title_tokens = place_tokens(product.title, *_attraction_names(product))
+    hay_tokens = title_tokens | place_tokens(
         product.description,
         product.short_description,
         city.name if city else "",
-        *_attraction_names(product),
     )
-    distinctive = hay_tokens - ({fold_place(destination.name)} if destination else set())
+    dest_token = fold_place(destination.name) if destination else ""
+    # Only the product title / attraction names may hard-reject: a Kazan tour
+    # whose long description mentions a nearby island must still be eligible.
+    distinctive = title_tokens - ({dest_token} if dest_token else set())
     unmatched = distinctive - article_tokens
-    # A side-trip place named on the product but not in the article is a hard miss.
     if unmatched:
         return 0, []
 

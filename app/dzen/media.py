@@ -129,7 +129,7 @@ def collect_catalog_images(
             if folded in (row.title or "").casefold()
         ]
         products.extend(titled[:8])
-    if city_name:
+    if city_name and not product_ids:
         folded = fold_place(city_name)
         city_rows = list(session.scalars(select(City).where(City.market == "ru")))
         city_ids = [
@@ -146,18 +146,15 @@ def collect_catalog_images(
                 )
             )
         )
-        # Same-city extras only when their title fits a heading or the city itself.
+        heading_tokens = place_tokens(*(headings or []), city_name)
+        dest_tokens = place_tokens(city_name)
         for product in extra:
             if product in products:
                 continue
-            if headings and not any(
-                _heading_score(product.cover or "", product, h) for h in headings
-            ):
-                title_tokens = place_tokens(product.title, city_name)
-                if title_tokens - place_tokens(city_name) and not (
-                    place_tokens(*(headings or [])) & title_tokens
-                ):
-                    continue
+            title_tokens = place_tokens(product.title)
+            distinctive = title_tokens - dest_tokens
+            if distinctive and not (distinctive & heading_tokens):
+                continue
             products.append(product)
 
     used_headings: set[int] = set()

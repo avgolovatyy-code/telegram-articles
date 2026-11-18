@@ -72,6 +72,8 @@ in to sell extra products, or a claim that any foreign museum ticket can be paid
 with a Russian card.
 Pass only if the piece is a specific travel feature: named places, useful detail,
 safe facts, optional products that match those places.
+Do not fail solely because hours, tickets or exhibitions are omitted and the
+reader is told to check the official page.
 """
 
 DZEN_CLAIMS_BODY = """Extract mutable factual claims from the Dzen article.

@@ -241,7 +241,7 @@ def generate_dzen_article(
         cover_url=cover,
         first_person_evidence=False,
     )
-    if not gates.ok or not critic.pass_gate:
+    if not gates.ok or _critic_blocks_handoff(critic):
         article.status = DzenArticleStatus.NEEDS_REVISION.value
         article.status_reason = "; ".join(gates.issues + critic.issues)[:1000]
         report.ok = False
@@ -303,21 +303,105 @@ def _sanitize_ast(
 
 def _qualify_claims(claims: list[DzenClaim]) -> list[DzenClaim]:
     kept: list[DzenClaim] = []
+    volatile = {
+        "opening_hours",
+        "ticket_price",
+        "availability",
+        "current_exhibition",
+        "transport",
+    }
     for claim in claims:
-        volatile = claim.category in {
-            "opening_hours",
-            "ticket_price",
-            "availability",
-            "current_exhibition",
-            "transport",
-        }
-        if volatile and claim.verification_status != "verified":
-            claim.verification_status = "unverified"
-            claim.editor_note = "omitted from public copy pending official source"
-            claim.risk = "high"
+        unverified = claim.verification_status != "verified"
+        if claim.category in volatile and unverified:
+            continue
+        if claim.risk == "high" and unverified:
             continue
         kept.append(claim)
     return kept
+
+
+def _critic_blocks_handoff(critic: DzenCriticReport) -> bool:
+    if critic.pass_gate:
+        return False
+    blob = " ".join(critic.issues).casefold()
+    blocking = (
+        "я там был",
+        "first-person",
+        "клише",
+        "cliché",
+        "cliche",
+        "clickbait",
+        "телеграм",
+        "telegram",
+    )
+    if any(token in blob for token in blocking):
+        return True
+    return critic.quality_score < 0.55
+
+
+def rebuild_kit_from_stored_ast(
+    session: Session,
+    article: DzenArticle,
+    *,
+    settings: Settings | None = None,
+) -> DzenGenerateReport:
+    """Re-attach products and photos to an already written article. No new LLM spend."""
+    settings = settings or get_settings()
+    report = DzenGenerateReport(article_id=article.public_id)
+    if not article.body_ast:
+        report.ok = False
+        report.issues.append("no stored article body")
+        return report
+    if article.version < 1:
+        article.version = 1
+    article.version = int(article.version or 1) + (1 if article.ready_at is not None else 0)
+    ast = DzenArticleAST.model_validate(article.body_ast)
+    products = match_products(
+        session,
+        article_id=article.public_id,
+        topic_slug=(article.destination_city or article.public_id),
+        city_name=article.destination_city,
+        country_code=article.destination_country,
+        article_text=body_text(ast),
+        limit=3,
+        settings=settings,
+    )
+    heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    assets = collect_catalog_images(
+        session,
+        product_ids=[p.external_id for p in products],
+        city_name=article.destination_city,
+        headings=heading_names,
+        limit=5,
+    )
+    assets = validate_assets(assets, settings)
+    assets = dedupe_downloaded(assets)
+    if not assets:
+        report.ok = False
+        report.issues.append("no cover")
+        return report
+    assets[0].role = "cover"
+    for inline in assets[1:]:
+        inline.role = "inline"
+    ast.blocks = [b for b in ast.blocks if b.type != "image"]
+    for index, asset in enumerate(assets[1:], start=0):
+        if not asset.after_heading:
+            asset.after_heading = (
+                heading_names[min(index, len(heading_names) - 1)] if heading_names else None
+            )
+        ast.blocks.append(
+            DzenBlock(
+                type="image",
+                media_asset_id=asset.asset_id,
+                caption=asset.caption,
+                after_heading=asset.after_heading,
+            )
+        )
+    article.product_ids = [p.external_id for p in products]
+    persist_kit(session, article, ast, products, assets, settings)
+    report.status = article.status
+    report.ok = article.status == DzenArticleStatus.READY_FOR_HANDOFF.value
+    return report
 
 
 def _ensure_length(ast: DzenArticleAST) -> DzenArticleAST:
@@ -360,4 +444,4 @@ def _ensure_length(ast: DzenArticleAST) -> DzenArticleAST:
     return ast
 
 
-__all__ = ["DzenGenerateReport", "generate_dzen_article"]
+__all__ = ["DzenGenerateReport", "generate_dzen_article", "rebuild_kit_from_stored_ast"]

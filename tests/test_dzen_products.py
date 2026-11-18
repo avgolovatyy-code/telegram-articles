@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.db.models import City, Product
-from app.dzen.media import image_fingerprint
+from app.dzen.media import collect_catalog_images, image_fingerprint
 from app.dzen.products import match_products
 
 
@@ -33,13 +33,14 @@ def _product(session, *, external_id: str, title: str, city_id: str, rank: int =
 
 def test_kazan_article_does_not_get_sviyazhsk(session, settings):
     kazan = _city(session, "551487", "Казань")
-    _product(
+    legends = _product(
         session,
         external_id="1526",
         title="Городские легенды Казани",
         city_id=kazan.external_id,
         rank=1,
     )
+    legends.description = "По Казани и, если захотите, однодневный выезд в Свияжск."
     _product(
         session,
         external_id="25427",
@@ -115,6 +116,34 @@ def test_sviyazhsk_allowed_when_article_names_it(session, settings):
     )
     assert len(picks) == 1
     assert "Свияжск" in picks[0].title
+
+
+def test_catalog_images_stay_with_matched_products(session):
+    kazan = _city(session, "551487", "Казань")
+    _product(
+        session,
+        external_id="1526",
+        title="Городские легенды Казани",
+        city_id=kazan.external_id,
+        rank=1,
+    )
+    _product(
+        session,
+        external_id="25427",
+        title="Свияжск: обзорная аудиоэкскурсия по острову-граду",
+        city_id=kazan.external_id,
+        rank=2,
+    )
+    assets = collect_catalog_images(
+        session,
+        product_ids=["1526"],
+        city_name="Казань",
+        headings=["Кремль", "Баумана", "Слобода"],
+        limit=5,
+    )
+    assert assets
+    assert all("25427" not in (asset.url or "") for asset in assets)
+    assert all("1526" in (asset.url or "") for asset in assets)
 
 
 def test_image_fingerprint_collapses_cdn_cache_variants():

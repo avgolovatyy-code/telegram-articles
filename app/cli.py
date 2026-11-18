@@ -133,6 +133,36 @@ def dzen_digest(
         _print(jobs.send_dzen_digest(session, force_hour=force))
 
 
+@app.command("dzen-rebuild-kit")
+def dzen_rebuild_kit(
+    article_id: Annotated[str, typer.Option(help="public_id of the Dzen article")],
+) -> None:
+    """Re-match products and photos on a stored article. Does not call the writer."""
+    _bootstrap()
+    from sqlalchemy import select
+
+    from app.db.models import DzenArticle
+    from app.dzen.pipeline import rebuild_kit_from_stored_ast
+
+    with session_scope() as session:
+        row = session.scalar(select(DzenArticle).where(DzenArticle.public_id == article_id))
+        if row is None:
+            raise typer.BadParameter(f"unknown dzen article {article_id}")
+        outcome = rebuild_kit_from_stored_ast(session, row)
+        typer.echo(
+            json.dumps(
+                {
+                    "ok": outcome.ok,
+                    "status": outcome.status,
+                    "issues": outcome.issues,
+                    "product_ids": row.product_ids,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+
+
 @app.command("russia-demand-refresh")
 def russia_demand_refresh() -> None:
     """Reload dated Russia demand observations; never invent search volumes."""

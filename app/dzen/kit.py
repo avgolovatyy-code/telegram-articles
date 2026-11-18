@@ -216,6 +216,8 @@ def persist_kit(
         if staged:
             path, zip_sha = build_zip(staged, staging_dir(article.public_id) / "media.zip")
             zip_path = str(path)
+            assets = staged
+            preview_html = render_html(ast, products, assets, include_images=True)
     previous = session.scalars(
         select(DzenPublishingKit).where(
             DzenPublishingKit.article_id == article.id,

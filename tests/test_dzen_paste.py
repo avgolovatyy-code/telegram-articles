@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from app.dzen.kit import clipboard_html, sanitize_for_dzen_editor
 from app.dzen.products import DzenProductPick
 from app.dzen.schemas import DzenArticleAST, DzenBlock
@@ -57,3 +59,11 @@ def test_clipboard_wraps_start_fragment_for_editors():
     assert html.startswith("<!--StartFragment-->")
     assert html.endswith("<!--EndFragment-->")
     assert "<h2>" in html
+
+
+def test_kit_css_uses_full_phone_width():
+    css = Path("app/admin/static/admin.css").read_text(encoding="utf-8")
+    assert "body.dzen-handoff { overflow-x: clip; }" in css
+    assert "body.dzen-handoff main" in css
+    assert "max-width: none" in css
+    assert "@media (max-width: 640px)" in css
