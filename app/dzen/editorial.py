@@ -51,7 +51,7 @@ class EditorialDecision(BaseModel):
     coverage: EditorialCoverage = Field(default_factory=EditorialCoverage)
     scores: EditorialScores = Field(default_factory=EditorialScores)
     evidence_ids: list[str] = Field(default_factory=list)
-    prompt_version: str = "dzen_editorial_quality_v1"
+    prompt_version: str = "dzen_russian_style_v2"
 
 
 def _issue(code: str, explanation: str, fix: str = "") -> EditorialIssue:
@@ -80,6 +80,16 @@ def evaluate_editorial(
     for message in gates.issues:
         if "repetition" in message:
             soft.append(_issue("repetition", message, "Consolidate repeated theses"))
+            continue
+        if "awkward_russian" in message:
+            blocking.append(
+                _issue(
+                    "awkward_russian",
+                    message,
+                    "Перепишите фразу естественным русским языком, называя конкретное действие "
+                    "или наблюдение вместо абстрактной метафоры.",
+                )
+            )
             continue
         if "chronology_conflict" in message:
             blocking.append(_issue("chronology_conflict", message))

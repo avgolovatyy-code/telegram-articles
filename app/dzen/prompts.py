@@ -65,6 +65,20 @@ DZEN_WRITER_BODY = """Напиши оригинальную русскоязыч
 а не SEO-копирайтер. Ориентиры живого тона — Tripster и Авиасейлс, но их шутки,
 зачины и фирменные обороты копировать нельзя.
 
+Пиши так, как изначально пишут по-русски, а не переводят с английского. Перед
+ответом мысленно прочитай каждое предложение вслух. Если фраза звучит как
+редакторская пометка, презентация маршрута или дословный перевод, перепиши её
+простыми словами. Не одушевляй места ради метафоры и не заменяй наблюдение
+абстракциями «скорость», «линия», «ось», «слой», «ткань», «география», «масштаб».
+Не говори, что улица «держит масштаб», мечети «сидят в ткани», день надо «собрать
+в одну линию», аудиогид — «слой внутри дня», а еду надо «держать без экзамена».
+Вместо этого называй конкретное действие и видимый признак:
+«начните в слободе и идите к Кремлю»; «мечети стоят среди жилых домов»;
+«аудиогид занимает 1,5–2 часа, но на еду и музеи нужно отдельное время»;
+«закажите одно татарское блюдо — пробовать всё меню не обязательно».
+Не используй глаголы «держит», «схлопнуть», «закрыть» в значении редакционного
+планирования. Не обращайся к читателю командой, если можно дать ясный совет.
+
 Короткие абзацы, хук в первых 2–3 предложениях. Называй конкретные районы, улицы,
 музеи, привычки города, странные детали и практические советы, которые можно
 проверить. Статья про один город не должна подходить к любому другому после
@@ -127,11 +141,20 @@ DZEN_CRITIC_V2_BODY = """You are an independent Dzen critic. You did not write t
 Return EditorialDecision JSON (accept|revise|needs_research|hold).
 Use the genre contract, reader_promise, dossier evidence_ids and itinerary plan.
 Cite span + proposed_fix for every issue.
+Judge Russian as a native senior editor, not only for grammar. Mark
+awkward_russian as a blocking issue when a sentence sounds translated from
+English, uses an inanimate place as an actor, leaks planning jargon, or hides a
+simple observation behind abstractions such as «скорость», «линия», «ось»,
+«слой», «ткань», «география» or «масштаб». The five constructions
+«на снегу это три разных скорости», «собрать день в одну линию»,
+«площадь держит купеческий масштаб», «мечети сидят в жилой ткани» and
+«еду держите татарской, но без экзамена» must never pass. Require an idiomatic,
+concrete rewrite; fixing grammar alone is insufficient.
 Hard blockers: chronology_conflict, headline_promise_gap, route_infeasible,
 unsupported_claim, misleading_product, unsuitable_venue, media_mismatch.
 Soft: repetition, flat_lead, weak_angle, generic_tip, awkward_link.
 Do not invent sources. Do not pass a hollow day or a causal date clash.
-Zero products is valid. Prompt version: dzen_editorial_quality_v1.
+Zero products is valid. Prompt version: dzen_russian_style_v2.
 """
 
 DZEN_CLAIMS_BODY = """Extract mutable factual claims from the Dzen article.

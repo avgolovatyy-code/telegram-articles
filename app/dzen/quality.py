@@ -10,6 +10,7 @@ from app.dzen.itinerary import itinerary_issues
 from app.dzen.links import coupon_count, image_url_is_clean
 from app.dzen.products import DzenProductPick, place_tokens
 from app.dzen.redundancy import redundancy_report
+from app.dzen.russian_style import russian_style_issues
 from app.dzen.schemas import DzenArticleAST
 
 AI_CLICHES = (
@@ -123,6 +124,10 @@ def run_gates(
     for phrase in AI_CLICHES:
         if phrase in folded:
             result.fail(f"AI cliché: {phrase}")
+    for issue in russian_style_issues(text):
+        result.fail(
+            f"awkward_russian: «{issue.span}» — {issue.explanation}; fix: {issue.proposed_fix}"
+        )
     if not first_person_evidence:
         for phrase in FIRST_PERSON:
             if phrase in folded:
