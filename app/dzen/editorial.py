@@ -51,7 +51,7 @@ class EditorialDecision(BaseModel):
     coverage: EditorialCoverage = Field(default_factory=EditorialCoverage)
     scores: EditorialScores = Field(default_factory=EditorialScores)
     evidence_ids: list[str] = Field(default_factory=list)
-    prompt_version: str = "dzen_russian_style_v2"
+    prompt_version: str = "dzen_russian_style_v3"
 
 
 def _issue(code: str, explanation: str, fix: str = "") -> EditorialIssue:

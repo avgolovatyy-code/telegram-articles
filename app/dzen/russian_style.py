@@ -89,6 +89,27 @@ _RULES = (
     ),
 )
 
+_CONTRAST = re.compile(
+    r"(?:\bне\s+(?:просто\s+)?[^.!?\n]{1,80}?,?\s+а\b|,\s+а\s+не\b)",
+    re.IGNORECASE,
+)
+_IMPERATIVE_START = re.compile(
+    r"^\s*(?:не\s+)?(?:"
+    r"начните|начинайте|идите|отправляйтесь|заложите|оставьте|"
+    r"сверьте|сверяйте|проверьте|выберите|посмотрите|попробуйте|"
+    r"зайдите|закажите|пройдите|обратите|добавляйте|обходите|отдавайте"
+    r")\b",
+    re.IGNORECASE,
+)
+
+
+def _sentences(text: str) -> list[str]:
+    return [
+        sentence.strip(" \t\n—•")
+        for sentence in re.split(r"(?<=[.!?])\s+|\n+", text)
+        if sentence.strip(" \t\n—•")
+    ]
+
 
 def russian_style_issues(text: str) -> list[RussianStyleIssue]:
     issues: list[RussianStyleIssue] = []
@@ -107,6 +128,38 @@ def russian_style_issues(text: str) -> list[RussianStyleIssue]:
                     proposed_fix=rule.proposed_fix,
                 )
             )
+
+    sentences = _sentences(text)
+    contrasts = [sentence for sentence in sentences if _CONTRAST.search(sentence)]
+    if len(contrasts) >= 4:
+        issues.append(
+            RussianStyleIssue(
+                span=" | ".join(contrasts[:3])[:400],
+                explanation=(
+                    f"the «не X, а Y» contrast template is overused ({len(contrasts)} sentences)"
+                ),
+                proposed_fix=(
+                    "Rewrite most contrasts as direct statements and keep only those "
+                    "needed for factual accuracy."
+                ),
+            )
+        )
+
+    imperatives = [sentence for sentence in sentences if _IMPERATIVE_START.search(sentence)]
+    if len(imperatives) >= 6:
+        issues.append(
+            RussianStyleIssue(
+                span=" | ".join(imperatives[:3])[:400],
+                explanation=(
+                    f"too many imperative sentences ({len(imperatives)}); "
+                    "the article sounds like instructions"
+                ),
+                proposed_fix=(
+                    "Use friendly options such as «можно», «лучше», «стоит» and "
+                    "reserve direct commands for essential safety advice."
+                ),
+            )
+        )
     return issues
 
 
