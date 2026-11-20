@@ -181,11 +181,14 @@ def build_digest_blocks(
     mention = mention_markup(settings)
     count = len(items)
     header = f"📝 WeGoTrip / Дзен — готовы статьи к публикации ({count})"
-    intro = (
-        f"{mention} Привет! Подготовили материалы, можно перенести в Дзен через готовые пакеты:"
-        if mention
-        else "Готовы материалы для переноса в Дзен:"
-    )
+    kit_note = "Ссылка служебная — это не страница Дзена и не для поиска."
+    if mention:
+        intro = (
+            f"{mention} Привет! Подготовили материалы, можно перенести в Дзен "
+            f"через готовые пакеты. {kit_note}"
+        )
+    else:
+        intro = f"Готовы материалы для переноса в Дзен. {kit_note}"
     blocks: list[dict[str, Any]] = [
         {"type": "header", "text": {"type": "plain_text", "text": header[:150]}},
         {"type": "section", "text": {"type": "mrkdwn", "text": intro}},

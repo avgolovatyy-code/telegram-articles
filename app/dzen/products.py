@@ -72,6 +72,8 @@ class DzenProductPick:
     duration_label: str | None = None
     distance_label: str | None = None
     listen_in_browser: bool = False
+    playback_discrepancy: bool = False
+    locale: str | None = None
     reader_pitch: str = ""
 
 
@@ -128,25 +130,32 @@ def product_is_free(product: Product) -> bool:
     return "бесплат" in blob or "free" in blob
 
 
-def listen_in_browser(product: Product) -> bool:
-    """Prefer the public web player over leftover FAQ copy that still says 'app only'."""
+_WEB_PLAYER = (
+    "в браузере",
+    "listen online in your browser",
+    "no app is required",
+    "приложение не обязательно",
+    "устанавливать приложение не обязательно",
+)
+_APP_ONLY = ("только в приложении", "доступна только в приложении")
+
+
+def _playback_flags(product: Product) -> tuple[bool, bool]:
     blob = _catalog_blob(product)
-    if any(
-        marker in blob
-        for marker in (
-            "в браузере",
-            "listen online in your browser",
-            "no app is required",
-            "приложение не обязательно",
-            "устанавливать приложение не обязательно",
-        )
-    ):
-        return True
-    audio = any(
-        token in blob
-        for token in ("аудиоэкскурсия", "аудиогид", "аудиотур", "audio tour", "audio guide")
-    )
-    return audio
+    web = any(marker in blob for marker in _WEB_PLAYER)
+    app_only = any(marker in blob for marker in _APP_ONLY)
+    return web, app_only
+
+
+def listen_in_browser(product: Product) -> bool:
+    """Promise a web player only when the catalogue is unambiguous."""
+    web, app_only = _playback_flags(product)
+    return web and not app_only
+
+
+def playback_discrepancy(product: Product) -> bool:
+    web, app_only = _playback_flags(product)
+    return web and app_only
 
 
 def human_duration(text: str | None) -> str | None:
@@ -188,7 +197,7 @@ def reader_pitch(product: Product) -> str:
     distance = human_distance(product.distance)
     if distance:
         bits.append(f"маршрут около {distance}")
-    if listen_in_browser(product):
+    if listen_in_browser(product) and not playback_discrepancy(product):
         bits.append("слушать можно в браузере, приложение ставить не обязательно")
     if not bits:
         return product.title
@@ -363,6 +372,8 @@ def match_products(
                 duration_label=human_duration(product.duration_text) or product.duration_text,
                 distance_label=human_distance(product.distance) or product.distance,
                 listen_in_browser=listen_in_browser(product),
+                playback_discrepancy=playback_discrepancy(product),
+                locale=product.locale,
                 reader_pitch=reader_pitch(product),
                 snapshot={
                     "title": product.title,
@@ -374,6 +385,7 @@ def match_products(
                     "distance": product.distance,
                     "is_free": product_is_free(product),
                     "listen_in_browser": listen_in_browser(product),
+                    "playback_discrepancy": playback_discrepancy(product),
                     "score": score,
                     "matched_places": matched,
                 },
@@ -393,6 +405,7 @@ __all__ = [
     "looks_russian",
     "match_products",
     "place_tokens",
+    "playback_discrepancy",
     "product_is_free",
     "reader_pitch",
     "score_product",

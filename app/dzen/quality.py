@@ -5,8 +5,12 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from app.dzen.chronology import chronology_conflicts, unverified_hours_issues, venue_framing_issues
+from app.dzen.itinerary import itinerary_issues
 from app.dzen.links import coupon_count, image_url_is_clean
 from app.dzen.products import DzenProductPick, place_tokens
+from app.dzen.redundancy import redundancy_report
+from app.dzen.russian_style import russian_style_issues
 from app.dzen.schemas import DzenArticleAST
 
 AI_CLICHES = (
@@ -32,10 +36,17 @@ FIRST_PERSON = (
     "я там был",
     "мы проверили на месте",
     "нашим редактором обнаружено",
+    "я впервые приехал",
+    "я впервые приехала",
+    "когда я приехал",
+    "когда я приехала",
 )
 UNSAFE_PAYMENT = (
     "любой билет в иностранный музей российской картой",
     "можно оплатить любой билет",
+    "любой билет за границей",
+    "все зарубежные музеи российской картой",
+    "оплатите российской картой любой",
 )
 
 
@@ -66,30 +77,10 @@ OPS_LEAKS = (
     "product_id",
     "media_asset_id",
 )
-WARM_INTERVAL = (
-    "полтора-два часа",
-    "каждые полтора",
-    "тепловые интервалы",
-    "точками восстановления",
-    "блоками по 1,5",
-    "блоками по 1,5–2",
-)
-SIDE_TRIPS = ("свияж", "петергоф", "иннополис")
-TWO_DAY = re.compile(r"два(?:\s+\w+){0,2}\s+дн|двухдневн|2\s*дн|уикенд|выходн", re.I)
-DAY_ONE = re.compile(r"день первый|первый день", re.I)
-DAY_TWO = re.compile(r"день второй|второй день", re.I)
 APP_ONLY = re.compile(r"только в приложении|нужно приложение|обязательно.+приложени", re.I)
-STORY_HINTS = (
-    "легенд",
-    "сююмбик",
-    "привид",
-    "алабрыс",
-    "джек",
-    "екатерин",
-    "марджан",
-    "кул-шариф",
-    "кул шариф",
-    "юнусов",
+YEAR_OR_STORY = re.compile(
+    r"\b(?:1[0-9]{3}|20[0-2][0-9])\b|легенд|фольклор|верси[яи]|по одной из версий",
+    re.I,
 )
 
 
@@ -133,6 +124,10 @@ def run_gates(
     for phrase in AI_CLICHES:
         if phrase in folded:
             result.fail(f"AI cliché: {phrase}")
+    for issue in russian_style_issues(text):
+        result.fail(
+            f"awkward_russian: «{issue.span}» — {issue.explanation}; fix: {issue.proposed_fix}"
+        )
     if not first_person_evidence:
         for phrase in FIRST_PERSON:
             if phrase in folded:
@@ -155,7 +150,7 @@ def run_gates(
     high_risk = [c for c in ast.claims if c.risk == "high" and c.verification_status != "verified"]
     if high_risk:
         result.fail("unverified high-risk claims must be omitted")
-    if re.search(r"\{\{|\}\}", text):
+    if re.search(r"\{\{|\}\}", text) or re.search(r"\{[A-Za-z_][A-Za-z0-9_]*\}", text):
         result.fail("template placeholders in article text")
     fluff_hits = [phrase for phrase in GENERIC_FLUFF if phrase in folded]
     if len(fluff_hits) >= 2:
@@ -173,25 +168,18 @@ def run_gates(
     for leak in OPS_LEAKS:
         if leak in folded:
             result.fail(f"ops note leaked into copy: {leak}")
-    warm_hits = sum(folded.count(phrase) for phrase in WARM_INTERVAL)
-    if warm_hits > 1:
-        result.fail("repeated warming-interval advice")
-    dest = (ast.destination_city or "").casefold()
-    for stem in SIDE_TRIPS:
-        if stem in folded and stem not in dest and stem not in ast.headline.casefold():
-            result.fail(f"side-trip {stem} stuffed into {ast.destination_city or 'article'}")
-    if TWO_DAY.search(ast.headline):
-        if not DAY_ONE.search(text) or not DAY_TWO.search(text):
-            result.fail("headline promises two days but the days are not both written")
-        day_two_places = 0
-        for title, body in _sections(ast):
-            if DAY_TWO.search(title) or DAY_TWO.search(body[:80]):
-                day_two_places = len(place_tokens(title, body))
-                break
-        if day_two_places < 2:
-            result.fail("day two needs named places, not a vague leftover slot")
-    if not any(hint in folded for hint in STORY_HINTS) and len(named) < 6:
-        result.fail("needs a local story or unusual detail, not only tourist advice")
+    for message in chronology_conflicts(text):
+        result.fail(message)
+    for message in venue_framing_issues(text):
+        result.fail(message)
+    for message in unverified_hours_issues(text):
+        result.fail(message)
+    for message in itinerary_issues(ast, products):
+        result.fail(message)
+    for message in redundancy_report(ast).issues:
+        result.fail(message)
+    if not YEAR_OR_STORY.search(text) and len(named) < 6:
+        result.fail("needs a local story, date, or unusual detail, not only tourist advice")
     for product in products:
         pitch_space = folded + " " + (product.reader_pitch or "").casefold()
         if product.duration_label and not any(token in folded for token in ("час", "мин", "км")):
@@ -206,6 +194,18 @@ def run_gates(
             result.fail("web player exists; do not describe the tour as app-only")
         if product.is_free and "проверьте карточку" in pitch_space:
             result.fail("free product described with a checkout ops note")
+        if not product.is_free and product.title.casefold() in folded and "бесплат" in folded:
+            result.fail(f"misleading_product: {product.external_id} is not free")
+        locale = (getattr(product, "locale", None) or "").lower()
+        if locale and locale not in {"ru", "ru-ru"}:
+            result.fail(f"product {product.external_id} locale={locale} in a Russian article")
+        if getattr(product, "playback_discrepancy", False) and (
+            "приложение не обязательно" in folded or "ставить не обязательно" in folded
+        ):
+            result.fail(
+                f"misleading_product: {product.external_id} playback is disputed; "
+                "do not state it categorically"
+            )
     return result
 
 

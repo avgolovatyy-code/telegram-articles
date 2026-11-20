@@ -19,20 +19,21 @@
     {% if kit.zip_asset_path %}
     <a class="btn" href="{{ '/admin/dzen/publishing-kits/' + article.public_id + '/media.zip' if admin else '/dzen/k/' + kit.access_token + '/media.zip' }}">Скачать все изображения (ZIP)</a>
     {% endif %}
-    <a class="btn" href="{{ studio_url }}" target="_blank" rel="noopener">Открыть Дзен-студию</a>
+    <a class="btn" href="{{ studio_url }}" target="_blank" rel="noopener noreferrer">Открыть Дзен-студию</a>
     <a class="btn" href="{{ '/dzen/k/' + kit.access_token + '/article.html' }}">article.html</a>
     <a class="btn" href="{{ '/dzen/k/' + kit.access_token + '/article.txt' }}">article.txt</a>
   </div>
   <p id="copy-status" class="muted small" role="status"></p>
 
-  <ol class="dzen-steps">
-    <li>Скопируйте заголовок, затем форматированный текст (Ctrl+V в статью Дзена).</li>
-    <li>Если ссылки или списки не перенеслись: нажмите «Выделить предпросмотр» или откройте article.html → Ctrl+A → Ctrl+C и вставьте ещё раз. Не переписывайте абзацы вручную.</li>
-    <li>В Дзене: Студия → Создать публикацию → Статья.</li>
-    <li>Загрузите обложку и фото по прямым ссылкам или из ZIP, после указанных разделов.</li>
-    <li>Проверьте ссылки WeGoTrip (<code>coupon={{ referer_id }}</code>) и отсутствие сырой разметки.</li>
-    <li>Опубликуйте и верните ссылку <code>dzen.ru/a/...</code> в Slack-тред или форму ниже.</li>
-  </ol>
+  <aside class="dzen-howto" aria-label="Как перенести в Дзен">
+    <p><strong>Это не страница Дзена и не публикация.</strong> Служебный пакет для переноса; ссылку никуда не постите — в поиск она попадать не должна.</p>
+    <ol>
+      <li>Скопируйте заголовок, затем форматированный текст.</li>
+      <li>Дзен: Студия → Создать публикацию → Статья → вставьте (Ctrl+V). Если ссылки поехали — «Выделить предпросмотр» или article.html → Ctrl+A/C.</li>
+      <li>Обложка и фото — из этого пакета, в указанном порядке. Ссылки WeGoTrip с <code>coupon={{ referer_id }}</code>.</li>
+      <li>Опубликуйте из кабинета Дзена и верните <code>dzen.ru/a/...</code> в Slack-тред или форму ниже.</li>
+    </ol>
+  </aside>
 
   <div class="dzen-preview" id="dzen-preview">{{ preview_html|safe }}</div>
 

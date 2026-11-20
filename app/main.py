@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.requests import Request
+from starlette.responses import Response
 
 from app.admin.routes import router as admin_router
 from app.api.routes import router as api_router
@@ -21,6 +23,9 @@ from app.logging_setup import configure_logging, get_logger
 from app.scheduler.runner import SchedulerRunner
 
 log = get_logger("app")
+
+ROBOTS_TAG = "noindex, nofollow, noarchive, nosnippet"
+ROBOTS_TXT = "User-agent: *\nDisallow: /\n"
 
 
 @asynccontextmanager
@@ -63,6 +68,20 @@ def create_app() -> FastAPI:
     async def healthz() -> dict[str, str]:
         return {"status": "ok"}
 
+    @application.get("/robots.txt", include_in_schema=False)
+    async def robots_txt() -> PlainTextResponse:
+        return PlainTextResponse(ROBOTS_TXT)
+
+    @application.middleware("http")
+    async def block_indexing(
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
+    ) -> Response:
+        response = await call_next(request)
+        response.headers["X-Robots-Tag"] = ROBOTS_TAG
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return response
+
     application.include_router(api_router)
     application.include_router(slack_router)
     application.include_router(dzen_router)
@@ -86,4 +105,4 @@ def create_app() -> FastAPI:
 
 app = create_app()
 
-__all__ = ["app", "create_app"]
+__all__ = ["ROBOTS_TAG", "ROBOTS_TXT", "app", "create_app"]

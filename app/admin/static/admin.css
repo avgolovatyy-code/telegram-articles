@@ -145,7 +145,17 @@ textarea { width: 100%; min-height: 320px; font-family: ui-monospace, Menlo, mon
 .dzen-kit { max-width: min(820px, 100%); width: 100%; }
 .dzen-kit .eyebrow { color: var(--muted); letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
 .dzen-actions { margin: 16px 0 8px; }
-.dzen-steps { color: var(--muted); padding-left: 20px; }
+.dzen-howto {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin: 12px 0 8px;
+  color: var(--text);
+}
+.dzen-howto p { margin: 0 0 8px; }
+.dzen-howto ol { margin: 0; padding-left: 20px; color: var(--muted); }
+.dzen-howto li { margin: 4px 0; }
 .dzen-preview { background: #f6f1e8; color: #1b1712; border-radius: 12px; padding: 28px 32px; margin: 24px 0; overflow-wrap: anywhere; }
 .dzen-preview h2 { font-size: 28px; margin: 0 0 12px; color: #1b1712; }
 .dzen-preview h3 { font-size: 18px; margin: 22px 0 8px; color: #1b1712; }

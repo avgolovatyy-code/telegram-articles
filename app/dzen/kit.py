@@ -32,6 +32,9 @@ FORBIDDEN_COPY_MARKERS = (
     "media_asset_id",
     "/admin/",
     "internal-source",
+    "Это не страница Дзена",
+    "Служебный пакет",
+    "dzen-howto",
 )
 
 
@@ -255,6 +258,7 @@ def persist_kit(
                 "duration": p.duration_label,
                 "distance": p.distance_label,
                 "listen_in_browser": p.listen_in_browser,
+                "playback_discrepancy": getattr(p, "playback_discrepancy", False),
                 "verified_at": utcnow().date().isoformat(),
             }
             for p in products

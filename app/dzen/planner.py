@@ -14,7 +14,9 @@ from app.ai.router import LLMGateway
 from app.config import Settings, get_settings
 from app.db.enums import DzenArticleStatus, DzenAudience, DzenFormat, DzenPillar, LLMTask
 from app.db.models import City, DzenArticle, Product
+from app.dzen.genre import genre_from_format
 from app.dzen.policy import local_now, parse_weekdays
+from app.dzen.portfolio import portfolio_report
 from app.dzen.schemas import DzenBrief, DzenDecisionSet, dzen_decision_json_schema
 from app.logging_setup import get_logger
 
@@ -118,6 +120,7 @@ def plan_dzen_week(
         .select_from(Product)
         .where(Product.market == "ru", Product.available.is_(True))
     )
+    portfolio = portfolio_report(session)
     brief_payload = {
         "run_date": run_date.isoformat(),
         "needed_dates": [d.isoformat() for d in missing],
@@ -126,9 +129,16 @@ def plan_dzen_week(
             {"name": c.name, "country": c.country_name, "country_id": c.country_external_id}
             for c in mixed[:16]
         ],
+        "portfolio": {
+            "genres": portfolio.get("genres") or {},
+            "countries": portfolio.get("countries") or {},
+            "heavy_genre": portfolio.get("heavy_genre") or "",
+            "zero_product_share": portfolio.get("zero_product_share") or 0,
+        },
         "rule": (
             "independent Dzen magazine; mix Russia and abroad; vary formats; "
-            "do not copy Telegram; do not plan neighbouring side-trip cities"
+            "do not copy Telegram; do not plan neighbouring side-trip cities; "
+            "do not repeat the rolling 30-day heavy genre on consecutive slots"
         ),
     }
     gateway = gateway or LLMGateway(session, settings=settings)
@@ -151,8 +161,14 @@ def plan_dzen_week(
         parsed or {"run_date": run_date.isoformat(), "briefs": []}
     )
     created: list[DzenArticle] = []
+    batch_genres: list[str] = []
+    heavy = str(portfolio.get("heavy_genre") or "")
     for index, day in enumerate(missing):
-        brief = _brief_for_day(decision, day, index, mixed)
+        brief = _brief_for_day(decision, day, index, mixed, batch_genres=batch_genres, heavy=heavy)
+        payload = json.loads(brief.model_dump_json())
+        payload["genre"] = brief.genre or genre_from_format(brief.format)
+        payload["reader_promise"] = brief.reader_promise or brief.reader_value
+        batch_genres.append(payload["genre"])
         article = DzenArticle(
             public_id=secrets.token_urlsafe(8),
             status=DzenArticleStatus.TOPIC_CANDIDATE.value,
@@ -163,7 +179,7 @@ def plan_dzen_week(
             destination_country=(brief.destination_country or "")[:16] or None,
             destination_city=(brief.destination_city or "")[:128] or None,
             headline=brief.angle[:200],
-            brief=json.loads(brief.model_dump_json()),
+            brief=payload,
         )
         session.add(article)
         created.append(article)
@@ -171,17 +187,15 @@ def plan_dzen_week(
     return created
 
 
-def _brief_for_day(
-    decision: DzenDecisionSet, day: dt.date, index: int, cities: list[City]
-) -> DzenBrief:
-    for item in decision.briefs:
-        if item.planned_date == day.isoformat():
-            return item
-    if index < len(decision.briefs):
-        item = decision.briefs[index]
-        item.planned_date = day.isoformat()
-        return item
-    angle, fmt, pillar, city, country = SEED_ANGLES[index % len(SEED_ANGLES)]
+def _seed_brief(day: dt.date, index: int, avoid: set[str]) -> DzenBrief:
+    pick = SEED_ANGLES[index % len(SEED_ANGLES)]
+    for offset in range(len(SEED_ANGLES)):
+        candidate = SEED_ANGLES[(index + offset) % len(SEED_ANGLES)]
+        genre = genre_from_format(candidate[1].value)
+        if genre not in avoid:
+            pick = candidate
+            break
+    angle, fmt, pillar, city, country = pick
     return DzenBrief(
         planned_date=day.isoformat(),
         format=fmt.value,
@@ -191,9 +205,40 @@ def _brief_for_day(
         destination_country=country,
         angle=angle,
         reader_value="Практическая польза без обязательной покупки",
+        reader_promise="Практическая польза без обязательной покупки",
+        genre=genre_from_format(fmt.value),
         why_now="слот независимого плана Дзена",
         intent="independent_dzen",
     )
+
+
+def _brief_for_day(
+    decision: DzenDecisionSet,
+    day: dt.date,
+    index: int,
+    _cities: list[City],
+    *,
+    batch_genres: list[str] | None = None,
+    heavy: str = "",
+) -> DzenBrief:
+    avoid = set(batch_genres[-1:] if batch_genres else [])
+    if heavy:
+        avoid.add(heavy)
+    chosen: DzenBrief | None = None
+    for item in decision.briefs:
+        if item.planned_date == day.isoformat():
+            chosen = item
+            break
+    if chosen is None and index < len(decision.briefs):
+        chosen = decision.briefs[index]
+        chosen.planned_date = day.isoformat()
+    if chosen is None:
+        return _seed_brief(day, index, avoid)
+    genre = chosen.genre or genre_from_format(chosen.format)
+    chosen.genre = genre
+    if batch_genres and genre == batch_genres[-1]:
+        return _seed_brief(day, index, avoid)
+    return chosen
 
 
 __all__ = ["plan_dzen_week", "upcoming_publish_dates"]

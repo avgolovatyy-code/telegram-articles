@@ -18,10 +18,24 @@ from app.db.enums import (
     LLMTask,
 )
 from app.db.models import DzenArticle
+from app.dzen.dossier import (
+    ArticleResearchDossier,
+    catalog_dossier,
+    dossier_json_schema,
+    merge_research,
+)
+from app.dzen.editorial import (
+    MAX_REVISIONS,
+    EditorialDecision,
+    decision_to_critic,
+    editorial_json_schema,
+    evaluate_editorial,
+)
+from app.dzen.genre import contract_for, genre_from_format
 from app.dzen.kit import persist_kit
 from app.dzen.media import collect_catalog_images, dedupe_downloaded, validate_assets
-from app.dzen.products import match_products
-from app.dzen.quality import body_text, run_gates
+from app.dzen.products import DzenProductPick, match_products
+from app.dzen.quality import body_text
 from app.dzen.schemas import (
     DzenArticleAST,
     DzenBlock,
@@ -31,16 +45,10 @@ from app.dzen.schemas import (
     dzen_claims_json_schema,
     dzen_critic_json_schema,
 )
-from app.errors import LLMError
+from app.errors import BudgetExceeded, LLMError
 from app.logging_setup import get_logger
 
 log = get_logger("dzen.pipeline")
-
-SAFE_PAYMENT_NOTE = (
-    "Для ряда зарубежных музеев на WeGoTrip доступны билеты с оплатой в рублях "
-    "российской картой — перед покупкой проверьте конкретный билет и способы "
-    "оплаты на странице заказа."
-)
 
 
 @dataclass(slots=True)
@@ -74,13 +82,16 @@ def generate_dzen_article(
         article.version = 1
     session.flush()
 
+    brief = article.brief if isinstance(article.brief, dict) else {}
+    first_person_evidence = bool(brief.get("first_person_evidence") or brief.get("interview_notes"))
     brief_text = " ".join(
         part
         for part in (
             article.headline,
             article.destination_city,
-            (article.brief or {}).get("angle") if isinstance(article.brief, dict) else "",
-            (article.brief or {}).get("reader_value") if isinstance(article.brief, dict) else "",
+            brief.get("angle"),
+            brief.get("reader_value"),
+            brief.get("reader_promise"),
         )
         if part
     )
@@ -95,57 +106,44 @@ def generate_dzen_article(
         limit=6,
         settings=settings,
     )
+    dossier = catalog_dossier(
+        article_id=article.public_id,
+        headline=article.headline,
+        city=article.destination_city,
+        country=article.destination_country,
+        fmt=article.format,
+        brief=brief,
+        products=inventory,
+    )
+    genre = brief.get("genre") or dossier.genre or genre_from_format(article.format)
+    contract = contract_for(genre, article.format)
+    dossier, research_cost = _run_research(gateway, article, dossier, inventory, report)
+    report.cost_usd += research_cost
+    _run_outline(gateway, article, dossier, contract, report)
 
     context: dict[str, Any] = {
-        "brief": article.brief,
+        "brief": brief,
         "headline_hint": article.headline,
         "city": article.destination_city,
         "country": article.destination_country,
         "format": article.format,
         "pillar": article.pillar,
-        "products": [
-            {
-                "id": p.external_id,
-                "title": p.title,
-                "inclusions": p.inclusions,
-                "ticket_included": p.ticket_included,
-                "matched_places": p.matched_places,
-                "is_free": p.is_free,
-                "duration": p.duration_label,
-                "distance": p.distance_label,
-                "listen_in_browser": p.listen_in_browser,
-                "pitch": p.reader_pitch,
-            }
-            for p in inventory
-        ],
-        "first_person_evidence": False,
+        "genre": genre,
+        "reader_promise": dossier.reader_promise,
+        "genre_contract": {
+            "genre": contract.genre,
+            "must_contain": contract.must_contain,
+            "reject_if": contract.reject_if,
+            "writer_brief": contract.writer_brief,
+        },
+        "dossier": json.loads(dossier.model_dump_json()),
+        "products": [_product_context(item) for item in inventory],
+        "first_person_evidence": first_person_evidence,
         "payment_claim_verified": False,
-        "instruction": (
-            "Write an original Russian Dzen travel feature. Name real districts, "
-            "streets, museums and habits of this city. If the headline promises two "
-            "days, write both days with places and durations. Do not add neighbouring "
-            "towns or islands unless the brief already names them. Products are "
-            "optional: mention at most those in context, and only next to a place "
-            "you actually described. Use catalog duration, distance and browser "
-            "playback. Never write «проверьте карточку товара». Do not mirror Telegram."
-        ),
+        "instruction": contract.writer_brief,
     }
     try:
-        written = gateway.run(
-            task=LLMTask.DZEN_WRITE,
-            prompt=PROMPTS["dzen_writer_v1"],
-            payload=json.dumps(context, ensure_ascii=False),
-            json_schema=dzen_article_json_schema(),
-            schema_name="dzen_article",
-            market="ru",
-            max_output_tokens=6000,
-            enforce_budget=True,
-        )
-        report.cost_usd += written.cost_usd
-        parsed = written.response.parsed
-        if not isinstance(parsed, dict):
-            raise LLMError("Dzen writer returned no structured payload")
-        ast = DzenArticleAST.model_validate(parsed)
+        ast = _write_ast(gateway, context, report, article, [p.external_id for p in inventory])
     except Exception as exc:
         article.status = DzenArticleStatus.BLOCKED.value
         article.status_reason = str(exc)[:500]
@@ -154,28 +152,7 @@ def generate_dzen_article(
         report.status = article.status
         return report
 
-    ast = _sanitize_ast(ast, article, [p.external_id for p in inventory], media_ids=[])
-    ast = _ensure_length(ast)
-
-    try:
-        claims_run = gateway.run(
-            task=LLMTask.DZEN_CLAIMS,
-            prompt=PROMPTS["dzen_claims_v1"],
-            payload=json.dumps({"article": json.loads(ast.model_dump_json())}, ensure_ascii=False),
-            json_schema=dzen_claims_json_schema(),
-            schema_name="dzen_claims",
-            market="ru",
-            enforce_budget=True,
-        )
-        report.cost_usd += claims_run.cost_usd
-        extra = claims_run.response.parsed if isinstance(claims_run.response.parsed, dict) else {}
-        extra_claims = [DzenClaim.model_validate(row) for row in extra.get("claims", [])]
-        if extra_claims:
-            ast.claims = extra_claims
-    except Exception as exc:
-        log.warning("dzen.claims_failed", error=str(exc))
-
-    ast.claims = _qualify_claims(ast.claims)
+    ast = _extract_claims(gateway, ast, report)
     article.status = DzenArticleStatus.DRAFT.value
     article.headline = ast.headline
     article.lead = ast.lead
@@ -183,165 +160,70 @@ def generate_dzen_article(
     article.actual_cost_usd = report.cost_usd
     session.flush()
 
-    try:
-        critic_run = gateway.run(
-            task=LLMTask.DZEN_CRITIC,
-            prompt=PROMPTS["dzen_critic_v1"],
-            payload=json.dumps({"article": json.loads(ast.model_dump_json())}, ensure_ascii=False),
-            json_schema=dzen_critic_json_schema(),
-            schema_name="dzen_critic",
-            market="ru",
-            enforce_budget=True,
+    decision = EditorialDecision()
+    critic = DzenCriticReport(pass_gate=False)
+    products: list[DzenProductPick] = []
+    assets: list[Any] = []
+    heading_names: list[str] = []
+    for attempt in range(MAX_REVISIONS + 1):
+        products, assets, heading_names = _attach_media(
+            session, article, ast, settings, inventory_ids=[p.external_id for p in inventory]
         )
-        report.cost_usd += critic_run.cost_usd
-        critic = DzenCriticReport.model_validate(critic_run.response.parsed or {})
-    except Exception as exc:
-        critic = DzenCriticReport(pass_gate=False, issues=[str(exc)])
-
-    article.critic_model = settings.dzen_critic_model_name
-    article.quality_scores = {
-        "critic_pass": critic.pass_gate,
-        "quality": critic.quality_score,
-        "factuality": critic.factuality_score,
-        "issues": critic.issues,
-    }
-    article.claim_ledger = [json.loads(c.model_dump_json()) for c in ast.claims]
-
-    products = match_products(
-        session,
-        article_id=article.public_id,
-        topic_slug=(article.destination_city or article.public_id),
-        city_name=article.destination_city,
-        country_code=article.destination_country,
-        article_text=body_text(ast),
-        focus_text=_focus_text(ast),
-        limit=3,
-        settings=settings,
-    )
-    heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
-    assets = collect_catalog_images(
-        session,
-        product_ids=[p.external_id for p in products],
-        city_name=article.destination_city,
-        headings=heading_names,
-        limit=5,
-    )
-    assets = validate_assets(assets, settings)
-    assets = dedupe_downloaded(assets)
-    if not assets:
-        article.status = DzenArticleStatus.BLOCKED.value
-        article.status_reason = "no licensed WeGoTrip cover"
-        report.ok = False
-        report.issues.append("no cover")
-        report.status = article.status
-        return report
-    assets[0].role = "cover"
-    for inline in assets[1:]:
-        inline.role = "inline"
-    ast = _sanitize_ast(
-        ast, article, [p.external_id for p in products], [a.asset_id for a in assets]
-    )
-    article.product_ids = [p.external_id for p in products]
-
-    cover = assets[0].url
-    gates = run_gates(
-        ast,
-        products=products,
-        image_urls=[a.url for a in assets],
-        cover_url=cover,
-        first_person_evidence=False,
-    )
-    if (not gates.ok or _critic_blocks_handoff(critic)) and not context.get("_retried"):
-        context["_retried"] = True
-        context["rewrite_issues"] = gates.issues + critic.issues
+        if not assets:
+            article.status = DzenArticleStatus.BLOCKED.value
+            article.status_reason = "no licensed WeGoTrip cover"
+            report.ok = False
+            report.issues.append("no cover")
+            report.status = article.status
+            return report
+        ast = _sanitize_ast(
+            ast, article, [p.external_id for p in products], [a.asset_id for a in assets]
+        )
+        article.product_ids = [p.external_id for p in products]
+        decision = evaluate_editorial(
+            ast,
+            products=products,
+            image_urls=[a.url for a in assets],
+            cover_url=assets[0].url,
+            first_person_evidence=first_person_evidence,
+            genre=genre,
+        )
+        critic = _run_critic(gateway, ast, dossier, decision, report)
+        _store_quality(article, decision, critic, dossier, rewritten=attempt > 0)
+        if not _should_revise(decision, critic, allow_soft=True):
+            break
+        if attempt >= MAX_REVISIONS:
+            article.status = DzenArticleStatus.NEEDS_REVISION.value
+            issues = _issue_list(decision, critic)
+            article.status_reason = "; ".join(issues)[:1000]
+            report.ok = False
+            report.issues = issues
+            report.status = article.status
+            report.cost_usd = article.actual_cost_usd or report.cost_usd
+            article.actual_cost_usd = report.cost_usd
+            return report
+        context["rewrite_issues"] = _issue_list(decision, critic)
+        context["rewrite_attempt"] = attempt + 1
         article.status = DzenArticleStatus.NEEDS_REVISION.value
         try:
-            written = gateway.run(
-                task=LLMTask.DZEN_WRITE,
-                prompt=PROMPTS["dzen_writer_v1"],
-                payload=json.dumps(context, ensure_ascii=False),
-                json_schema=dzen_article_json_schema(),
-                schema_name="dzen_article",
-                market="ru",
-                max_output_tokens=6000,
-                enforce_budget=True,
-            )
-            report.cost_usd += written.cost_usd
-            parsed = written.response.parsed
-            if isinstance(parsed, dict):
-                ast = DzenArticleAST.model_validate(parsed)
-                ast = _sanitize_ast(ast, article, [p.external_id for p in inventory], media_ids=[])
-                ast = _ensure_length(ast)
-                ast.claims = _qualify_claims(ast.claims)
-                products = match_products(
-                    session,
-                    article_id=article.public_id,
-                    topic_slug=(article.destination_city or article.public_id),
-                    city_name=article.destination_city,
-                    country_code=article.destination_country,
-                    article_text=body_text(ast),
-                    focus_text=_focus_text(ast),
-                    limit=3,
-                    settings=settings,
-                )
-                heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
-                assets = collect_catalog_images(
-                    session,
-                    product_ids=[p.external_id for p in products],
-                    city_name=article.destination_city,
-                    headings=heading_names,
-                    limit=5,
-                )
-                assets = validate_assets(assets, settings)
-                assets = dedupe_downloaded(assets)
-                if assets:
-                    assets[0].role = "cover"
-                    ast = _sanitize_ast(
-                        ast,
-                        article,
-                        [p.external_id for p in products],
-                        [a.asset_id for a in assets],
-                    )
-                    article.product_ids = [p.external_id for p in products]
-                    gates = run_gates(
-                        ast,
-                        products=products,
-                        image_urls=[a.url for a in assets],
-                        cover_url=assets[0].url,
-                        first_person_evidence=False,
-                    )
-                    try:
-                        critic_run = gateway.run(
-                            task=LLMTask.DZEN_CRITIC,
-                            prompt=PROMPTS["dzen_critic_v1"],
-                            payload=json.dumps(
-                                {"article": json.loads(ast.model_dump_json())},
-                                ensure_ascii=False,
-                            ),
-                            json_schema=dzen_critic_json_schema(),
-                            schema_name="dzen_critic",
-                            market="ru",
-                            enforce_budget=True,
-                        )
-                        report.cost_usd += critic_run.cost_usd
-                        critic = DzenCriticReport.model_validate(critic_run.response.parsed or {})
-                        article.quality_scores = {
-                            "critic_pass": critic.pass_gate,
-                            "quality": critic.quality_score,
-                            "factuality": critic.factuality_score,
-                            "issues": critic.issues,
-                            "rewritten": True,
-                        }
-                    except Exception as critic_exc:
-                        log.warning("dzen.critic_retry_failed", error=str(critic_exc))
+            ast = _write_ast(gateway, context, report, article, [p.external_id for p in inventory])
+            ast = _extract_claims(gateway, ast, report)
+            article.headline = ast.headline
+            article.lead = ast.lead
         except Exception as exc:
-            gates.issues.append(str(exc))
-            gates.ok = False
-    if not gates.ok or _critic_blocks_handoff(critic):
+            report.issues.append(str(exc))
+            article.status = DzenArticleStatus.NEEDS_REVISION.value
+            article.status_reason = str(exc)[:1000]
+            report.ok = False
+            report.status = article.status
+            return report
+
+    if _should_revise(decision, critic, allow_soft=True):
         article.status = DzenArticleStatus.NEEDS_REVISION.value
-        article.status_reason = "; ".join(gates.issues + critic.issues)[:1000]
+        issues = _issue_list(decision, critic)
+        article.status_reason = "; ".join(issues)[:1000]
         report.ok = False
-        report.issues = gates.issues + critic.issues
+        report.issues = issues
         report.status = article.status
         return report
 
@@ -365,6 +247,291 @@ def generate_dzen_article(
     report.status = article.status
     report.ok = article.status == DzenArticleStatus.READY_FOR_HANDOFF.value
     return report
+
+
+def _product_context(product: DzenProductPick) -> dict[str, Any]:
+    return {
+        "id": product.external_id,
+        "title": product.title,
+        "inclusions": product.inclusions,
+        "ticket_included": product.ticket_included,
+        "matched_places": product.matched_places,
+        "is_free": product.is_free,
+        "duration": product.duration_label,
+        "distance": product.distance_label,
+        "listen_in_browser": product.listen_in_browser,
+        "playback_discrepancy": getattr(product, "playback_discrepancy", False),
+        "locale": product.locale,
+        "pitch": product.reader_pitch,
+    }
+
+
+def _run_research(
+    gateway: LLMGateway,
+    article: DzenArticle,
+    dossier: ArticleResearchDossier,
+    inventory: list[DzenProductPick],
+    report: DzenGenerateReport,
+) -> tuple[ArticleResearchDossier, float]:
+    prompt = PROMPTS.get("dzen_research_v1")
+    if prompt is None:
+        return dossier, 0.0
+    payload = {
+        "article_id": article.public_id,
+        "city": article.destination_city,
+        "country": article.destination_country,
+        "format": article.format,
+        "genre": dossier.genre,
+        "headline_hint": article.headline,
+        "brief": article.brief,
+        "catalog_dossier": json.loads(dossier.model_dump_json()),
+        "products": [_product_context(item) for item in inventory],
+    }
+    try:
+        result = gateway.run(
+            task=LLMTask.DZEN_RESEARCH,
+            prompt=prompt,
+            payload=json.dumps(payload, ensure_ascii=False),
+            json_schema=dossier_json_schema(),
+            schema_name="dzen_research",
+            market="ru",
+            enforce_budget=True,
+        )
+        parsed = result.response.parsed if isinstance(result.response.parsed, dict) else {}
+        return merge_research(dossier, parsed), result.cost_usd
+    except BudgetExceeded:
+        dossier.unknowns_and_risks.append(
+            "budget exceeded: catalog-only dossier, do not invent missing facts"
+        )
+        log.warning("dzen.research_budget", article=article.public_id)
+        return dossier, 0.0
+    except Exception as exc:
+        log.warning("dzen.research_failed", error=str(exc))
+        return dossier, 0.0
+
+
+def _run_outline(
+    gateway: LLMGateway,
+    article: DzenArticle,
+    dossier: ArticleResearchDossier,
+    contract: Any,
+    report: DzenGenerateReport,
+) -> None:
+    prompt = PROMPTS.get("dzen_outline_v1")
+    if prompt is None:
+        return
+    try:
+        result = gateway.run(
+            task=LLMTask.DZEN_OUTLINE,
+            prompt=prompt,
+            payload=json.dumps(
+                {
+                    "dossier": json.loads(dossier.model_dump_json()),
+                    "contract": contract.writer_brief,
+                    "format": article.format,
+                },
+                ensure_ascii=False,
+            ),
+            schema_name="dzen_outline",
+            market="ru",
+            enforce_budget=True,
+        )
+        report.cost_usd += result.cost_usd
+    except BudgetExceeded:
+        log.warning("dzen.outline_budget", article=article.public_id)
+    except Exception as exc:
+        log.warning("dzen.outline_failed", error=str(exc))
+
+
+def _write_ast(
+    gateway: LLMGateway,
+    context: dict[str, Any],
+    report: DzenGenerateReport,
+    article: DzenArticle,
+    product_ids: list[str],
+) -> DzenArticleAST:
+    prompt = PROMPTS.get("dzen_writer_v2") or PROMPTS["dzen_writer_v1"]
+    written = gateway.run(
+        task=LLMTask.DZEN_WRITE,
+        prompt=prompt,
+        payload=json.dumps(context, ensure_ascii=False),
+        json_schema=dzen_article_json_schema(),
+        schema_name="dzen_article",
+        market="ru",
+        max_output_tokens=6000,
+        enforce_budget=True,
+    )
+    report.cost_usd += written.cost_usd
+    parsed = written.response.parsed
+    if not isinstance(parsed, dict):
+        raise LLMError("Dzen writer returned no structured payload")
+    ast = DzenArticleAST.model_validate(parsed)
+    ast = _sanitize_ast(ast, article, product_ids, media_ids=[])
+    return _ensure_length(ast)
+
+
+def _extract_claims(
+    gateway: LLMGateway, ast: DzenArticleAST, report: DzenGenerateReport
+) -> DzenArticleAST:
+    try:
+        claims_run = gateway.run(
+            task=LLMTask.DZEN_CLAIMS,
+            prompt=PROMPTS["dzen_claims_v1"],
+            payload=json.dumps({"article": json.loads(ast.model_dump_json())}, ensure_ascii=False),
+            json_schema=dzen_claims_json_schema(),
+            schema_name="dzen_claims",
+            market="ru",
+            enforce_budget=True,
+        )
+        report.cost_usd += claims_run.cost_usd
+        extra = claims_run.response.parsed if isinstance(claims_run.response.parsed, dict) else {}
+        extra_claims = [DzenClaim.model_validate(row) for row in extra.get("claims", [])]
+        if extra_claims:
+            ast.claims = extra_claims
+    except Exception as exc:
+        log.warning("dzen.claims_failed", error=str(exc))
+    ast.claims = _qualify_claims(ast.claims)
+    return ast
+
+
+def _run_critic(
+    gateway: LLMGateway,
+    ast: DzenArticleAST,
+    dossier: ArticleResearchDossier,
+    deterministic: EditorialDecision,
+    report: DzenGenerateReport,
+) -> DzenCriticReport:
+    prompt = PROMPTS.get("dzen_critic_v2") or PROMPTS["dzen_critic_v1"]
+    schema_name = "dzen_editorial" if prompt and prompt.name.endswith("v2") else "dzen_critic"
+    json_schema = (
+        editorial_json_schema() if schema_name == "dzen_editorial" else dzen_critic_json_schema()
+    )
+    try:
+        critic_run = gateway.run(
+            task=LLMTask.DZEN_CRITIC,
+            prompt=prompt,
+            payload=json.dumps(
+                {
+                    "article": json.loads(ast.model_dump_json()),
+                    "dossier": json.loads(dossier.model_dump_json()),
+                    "deterministic": json.loads(deterministic.model_dump_json()),
+                },
+                ensure_ascii=False,
+            ),
+            json_schema=json_schema,
+            schema_name=schema_name,
+            market="ru",
+            enforce_budget=True,
+        )
+        report.cost_usd += critic_run.cost_usd
+        parsed = critic_run.response.parsed or {}
+        if schema_name == "dzen_editorial" and isinstance(parsed, dict) and "decision" in parsed:
+            llm_decision = EditorialDecision.model_validate(parsed)
+            merged = _merge_editorial(deterministic, llm_decision)
+            return decision_to_critic(merged)
+        return DzenCriticReport.model_validate(parsed)
+    except Exception as exc:
+        log.warning("dzen.critic_failed", error=str(exc))
+        return decision_to_critic(deterministic)
+
+
+def _merge_editorial(deterministic: EditorialDecision, llm: EditorialDecision) -> EditorialDecision:
+    if deterministic.blocking_issues:
+        combined = list(deterministic.blocking_issues)
+        seen = {item.explanation for item in combined}
+        for item in llm.blocking_issues:
+            if item.explanation not in seen:
+                combined.append(item)
+        deterministic.blocking_issues = combined
+        if deterministic.decision == "accept":
+            deterministic.decision = llm.decision if llm.decision != "accept" else "revise"
+        return deterministic
+    if llm.decision in {"needs_research", "hold", "revise"}:
+        return llm
+    return deterministic
+
+
+def _attach_media(
+    session: Session,
+    article: DzenArticle,
+    ast: DzenArticleAST,
+    settings: Settings,
+    *,
+    inventory_ids: list[str],
+) -> tuple[list[DzenProductPick], list[Any], list[str]]:
+    del inventory_ids
+    products = match_products(
+        session,
+        article_id=article.public_id,
+        topic_slug=(article.destination_city or article.public_id),
+        city_name=article.destination_city,
+        country_code=article.destination_country,
+        article_text=body_text(ast),
+        focus_text=_focus_text(ast),
+        limit=3,
+        settings=settings,
+    )
+    heading_names = [b.text for b in ast.blocks if b.type == "heading" and b.text]
+    assets = collect_catalog_images(
+        session,
+        product_ids=[p.external_id for p in products],
+        city_name=article.destination_city,
+        headings=heading_names,
+        limit=5,
+    )
+    assets = validate_assets(assets, settings)
+    assets = dedupe_downloaded(assets)
+    if assets:
+        assets[0].role = "cover"
+        for inline in assets[1:]:
+            inline.role = "inline"
+    return products, assets, heading_names
+
+
+def _store_quality(
+    article: DzenArticle,
+    decision: EditorialDecision,
+    critic: DzenCriticReport,
+    dossier: ArticleResearchDossier,
+    *,
+    rewritten: bool,
+) -> None:
+    scores = dict(article.quality_scores or {})
+    scores.update(
+        {
+            "critic_pass": critic.pass_gate,
+            "quality": critic.quality_score,
+            "factuality": critic.factuality_score,
+            "issues": critic.issues,
+            "editorial_decision": decision.decision,
+            "blocking": [json.loads(item.model_dump_json()) for item in decision.blocking_issues],
+            "prompt_version": decision.prompt_version,
+            "genre": dossier.genre,
+            "reader_promise": dossier.reader_promise,
+            "product_data_discrepancies": dossier.product_data_discrepancies,
+            "rewritten": rewritten,
+        }
+    )
+    article.quality_scores = scores
+    article.critic_model = article.critic_model or "dzen_editorial_quality_v1"
+
+
+def _issue_list(decision: EditorialDecision, critic: DzenCriticReport) -> list[str]:
+    items = [item.explanation for item in decision.blocking_issues + decision.non_blocking_issues]
+    items.extend(critic.issues)
+    return list(dict.fromkeys(item for item in items if item))
+
+
+def _should_revise(
+    decision: EditorialDecision, critic: DzenCriticReport, *, allow_soft: bool
+) -> bool:
+    if decision.blocking_issues or decision.decision in {"needs_research", "hold"}:
+        return True
+    if allow_soft and decision.non_blocking_issues:
+        return True
+    if allow_soft and decision.decision == "revise":
+        return True
+    return _critic_blocks_handoff(critic)
 
 
 def _sanitize_ast(
@@ -500,18 +667,19 @@ def rebuild_kit_from_stored_ast(
             )
         )
     article.product_ids = [p.external_id for p in products]
-    gates = run_gates(
+    decision = evaluate_editorial(
         ast,
         products=products,
         image_urls=[a.url for a in assets],
         cover_url=assets[0].url,
         first_person_evidence=False,
+        genre=(article.brief or {}).get("genre") if isinstance(article.brief, dict) else None,
     )
-    if not gates.ok:
+    if decision.blocking_issues:
         article.status = DzenArticleStatus.NEEDS_REVISION.value
-        article.status_reason = "; ".join(gates.issues)[:1000]
+        article.status_reason = "; ".join(_issue_list(decision, DzenCriticReport()))[:1000]
         report.ok = False
-        report.issues = gates.issues
+        report.issues = _issue_list(decision, DzenCriticReport())
         report.status = article.status
         return report
     persist_kit(session, article, ast, products, assets, settings)
@@ -580,18 +748,19 @@ def apply_editorial_ast(
                 after_heading=asset.after_heading,
             )
         )
-    gates = run_gates(
+    decision = evaluate_editorial(
         ast,
         products=products,
         image_urls=[a.url for a in assets],
         cover_url=assets[0].url,
         first_person_evidence=False,
+        genre=(article.brief or {}).get("genre") if isinstance(article.brief, dict) else None,
     )
-    if not gates.ok:
+    if decision.blocking_issues:
         article.status = DzenArticleStatus.NEEDS_REVISION.value
-        article.status_reason = "; ".join(gates.issues)[:1000]
+        article.status_reason = "; ".join(_issue_list(decision, DzenCriticReport()))[:1000]
         report.ok = False
-        report.issues = gates.issues
+        report.issues = _issue_list(decision, DzenCriticReport())
         report.status = article.status
         return report
     if article.version < 1:
@@ -607,42 +776,12 @@ def apply_editorial_ast(
 
 
 def _ensure_length(ast: DzenArticleAST) -> DzenArticleAST:
-    """Pad only with already-stated practical recap — never invent facts."""
-    text = body_text(ast)
-    if len(text) >= 2500:
-        return ast
-    extra = ast.practical_takeaway or ast.reader_value or ast.lead
-    city = ast.destination_city or "городе"
-    while len(body_text(ast)) < 2500:
-        ast.blocks.append(
-            DzenBlock(
-                type="paragraph",
-                text=(
-                    f"{extra} Ещё раз по {city}: сверяйте часы и правила входа "
-                    "на официальной странице места, которое собираетесь пройти, "
-                    "а не по пересказу. Покупка аудиогида не обязательна."
-                ),
-            )
-        )
-        if len(ast.blocks) > 40:
-            break
-    headings = [b for b in ast.blocks if b.type == "heading"]
-    needed = 3 - len(headings)
-    city_headings = [
-        f"Зачем ехать в {city}",
-        f"С чего начать маршрут по {city}",
-        f"Что проверить в {city} заранее",
-    ]
-    for index in range(max(0, needed)):
-        ast.blocks.insert(0, DzenBlock(type="heading", text=city_headings[index]))
+    """Do not invent filler. A short draft fails the length gate and can be revised."""
     if len(ast.lead) < 200:
         ast.lead = (
-            (ast.lead + " ").strip()
-            + " Разберём маршрут, ограничения и то, что можно проверить заранее, "
-            "без обязательной покупки аудиогида."
+            (ast.lead + " ").strip() + " Разберём, что именно получит читатель и какие утверждения "
+            "сюда намеренно не входят."
         )
-        if len(ast.lead) < 200:
-            ast.lead = ast.lead + " " + SAFE_PAYMENT_NOTE
     return ast
 
 

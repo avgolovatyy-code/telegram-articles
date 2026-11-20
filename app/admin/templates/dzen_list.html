@@ -7,11 +7,25 @@
   Slack: {{ dzen_days }} в {{ dzen_hour }}:00 Europe/Moscow, упоминание &lt;@{{ mention }}&gt; не чаще раза в рабочий день.
   Автопубликация: {{ 'включена — это ошибка' if autopublish else 'выключена' }}.
 </p>
+{% if portfolio %}
+<p class="muted small">
+  30 дней: {{ portfolio.article_count }} статей
+  · жанры:
+  {% for name, count in (portfolio.genres or {}).items() %}{{ name }} {{ count }}{% if not loop.last %}, {% endif %}{% endfor %}
+  {% if not portfolio.genres %}—{% endif %}
+  · страны:
+  {% for name, count in (portfolio.countries or {}).items() %}{{ name }} {{ count }}{% if not loop.last %}, {% endif %}{% endfor %}
+  {% if not portfolio.countries %}—{% endif %}
+  · first-pass {{ portfolio.first_pass_accept }}
+  · hold {{ portfolio.holds }}
+  · без товара {{ '%.0f'|format((portfolio.zero_product_share or 0) * 100) }}%
+</p>
+{% endif %}
 
 <table>
   <thead>
     <tr>
-      <th>Дата</th><th>Статус</th><th>Заголовок</th><th>Город</th><th>Kit</th>
+      <th>Дата</th><th>Статус</th><th>Качество</th><th>Заголовок</th><th>Город</th><th>Kit</th>
     </tr>
   </thead>
   <tbody>
@@ -19,6 +33,7 @@
     <tr>
       <td class="nowrap muted small">{{ row.planned_date or '—' }}</td>
       <td><span class="badge {{ status_class(row.status) }}">{{ row.status }}</span></td>
+      <td class="muted small">{{ (row.quality_scores or {}).get('editorial_decision') or '—' }}{% if (row.brief or {}).get('genre') %} · {{ (row.brief or {}).get('genre') }}{% endif %}{% if row.status_reason %}<div>{{ row.status_reason }}</div>{% endif %}</td>
       <td>{{ row.headline or (row.brief or {}).get('angle', row.public_id) }}</td>
       <td class="muted small">{{ row.destination_city or '—' }}</td>
       <td>
@@ -28,7 +43,7 @@
       </td>
     </tr>
   {% else %}
-    <tr><td colspan="5" class="muted">Пока нет статей Дзена.</td></tr>
+    <tr><td colspan="6" class="muted">Пока нет статей Дзена.</td></tr>
   {% endfor %}
   </tbody>
 </table>

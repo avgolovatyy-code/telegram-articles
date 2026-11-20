@@ -80,6 +80,8 @@ class DzenBrief(BaseModel):
     destination_city: str | None = None
     angle: str
     reader_value: str
+    reader_promise: str = ""
+    genre: str = ""
     why_now: str = ""
     supporting_queries: list[str] = Field(default_factory=list)
     product_recommendation: Literal["none", "optional"] = "optional"
@@ -233,6 +235,8 @@ def dzen_decision_json_schema() -> dict[str, Any]:
             "destination_city",
             "angle",
             "reader_value",
+            "reader_promise",
+            "genre",
             "why_now",
             "supporting_queries",
             "product_recommendation",
@@ -248,6 +252,8 @@ def dzen_decision_json_schema() -> dict[str, Any]:
             "destination_city": _str_null(),
             "angle": _str(),
             "reader_value": _str(),
+            "reader_promise": _str(),
+            "genre": _str(),
             "why_now": _str(),
             "supporting_queries": {"type": "array", "items": _str()},
             "product_recommendation": {"type": "string", "enum": ["none", "optional"]},

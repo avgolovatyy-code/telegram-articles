@@ -29,7 +29,7 @@ from app.logging_setup import get_logger
 log = get_logger("ai.router")
 
 #: Tasks that must use the high-quality writer model.
-WRITER_TASKS = {LLMTask.ARTICLE_WRITE, LLMTask.OUTLINE, LLMTask.DZEN_WRITE, LLMTask.DZEN_OUTLINE}
+WRITER_TASKS = {LLMTask.ARTICLE_WRITE, LLMTask.OUTLINE, LLMTask.DZEN_WRITE}
 
 #: Everything else runs on the cheap utility model (spec §12.1, §48).
 UTILITY_TASKS = {
@@ -44,6 +44,9 @@ UTILITY_TASKS = {
     LLMTask.CHIEF_EDITOR,
     LLMTask.DZEN_CHIEF_EDITOR,
     LLMTask.DZEN_CLAIMS,
+    LLMTask.DZEN_OUTLINE,
+    LLMTask.DZEN_RESEARCH,
+    LLMTask.DZEN_CRITIC,
 }
 
 

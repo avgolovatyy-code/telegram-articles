@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1,
+    "genre": "itinerary",
+    "place": "Казань",
+    "gate": "accept",
+    "check": "Marjani chronology; audio ≠ day"
+  },
+  {
+    "id": 2,
+    "genre": "museum",
+    "place": "Барселона",
+    "gate": "accept",
+    "check": "ticket inclusion; locale=ru"
+  },
+  {
+    "id": 3,
+    "genre": "culture",
+    "place": "Париж",
+    "gate": "accept",
+    "check": "no false travel ban"
+  },
+  {
+    "id": 4,
+    "genre": "itinerary",
+    "place": "Стамбул",
+    "gate": "accept",
+    "check": "audio not whole day"
+  },
+  {
+    "id": 5,
+    "genre": "culture",
+    "place": "Токио",
+    "gate": "accept",
+    "check": "no exotic cliché"
+  },
+  {
+    "id": 6,
+    "genre": "itinerary",
+    "place": "Нижний Новгород",
+    "gate": "accept",
+    "check": "both days named"
+  },
+  {
+    "id": 7,
+    "genre": "museum",
+    "place": "Лондон",
+    "gate": "accept",
+    "check": "hours omitted"
+  },
+  {
+    "id": 8,
+    "genre": "story",
+    "place": "Санкт-Петербург",
+    "gate": "accept",
+    "check": "1703 not causal clash"
+  },
+  {
+    "id": 9,
+    "genre": "howto",
+    "place": "Париж",
+    "gate": "accept",
+    "check": "scoped payment"
+  },
+  {
+    "id": 10,
+    "genre": "news",
+    "place": "Лондон",
+    "gate": "accept",
+    "check": "announced ≠ in force"
+  },
+  {
+    "id": 11,
+    "genre": "comparison",
+    "place": "Санкт-Петербург",
+    "gate": "accept",
+    "check": "criteria first"
+  },
+  {
+    "id": 12,
+    "genre": "story",
+    "place": "Казань",
+    "gate": "accept",
+    "check": "legend vs document"
+  }
+]
